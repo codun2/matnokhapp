@@ -35,7 +35,7 @@ fun DriverSubscriptionsScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (St
     val scope = rememberCoroutineScope()
     val ctx = androidx.compose.ui.platform.LocalContext.current
     var subs by remember { mutableStateOf<List<DrvSub>?>(null) }
-    var busy by remember { mutableStateOf(false) }
+    var payingId by remember { mutableStateOf<Int?>(null) }
     suspend fun load() { call({ Net.api.driverSubscriptions() }, toast)?.let { subs = it.subscriptions } }
     LaunchedEffect(Unit) { load() }
 
@@ -58,16 +58,16 @@ fun DriverSubscriptionsScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (St
                         }
                         if (s.status == "pending" && s.price > 0.0) {
                             Spacer(Modifier.height(12.dp))
-                            Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(13.dp)).background(C.green).clickable(enabled = !busy) {
-                                busy = true
+                            Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(13.dp)).background(C.green).clickable(enabled = payingId == null) {
+                                payingId = s.id
                                 scope.launch {
                                     val r = call({ Net.api.driverPaySub(PaySubBody(s.id)) }, toast)
                                     val u = r?.payment_url
                                     if (u != null) runCatching { ctx.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(u)).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)) }.onFailure { toast("تعذّر فتح صفحة الدفع") }
-                                    busy = false
+                                    payingId = null
                                 }
                             }.padding(vertical = 12.dp), contentAlignment = Alignment.Center) {
-                                T(if (busy) "جارٍ فتح الدفع…" else "ادفع الآن · ﷼${s.price.toInt()}", 13, FontWeight.ExtraBold, Color.White)
+                                T(if (payingId == s.id) "جارٍ فتح الدفع…" else "ادفع الآن · ﷼${s.price.toInt()}", 13, FontWeight.ExtraBold, Color.White)
                             }
                             Spacer(Modifier.height(5.dp))
                             T("بعد الدفع عُد وحدّث الشاشة.", 10, FontWeight.Normal, C.muted)
