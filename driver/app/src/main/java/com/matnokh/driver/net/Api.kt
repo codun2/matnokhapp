@@ -28,7 +28,7 @@ data class DrvSub(val id: Int, val status: String, val service: String? = null, 
 data class DrvSubsResp(val subscriptions: List<DrvSub> = emptyList(), val has_active: Boolean = false)
 data class PaySubBody(val driver_subscription_id: Int)
 data class PayResp(val payment_url: String? = null)
-data class PayInfoResp(val bank_name: String? = null, val bank_iban: String? = null, val tap_enabled: Boolean = false)
+data class PayInfoResp(val bank_name: String? = null, val bank_iban: String? = null, val tap_enabled: Boolean = false, val bank_enabled: Boolean = true, val cash_enabled: Boolean = true)
 data class ManualPayBody(val driver_subscription_id: Int, val method: String, val receipt: String? = null)
 data class VModel(val id: Int, val name: String)
 data class VMake(val id: Int, val name: String, val models: List<VModel> = emptyList())

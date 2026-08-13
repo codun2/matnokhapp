@@ -122,11 +122,13 @@ fun DriverSubscriptionsScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (St
                     T("اختر طريقة الدفع", 17, FontWeight.Black, C.head)
                     Spacer(Modifier.height(4.dp))
                     T("﷼${s.price.toInt()} · ${s.service ?: "خدمة"}", 12, FontWeight.Medium, C.muted)
-                    if (payInfo?.tap_enabled != false) {
-                        PayOption("دفع إلكتروني (بطاقة)", "تفعيل فوري بعد الدفع") { chooserFor = null; payTap(s) }
-                    }
-                    PayOption("تحويل بنكي", "حوّل على الآيبان وارفع صورة الإشعار") { bankFor = s; chooserFor = null }
-                    PayOption("كاش", "تفعيل خلال 24 ساعة بعد التأكيد") { chooserFor = null; payCash(s) }
+                    val eOn = payInfo?.tap_enabled == true
+                    val bOn = payInfo?.bank_enabled != false
+                    val cOn = payInfo?.cash_enabled != false
+                    if (eOn) { PayOption("دفع إلكتروني (بطاقة)", "تفعيل فوري بعد الدفع") { chooserFor = null; payTap(s) } }
+                    if (bOn) { PayOption("تحويل بنكي", "حوّل على الآيبان وارفع صورة الإشعار") { bankFor = s; chooserFor = null } }
+                    if (cOn) { PayOption("كاش", "تفعيل خلال 24 ساعة بعد التأكيد") { chooserFor = null; payCash(s) } }
+                    if (!eOn && !bOn && !cOn) { Spacer(Modifier.height(12.dp)); T("لا توجد طريقة دفع متاحة حالياً — تواصل مع الإدارة", 12, FontWeight.Medium, C.muted) }
                     Spacer(Modifier.height(14.dp))
                     Box(Modifier.fillMaxWidth().clickable { chooserFor = null }.padding(vertical = 8.dp), contentAlignment = Alignment.Center) {
                         T("إلغاء", 13, FontWeight.Bold, C.muted)
