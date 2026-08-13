@@ -45,7 +45,7 @@ fun LoginScreen(onLoggedIn: () -> Unit, onRegister: () -> Unit, toast: (String) 
 
     LaunchedEffect(Unit) {
         runCatching { Net.api.loginMethods() }.onSuccess {
-            methods = it.methods.filter { m -> m != "phone_otp" }.ifEmpty { listOf("phone_password") }
+            methods = it.methods.filter { m -> m != "phone_otp" && m != "email_password" }.ifEmpty { listOf("phone_password") }
             method = methods.first()
         }
     }
