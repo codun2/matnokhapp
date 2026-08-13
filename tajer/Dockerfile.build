@@ -1,0 +1,27 @@
+FROM eclipse-temurin:17-jdk
+
+ENV ANDROID_SDK_ROOT=/opt/android-sdk
+ENV ANDROID_HOME=/opt/android-sdk
+ENV GRADLE_USER_HOME=/opt/gradle-home
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      curl unzip ca-certificates && rm -rf /var/lib/apt/lists/*
+
+# Android command-line tools
+RUN mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools && cd /tmp && \
+    curl -fsSL -o cmdtools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip && \
+    unzip -q cmdtools.zip -d ${ANDROID_SDK_ROOT}/cmdline-tools && \
+    mv ${ANDROID_SDK_ROOT}/cmdline-tools/cmdline-tools ${ANDROID_SDK_ROOT}/cmdline-tools/latest && \
+    rm cmdtools.zip
+
+ENV PATH=${PATH}:${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/platform-tools
+
+RUN yes | sdkmanager --licenses >/dev/null 2>&1 || true && \
+    sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" >/dev/null
+
+# Gradle
+RUN cd /opt && curl -fsSL -o gradle.zip https://services.gradle.org/distributions/gradle-8.9-bin.zip && \
+    unzip -q gradle.zip && rm gradle.zip && ln -s /opt/gradle-8.9/bin/gradle /usr/local/bin/gradle
+
+WORKDIR /project

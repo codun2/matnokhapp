@@ -1,0 +1,19 @@
+# Gradle / build
+**/.gradle/
+**/build/
+**/.kotlin/
+**/.cxx/
+# Android local
+**/local.properties
+# IDE
+.idea/
+*.iml
+# OS junk
+.DS_Store
+._*
+# keystores/secrets (safety)
+*.jks
+*.keystore
+google-services.json
+# manual timestamped backups
+*.bak-*

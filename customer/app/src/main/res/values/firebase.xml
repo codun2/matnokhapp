@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="fcm_project_id" translatable="false">mtnokh-5642e</string>
+    <string name="fcm_application_id" translatable="false">1:829330799561:android:ec2e9a4e7e54796b004618</string>
+    <string name="fcm_api_key" translatable="false">AIzaSyADmqjpLCvWXMVD14hFNfi1tUAc-62kcQ4</string>
+    <string name="fcm_sender_id" translatable="false">829330799561</string>
+</resources>
