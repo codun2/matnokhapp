@@ -89,6 +89,10 @@ data class OrderAddon(val name: String, val price: Double)
 data class OrderItemDto(val id: Int, val name: String, val price: Double, val qty: Int, val addons: List<OrderAddon> = emptyList(), val line_total: Double)
 data class OrderDetail(val id: Int, val order_no: String?, val customer: String, val phone: String?, val branch: String?, val status: String, val items_total: Double, val delivery_fee: Double, val discount: Double, val total: Double, val payment_method: String?, val is_paid: Boolean, val drop_address: String?, val dt: String?)
 data class OrderDetailResp(val order: OrderDetail, val items: List<OrderItemDto>)
+data class ChatMsg(val id: Int, val sender: String? = null, val body: String? = null, val image: String? = null, val at: String? = null, val mine: Boolean = false)
+data class ChatResp(val thread_id: Int = 0, val locked: Boolean = false, val messages: List<ChatMsg> = emptyList())
+data class ChatSendBody(val body: String? = null, val image: String? = null)
+data class ChatSendResp(val id: Int = 0)
 
 // ── بوابات الدفع ──
 data class PayField(val key: String, val label: String, val secret: Boolean = false)
@@ -120,6 +124,8 @@ interface MerchantApi {
     @GET("merchant/login-method") suspend fun loginMethods(): MethodsResp
     @POST("merchant/register") suspend fun register(@Body body: RegisterBody): MsgResp
     @Multipart @POST("merchant/register-upload") suspend fun registerUpload(@Part file: MultipartBody.Part): UploadResp
+    @GET("merchant/chat/{id}") suspend fun chatShow(@Path("id") id: Int, @Query("after") after: Int = 0): ChatResp
+    @POST("merchant/chat/{id}") suspend fun chatSend(@Path("id") id: Int, @Body b: ChatSendBody): ChatSendResp
     @POST("merchant/request-otp") suspend fun requestOtp(@Body body: Map<String, String>): MsgResp
     @POST("merchant/login") suspend fun login(@Body body: LoginBody): LoginResp
     @GET("merchant/me") suspend fun me(): MeResp

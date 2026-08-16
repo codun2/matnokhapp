@@ -38,6 +38,7 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit
     var tab by remember { mutableStateOf("open") }
     var orders by remember { mutableStateOf<List<OrderRow>?>(null) }
     var detail by remember { mutableStateOf<OrderDetailResp?>(null) }
+    var chatFor by remember { mutableStateOf<Pair<Int, String>?>(null) }
 
     suspend fun load() { orders = null; call({ Net.api.orders(tab) }, toast)?.let { orders = it.orders } }
     LaunchedEffect(tab) { load() }
@@ -52,6 +53,9 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit
     }
 
     fun act(block: suspend () -> Unit) = scope.launch { block(); load() }
+
+    val chatCo = chatFor
+    if (chatCo != null) { ChatScreen(chatCo.first, "محادثة ${chatCo.second}", { chatFor = null }, onMenu, toast); return }
 
     Column(Modifier.fillMaxSize().background(C.bg)) {
         ScreenHeader("طلبات المتجر", onBack, onMenu)
@@ -102,7 +106,7 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit
         }
     }
 
-    detail?.let { OrderDetailDialog(it, onClose = { detail = null }) }
+    detail?.let { OrderDetailDialog(it, onClose = { detail = null }, onChat = { d -> detail = null; chatFor = d.order.id to d.order.customer }) }
 }
 
 @Composable
@@ -157,7 +161,7 @@ private fun OrderCard(o: OrderRow, onOpen: () -> Unit, onAccept: () -> Unit, onR
 private fun payLabel(m: String?): String = when (m) { "card", "tap" -> "بطاقة ✓"; "cash" -> "نقداً"; else -> m ?: "—" }
 
 @Composable
-private fun OrderDetailDialog(d: OrderDetailResp, onClose: () -> Unit) {
+private fun OrderDetailDialog(d: OrderDetailResp, onClose: () -> Unit, onChat: ((OrderDetailResp) -> Unit)? = null) {
     Box(Modifier.fillMaxSize().background(Color(0x80253A34)).clickable(onClick = onClose), contentAlignment = Alignment.Center) {
         Column(Modifier.padding(20.dp).fillMaxWidth().widthIn(max = 360.dp).heightIn(max = 620.dp)
             .clip(RoundedCornerShape(24.dp)).background(C.bg).clickable(enabled = false) {}) {
@@ -231,6 +235,15 @@ private fun OrderInfoBar(d: OrderDetailResp) {
                 .padding(vertical = 11.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
                 Ic(R.drawable.ic_phone, 15.dp, C.greenD); Spacer(Modifier.width(7.dp))
                 T("اتصال بالزبون · $phone", 12, FontWeight.ExtraBold, C.greenD)
+            }
+        }
+        if (onChat != null) {
+            Spacer(Modifier.height(8.dp))
+            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Color(0xFFEEF4EF))
+                .clickable { onChat(d) }
+                .padding(vertical = 11.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                Ic(R.drawable.ic_msg, 15.dp, C.greenD); Spacer(Modifier.width(7.dp))
+                T("محادثة الزبون", 12, FontWeight.ExtraBold, C.greenD)
             }
         }
     }
