@@ -15,6 +15,7 @@ object NotificationBus {
     // توجيه عند الضغط على الإشعار (من الخلفية أو من النظام)
     var pendingScreen by mutableStateOf<String?>(null)
     var pendingOrderId by mutableStateOf<Int?>(null)
+    var pendingChatOrderId by mutableStateOf<Int?>(null)
 
     fun push(title: String, body: String, type: String?, orderId: Int?) {
         incoming = InAppMsg(title, body, type, orderId)
@@ -25,6 +26,7 @@ object NotificationBus {
 
     /** يُستدعى عند الضغط على إشعار: يحدّد الوجهة. */
     fun routeFrom(type: String?, orderId: Int?) {
+        if (type == "chat") { if (orderId != null) pendingChatOrderId = orderId; pendingScreen = "orders"; return }
         if (orderId != null) pendingOrderId = orderId
         pendingScreen = when {
             orderId != null || type == "new_order" || type == "order_update" -> "orders"

@@ -51,6 +51,14 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit
             call({ Net.api.orderDetail(id) }, toast)?.let { detail = it }
         }
     }
+    val pendingChat = com.matnokh.tajer.net.NotificationBus.pendingChatOrderId
+    LaunchedEffect(pendingChat) {
+        pendingChat?.let { id ->
+            com.matnokh.tajer.net.NotificationBus.pendingChatOrderId = null
+            val d = call({ Net.api.orderDetail(id) }, toast)
+            chatFor = id to (d?.order?.customer ?: "الزبون")
+        }
+    }
 
     fun act(block: suspend () -> Unit) = scope.launch { block(); load() }
 
