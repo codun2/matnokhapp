@@ -105,6 +105,7 @@ fun Root() {
                             onFinish = { scope.launch { repoNow(toast); repoPast(toast); repoDash(toast) }; screen = "home" }, onExpand = { screen = "routemap" })
                         "earn" -> EarnScreen({ screen = "home" }, openMenu, toast)
                         "profile" -> ProfileScreen({ screen = "home" }, openMenu, onLogout = { logout() }, toast, onNav = { screen = it })
+                        "company" -> CompanyScreen({ screen = "profile" }, openMenu, toast)
                         "vehicle" -> DriverInfoScreen("vehicle", { screen = "profile" }, openMenu, toast)
                         "documents" -> DriverInfoScreen("documents", { screen = "profile" }, openMenu, toast)
                         "myservices" -> DriverInfoScreen("myservices", { screen = "profile" }, openMenu, toast)

@@ -38,6 +38,12 @@ fun ProfileScreen(onBack: () -> Unit, onMenu: () -> Unit, onLogout: () -> Unit, 
                 Kpi("﷼${Drv.balance.value}", "الرصيد", C.terraText, Modifier.weight(1f))
             }
             Spacer(Modifier.height(14.dp))
+            if (Drv.companyName.value.isNotBlank()) {
+                Column(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp))) {
+                    PRow(Grad.green, R.drawable.ic_shop, "شركتي", "التابع لـ ${Drv.companyName.value} · السحوبات والوصولات", last = true) { onNav("company") }
+                }
+                Spacer(Modifier.height(14.dp))
+            }
             Column(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp))) {
                 PRow(Grad.green, R.drawable.ic_van, "مركبتي", Drv.vehicle.value + (Drv.plate.value?.takeIf { it.isNotBlank() }?.let { " · $it" } ?: "")) { onNav("vehicle") }
                 PRow(Grad.blue, R.drawable.ic_doc, "مستنداتي", "الهوية ورخصة القيادة") { onNav("documents") }

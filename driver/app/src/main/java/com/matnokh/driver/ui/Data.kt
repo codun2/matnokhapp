@@ -107,6 +107,8 @@ object Drv {
     var passportPhoto = mutableStateOf<String?>(null)
     var vehicle = mutableStateOf("مركبتي")
     var city = mutableStateOf("—")
+    var companyId = mutableStateOf<Int?>(null)
+    var companyName = mutableStateOf("")
     var driverLat = mutableStateOf<Double?>(null)
     var driverLng = mutableStateOf<Double?>(null)
 
@@ -129,6 +131,7 @@ suspend fun repoMe(toast: (String) -> Unit) {
         Drv.nationalId.value = d.national_id; Drv.license.value = d.license_number
         Drv.services.clear(); d.services?.let { Drv.services.addAll(it) }
         Drv.licensePhoto.value = d.license_photo; Drv.idPhoto.value = d.national_id_photo; Drv.passportPhoto.value = d.passport_photo
+        Drv.companyId.value = d.delivery_company_id; Drv.companyName.value = d.company_name ?: ""
     }
 }
 suspend fun repoMyOffers(toast: (String) -> Unit): List<Job> =

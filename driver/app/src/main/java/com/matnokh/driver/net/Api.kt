@@ -18,6 +18,7 @@ data class DriverBrief(
     val lat: Double? = null, val lng: Double? = null,
     val vehicle_photo: String? = null, val national_id: String? = null, val license_number: String? = null, val services: List<String>? = null,
     val license_photo: String? = null, val national_id_photo: String? = null, val passport_photo: String? = null,
+    val delivery_company_id: Int? = null, val company_name: String? = null,
 )
 data class MethodsResp(val methods: List<String>)
 data class SvcLite(val id: Int, val name: String, val key: String, val vehicle_sizes: List<String> = emptyList())
@@ -43,6 +44,9 @@ data class StoreOrderDto(val id: Int, val order_no: String?, val store: String?,
 data class StoreOrdersResp(val orders: List<StoreOrderDto>)
 data class MsgResp(val message: String?, val status: String?, val dev_code: String?)
 data class MeResp(val driver: DriverBrief?)
+data class CompanyLite(val id: Int = 0, val name: String = "", val phone: String? = null)
+data class SettlementItem(val amount: Double = 0.0, val orders_count: Int = 0, val settled_at: String? = null, val method: String? = null, val reference: String? = null, val note: String? = null, val payment_proof: String? = null)
+data class CompanyAccountResp(val company: CompanyLite? = null, val balance: Double = 0.0, val settlements: List<SettlementItem> = emptyList())
 data class UploadResp(val url: String?)
 data class ProfileBody(val name: String? = null, val email: String? = null, val avatar: String? = null)
 
@@ -83,6 +87,7 @@ interface DriverApi {
     @Multipart @POST("driver/register-upload") suspend fun registerUpload(@Part file: MultipartBody.Part): UploadResp
     @POST("driver/request-otp") suspend fun requestOtp(@Body b: Map<String, String>): MsgResp
     @GET("driver/me") suspend fun me(): MeResp
+    @GET("driver/company-account") suspend fun companyAccount(): CompanyAccountResp
     @Multipart @POST("driver/uploads") suspend fun upload(@Part file: MultipartBody.Part): UploadResp
     @PATCH("driver/profile") suspend fun updateProfile(@Body b: ProfileBody): MsgResp
     @POST("driver/logout") suspend fun logout(): MsgResp
