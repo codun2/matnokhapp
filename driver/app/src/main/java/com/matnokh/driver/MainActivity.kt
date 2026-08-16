@@ -89,7 +89,7 @@ fun Root() {
     }
     Box(Modifier.fillMaxSize().background(C.bg)) {
         when (screen) {
-            "splash" -> SplashScreen(onStart = { if (Session.isLoggedIn()) goHomeLoaded() else screen = "login" })
+            "splash" -> SplashScreen(onStart = { if (Session.isLoggedIn()) { com.matnokh.driver.net.Fcm.registerToken(fcmCtx); goHomeLoaded() } else screen = "login" })
             "login" -> LoginScreen(onLoggedIn = { goHomeLoaded(); com.matnokh.driver.net.Fcm.registerToken(fcmCtx) }, onRegister = { screen = "register" }, toast = toast)
             "register" -> RegisterScreen(onDone = { screen = "login" }, onBack = { screen = "login" }, toast = toast)
             else -> Column(Modifier.fillMaxSize()) {

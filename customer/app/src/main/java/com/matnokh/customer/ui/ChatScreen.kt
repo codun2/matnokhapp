@@ -60,7 +60,7 @@ fun ChatScreen(kind: String, orderId: Int, type: String, title: String, onBack: 
             hint = null; locked = r.locked
             if (r.messages.isNotEmpty()) {
                 msgs.addAll(r.messages.filter { m -> msgs.none { it.id == m.id } })
-                listState.animateScrollToItem((msgs.size - 1).coerceAtLeast(0))
+                runCatching { listState.scrollToItem(0) }
             }
         }
     }
@@ -71,8 +71,8 @@ fun ChatScreen(kind: String, orderId: Int, type: String, title: String, onBack: 
         if (sending) return
         scope.launch {
             sending = true
-            chatApi({ Net.api.chatSend(kind, orderId, type, ChatSendBody(body, image)) }, toast)?.let { input = ""; poll() }
-            sending = false
+            try { chatApi({ Net.api.chatSend(kind, orderId, type, ChatSendBody(body, image)) }, toast)?.let { input = ""; poll() } }
+            finally { sending = false }
         }
     }
 
@@ -93,9 +93,9 @@ fun ChatScreen(kind: String, orderId: Int, type: String, title: String, onBack: 
     Column(Modifier.fillMaxSize().background(C.bg)) {
         ScreenHeader(title, onBack, onMenu)
         hint?.let { Box(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 6.dp), contentAlignment = Alignment.Center) { T(it, 11, FontWeight.Bold, C.muted) } }
-        LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, reverseLayout = true, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             item { Spacer(Modifier.height(4.dp)) }
-            items(msgs, key = { it.id }) { m ->
+            items(msgs.reversed(), key = { it.id }) { m ->
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = if (m.mine) Arrangement.End else Arrangement.Start) {
                     Column(
                         Modifier.widthIn(max = 290.dp).clip(RoundedCornerShape(16.dp))
