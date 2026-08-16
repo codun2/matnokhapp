@@ -178,7 +178,7 @@ private fun OrderDetailDialog(d: OrderDetailResp, onClose: () -> Unit, onChat: (
                 d.order.drop_address?.let { Spacer(Modifier.height(6.dp)); Row(verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_pin, 13.dp, Color.White); Spacer(Modifier.width(5.dp)); T(it, 11, FontWeight.Medium, Color.White.copy(alpha = .9f), maxLines = 1) } }
             }
             // معلومات الطلب + الاتصال بالزبون
-            OrderInfoBar(d)
+            OrderInfoBar(d, onChat)
             // العناصر
             Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 14.dp)) {
                 T("عناصر الطلب (${d.items.size})", 12, FontWeight.ExtraBold, C.head)
@@ -211,7 +211,7 @@ private fun OrderDetailDialog(d: OrderDetailResp, onClose: () -> Unit, onChat: (
 }
 
 @Composable
-private fun OrderInfoBar(d: OrderDetailResp) {
+private fun OrderInfoBar(d: OrderDetailResp, onChat: ((OrderDetailResp) -> Unit)? = null) {
     val ctx = LocalContext.current
     val o = d.order
     Column(Modifier.fillMaxWidth().background(C.card).padding(horizontal = 18.dp, vertical = 12.dp)) {
