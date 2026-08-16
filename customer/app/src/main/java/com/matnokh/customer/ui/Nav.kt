@@ -43,6 +43,8 @@ object Sel {
     var chatType by mutableStateOf("driver")
     var chatTitle by mutableStateOf("محادثة")
     var chatBack by mutableStateOf("orders")
+    var deeplinkKind by mutableStateOf<String?>(null)
+    var deeplinkChatType by mutableStateOf<String?>(null)
     val service get() = CData.services.firstOrNull { it.id == serviceId } ?: CData.services[0]
 }
 

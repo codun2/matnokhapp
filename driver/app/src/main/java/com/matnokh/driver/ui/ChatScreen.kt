@@ -84,7 +84,7 @@ fun ChatScreen(kind: String, orderId: Int, title: String, onBack: () -> Unit, on
         }
     }
 
-    Column(Modifier.fillMaxSize().background(C.bg).imePadding()) {
+    Column(Modifier.fillMaxSize().background(C.bg)) {
         ScreenHeader(title, onBack, onMenu)
         LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             item { Spacer(Modifier.height(4.dp)) }

@@ -24,7 +24,7 @@ class MatnokhMessagingService : FirebaseMessagingService() {
         val body = message.notification?.body ?: message.data["body"] ?: ""
         val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) nm.createNotificationChannel(NotificationChannel("matnokh_default", "إشعارات مطنوخ", NotificationManager.IMPORTANCE_HIGH))
-        val intent = packageManager.getLaunchIntentForPackage(packageName)?.apply { flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP; putExtra("open", message.data["open"] ?: "orders"); putExtra("order_id", message.data["order_id"]) }
+        val intent = packageManager.getLaunchIntentForPackage(packageName)?.apply { flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP; putExtra("open", message.data["open"] ?: "orders"); putExtra("order_id", message.data["order_id"]); putExtra("kind", message.data["kind"]); putExtra("chat_type", message.data["chat_type"]) }
         val pi = PendingIntent.getActivity(this, 0, intent ?: Intent(), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         nm.notify(System.currentTimeMillis().toInt(), NotificationCompat.Builder(this, "matnokh_default")
             .setSmallIcon(R.drawable.ic_launcher_foreground).setContentTitle(title).setContentText(body)

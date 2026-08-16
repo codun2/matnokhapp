@@ -28,6 +28,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         Session.init(this)
         DrvNotif.open = intent?.getStringExtra("open")
+        DrvNotif.kind = intent?.getStringExtra("kind")
+        DrvNotif.orderId = intent?.getStringExtra("order_id")?.toIntOrNull()
         enableEdgeToEdge()
         setContent { MatnokhTheme { Root() } }
     }
@@ -36,10 +38,12 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         DrvNotif.open = intent.getStringExtra("open")
+        DrvNotif.kind = intent.getStringExtra("kind")
+        DrvNotif.orderId = intent.getStringExtra("order_id")?.toIntOrNull()
     }
 }
 
-object DrvNotif { var open by mutableStateOf<String?>(null) }
+object DrvNotif { var open by mutableStateOf<String?>(null); var kind: String? = null; var orderId: Int? = null }
 
 @Composable
 fun Root() {
@@ -103,8 +107,12 @@ fun Root() {
                         "active" -> ActiveScreen(Drv.nowOrders.firstOrNull(), Drv.fare.value, { screen = "home" }, openMenu, toast,
                             onStatus = { st -> scope.launch { Drv.nowOrders.firstOrNull()?.let { o -> if (o.isStore) { val mapped = if (st == "loaded") "picked_up" else st; if (repoStoreStatus(o.oid, mapped, toast)) { if (st == "delivered") Drv.activeStep.value = 4 else { val idx = Drv.nowOrders.indexOfFirst { it.oid == o.oid }; if (idx >= 0) Drv.nowOrders[idx] = Drv.nowOrders[idx].copy(status = mapped); Drv.activeStep.value = statusToStep(mapped) } } } else { if (repoStatus(o.oid, st, toast)) { if (st == "delivered") Drv.activeStep.value = 4 else { repoActive(toast) } } } } } },
                             onFinish = { scope.launch { repoNow(toast); repoPast(toast); repoDash(toast) }; screen = "home" }, onExpand = { screen = "routemap" },
-                            onChat = { if (Drv.nowOrders.isNotEmpty()) screen = "chat" })
-                        "chat" -> Drv.nowOrders.firstOrNull()?.let { j -> ChatScreen(if (j.isStore) "store" else "transport", j.oid, "محادثة ${j.cust}", { screen = "active" }, openMenu, toast) } ?: run { screen = "home" }
+                            onChat = { if (Drv.nowOrders.isNotEmpty()) { DrvNotif.kind = null; DrvNotif.orderId = null; screen = "chat" } })
+                        "chat" -> {
+                            val nk = DrvNotif.kind; val nid = DrvNotif.orderId
+                            if (nid != null) ChatScreen(nk ?: "store", nid, "محادثة الزبون", { DrvNotif.kind = null; DrvNotif.orderId = null; screen = "home" }, openMenu, toast)
+                            else Drv.nowOrders.firstOrNull()?.let { j -> ChatScreen(if (j.isStore) "store" else "transport", j.oid, "محادثة ${j.cust}", { screen = "active" }, openMenu, toast) } ?: run { screen = "home" }
+                        }
                         "earn" -> EarnScreen({ screen = "home" }, openMenu, toast)
                         "profile" -> ProfileScreen({ screen = "home" }, openMenu, onLogout = { logout() }, toast, onNav = { screen = it })
                         "company" -> CompanyScreen({ screen = "profile" }, openMenu, toast)

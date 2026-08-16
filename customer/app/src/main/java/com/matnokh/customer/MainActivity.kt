@@ -47,6 +47,8 @@ class MainActivity : ComponentActivity() {
     private fun readNotif(i: android.content.Intent?) {
         i?.getStringExtra("open")?.let { Sel.deeplink = it }
         i?.getStringExtra("order_id")?.toIntOrNull()?.let { Sel.deeplinkOrderId = it }
+        i?.getStringExtra("kind")?.let { Sel.deeplinkKind = it }
+        i?.getStringExtra("chat_type")?.let { Sel.deeplinkChatType = it }
     }
 }
 
@@ -74,7 +76,7 @@ fun Root() {
 
     LaunchedEffect(screen, Sel.deeplink) {
         val d = Sel.deeplink
-        if (d != null && Session.isLoggedIn() && screen !in setOf("splash", "login", "register")) { if (d == "transportbids") Sel.transportId = Sel.deeplinkOrderId; screen = d; Sel.deeplink = null }
+        if (d != null && Session.isLoggedIn() && screen !in setOf("splash", "login", "register")) { if (d == "transportbids") Sel.transportId = Sel.deeplinkOrderId; if (d == "chat") { Sel.chatKind = Sel.deeplinkKind ?: "store"; Sel.chatId = Sel.deeplinkOrderId; Sel.chatType = if (Sel.deeplinkChatType == "cm") "merchant" else "driver"; Sel.chatTitle = if (Sel.deeplinkChatType == "cm") "محادثة المتجر" else "محادثة المندوب"; Sel.chatBack = "orders" }; screen = d; Sel.deeplink = null }
     }
     fun openStore(s: UiStore) { Sel.store = s; Sel.sectionIdx = 0; Sel.sectionStoreId = s.id; Sel.storeBack = if (screen in setOf("home", "stores", "nearby")) screen else "home"; screen = "store"; scope.launch { call({ Repo.loadStore(s.id) }, toast) } }
     fun openOffer(o: UiOffer) { Sel.store = UiStore(o.storeId, o.storeName, o.storeCategory, o.storeLogo, "", true, 0, ""); Sel.product = o.product; Sel.prodBack = "offersall"; screen = "product" }
