@@ -20,6 +20,10 @@ class MatnokhMessagingService : FirebaseMessagingService() {
         if (Session.isLoggedIn()) CoroutineScope(Dispatchers.IO).launch { runCatching { Net.api.registerDeviceToken(mapOf("token" to token, "platform" to "android")) } }
     }
     override fun onMessageReceived(message: RemoteMessage) {
+        if (message.data["type"] == "chat") {
+            val k = (message.data["kind"] ?: "") + ":" + (message.data["order_id"] ?: "") + ":" + (message.data["chat_type"] ?: "")
+            if (com.matnokh.driver.ui.ChatOpen.key == k) return
+        }
         val title = message.notification?.title ?: message.data["title"] ?: "مطنوخ"
         val body = message.notification?.body ?: message.data["body"] ?: ""
         val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

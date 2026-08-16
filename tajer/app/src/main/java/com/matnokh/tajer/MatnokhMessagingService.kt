@@ -29,6 +29,10 @@ class MatnokhMessagingService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
+        if (message.data["type"] == "chat") {
+            val k = (message.data["kind"] ?: "") + ":" + (message.data["order_id"] ?: "") + ":" + (message.data["chat_type"] ?: "")
+            if (com.matnokh.tajer.ui.ChatOpen.key == k) return
+        }
         val title = message.notification?.title ?: message.data["title"] ?: "مطنوخ"
         val body = message.notification?.body ?: message.data["body"] ?: ""
         val type = message.data["type"]

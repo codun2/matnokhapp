@@ -36,6 +36,9 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
+/** المحادثة المفتوحة حالياً — تكتم إشعارات نفس المحادثة أثناء وجود المستخدم داخلها. */
+object ChatOpen { @Volatile var key: String? = null }
+
 /** دردشة المندوب مع الزبون — مربوطة بالطلب، تحديث كل ٣ ثوانٍ + دعم الصور. */
 @Composable
 fun ChatScreen(kind: String, orderId: Int, title: String, onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit) {
@@ -59,6 +62,7 @@ fun ChatScreen(kind: String, orderId: Int, title: String, onBack: () -> Unit, on
         }
     }
 
+    DisposableEffect(kind, orderId) { ChatOpen.key = "$kind:$orderId:dc"; onDispose { ChatOpen.key = null } }
     LaunchedEffect(Unit) { while (true) { poll(); delay(3000) } }
 
     fun sendNow(body: String?, image: String?) {

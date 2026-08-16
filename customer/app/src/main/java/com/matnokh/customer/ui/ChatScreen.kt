@@ -40,6 +40,9 @@ private suspend fun <T> chatApi(block: suspend () -> T, onErr: (String) -> Unit)
 catch (e: retrofit2.HttpException) { onErr(errorMessage(e) ?: "تعذّر تنفيذ العملية"); null }
 catch (e: Exception) { onErr("تعذّر الاتصال بالخادم"); null }
 
+/** المحادثة المفتوحة حالياً — تكتم إشعارات نفس المحادثة أثناء وجود المستخدم داخلها. */
+object ChatOpen { @Volatile var key: String? = null }
+
 /** دردشة الزبون (مع المندوب أو المتجر) — مربوطة بالطلب، تحديث كل ٣ ثوانٍ + صور. */
 @Composable
 fun ChatScreen(kind: String, orderId: Int, type: String, title: String, onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit) {
@@ -65,6 +68,7 @@ fun ChatScreen(kind: String, orderId: Int, type: String, title: String, onBack: 
         }
     }
 
+    DisposableEffect(kind, orderId, type) { ChatOpen.key = "$kind:$orderId:" + (if (type == "merchant" || type == "cm") "cm" else "dc"); onDispose { ChatOpen.key = null } }
     LaunchedEffect(Unit) { poll(notify = true); while (true) { delay(3000); poll() } }
 
     fun sendNow(body: String?, image: String?) {
