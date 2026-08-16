@@ -102,7 +102,9 @@ fun Root() {
                         "wait" -> WaitScreen(bidJob?.cust ?: "الزبون", bidJob?.let { Drv.received.firstOrNull { o -> o.oid == it.oid }?.price ?: it.price } ?: 0, { screen = "home" }, openMenu)
                         "active" -> ActiveScreen(Drv.nowOrders.firstOrNull(), Drv.fare.value, { screen = "home" }, openMenu, toast,
                             onStatus = { st -> scope.launch { Drv.nowOrders.firstOrNull()?.let { o -> if (o.isStore) { val mapped = if (st == "loaded") "picked_up" else st; if (repoStoreStatus(o.oid, mapped, toast)) { if (st == "delivered") Drv.activeStep.value = 4 else { val idx = Drv.nowOrders.indexOfFirst { it.oid == o.oid }; if (idx >= 0) Drv.nowOrders[idx] = Drv.nowOrders[idx].copy(status = mapped); Drv.activeStep.value = statusToStep(mapped) } } } else { if (repoStatus(o.oid, st, toast)) { if (st == "delivered") Drv.activeStep.value = 4 else { repoActive(toast) } } } } } },
-                            onFinish = { scope.launch { repoNow(toast); repoPast(toast); repoDash(toast) }; screen = "home" }, onExpand = { screen = "routemap" })
+                            onFinish = { scope.launch { repoNow(toast); repoPast(toast); repoDash(toast) }; screen = "home" }, onExpand = { screen = "routemap" },
+                            onChat = { if (Drv.nowOrders.isNotEmpty()) screen = "chat" })
+                        "chat" -> Drv.nowOrders.firstOrNull()?.let { j -> ChatScreen(if (j.isStore) "store" else "transport", j.oid, "محادثة ${j.cust}", { screen = "active" }, openMenu, toast) } ?: run { screen = "home" }
                         "earn" -> EarnScreen({ screen = "home" }, openMenu, toast)
                         "profile" -> ProfileScreen({ screen = "home" }, openMenu, onLogout = { logout() }, toast, onNav = { screen = it })
                         "company" -> CompanyScreen({ screen = "profile" }, openMenu, toast)

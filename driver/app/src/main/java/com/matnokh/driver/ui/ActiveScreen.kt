@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.matnokh.driver.R
 
 @Composable
-fun ActiveScreen(job: Job?, fare: Int, onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit, onStatus: (String) -> Unit, onFinish: () -> Unit, onExpand: () -> Unit) {
+fun ActiveScreen(job: Job?, fare: Int, onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit, onStatus: (String) -> Unit, onFinish: () -> Unit, onExpand: () -> Unit, onChat: () -> Unit = {}) {
     if (job == null) {
         Column(Modifier.fillMaxSize().background(C.bg)) {
             ScreenHeader("الطلب النشط", onBack, onMenu)
@@ -85,7 +85,7 @@ fun ActiveScreen(job: Job?, fare: Int, onBack: () -> Unit, onMenu: () -> Unit, t
                     Box(Modifier.size(52.dp).clip(RoundedCornerShape(17.dp)).background(Grad.terra), contentAlignment = Alignment.Center) { T(job.av, 16, FontWeight.ExtraBold, Color.White) }
                     Spacer(Modifier.width(13.dp))
                     Column(Modifier.weight(1f)) { T(job.cust, 14, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T("${job.to} · أجرتك ﷼$fare", 11, FontWeight.Normal, C.muted, maxLines = 1) }
-                    Box(Modifier.size(44.dp).clip(RoundedCornerShape(15.dp)).background(C.card2).clickable { toast("محادثة الزبون") }, contentAlignment = Alignment.Center) { Ic(R.drawable.ic_msg, 17.dp, Color(0xFF5D6B62)) }
+                    Box(Modifier.size(44.dp).clip(RoundedCornerShape(15.dp)).background(C.card2).clickable { onChat() }, contentAlignment = Alignment.Center) { Ic(R.drawable.ic_msg, 17.dp, Color(0xFF5D6B62)) }
                     Spacer(Modifier.width(9.dp))
                     Box(Modifier.size(44.dp).clip(RoundedCornerShape(15.dp)).background(Grad.green), contentAlignment = Alignment.Center) { Box(Modifier.clickable { toast("اتصال بالزبون") }, contentAlignment = Alignment.Center) { Ic(R.drawable.ic_phone, 17.dp, Color.White) } }
                 }

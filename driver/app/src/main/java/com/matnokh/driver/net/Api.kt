@@ -47,6 +47,10 @@ data class MeResp(val driver: DriverBrief?)
 data class CompanyLite(val id: Int = 0, val name: String = "", val phone: String? = null)
 data class SettlementItem(val amount: Double = 0.0, val orders_count: Int = 0, val settled_at: String? = null, val method: String? = null, val reference: String? = null, val note: String? = null, val payment_proof: String? = null)
 data class CompanyAccountResp(val company: CompanyLite? = null, val balance: Double = 0.0, val settlements: List<SettlementItem> = emptyList())
+data class ChatMsg(val id: Int, val sender: String? = null, val body: String? = null, val image: String? = null, val at: String? = null, val mine: Boolean = false)
+data class ChatResp(val thread_id: Int = 0, val locked: Boolean = false, val messages: List<ChatMsg> = emptyList())
+data class ChatSendBody(val body: String? = null, val image: String? = null)
+data class ChatSendResp(val id: Int = 0)
 data class UploadResp(val url: String?)
 data class ProfileBody(val name: String? = null, val email: String? = null, val avatar: String? = null)
 
@@ -88,6 +92,8 @@ interface DriverApi {
     @POST("driver/request-otp") suspend fun requestOtp(@Body b: Map<String, String>): MsgResp
     @GET("driver/me") suspend fun me(): MeResp
     @GET("driver/company-account") suspend fun companyAccount(): CompanyAccountResp
+    @GET("driver/chat/{kind}/{id}") suspend fun chatShow(@Path("kind") kind: String, @Path("id") id: Int, @Query("after") after: Int = 0): ChatResp
+    @POST("driver/chat/{kind}/{id}") suspend fun chatSend(@Path("kind") kind: String, @Path("id") id: Int, @Body b: ChatSendBody): ChatSendResp
     @Multipart @POST("driver/uploads") suspend fun upload(@Part file: MultipartBody.Part): UploadResp
     @PATCH("driver/profile") suspend fun updateProfile(@Body b: ProfileBody): MsgResp
     @POST("driver/logout") suspend fun logout(): MsgResp
