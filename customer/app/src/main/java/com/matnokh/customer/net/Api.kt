@@ -18,6 +18,10 @@ data class PricingResp(val km_price_min: Double = 1.0, val km_price_max: Double 
 data class FavResp(val favorite: Boolean = false)
 data class IdsResp(val ids: List<Int> = emptyList())
 data class UploadResp(val url: String?)
+data class ChatMsg(val id: Int, val sender: String? = null, val body: String? = null, val image: String? = null, val at: String? = null, val mine: Boolean = false)
+data class ChatResp(val thread_id: Int = 0, val locked: Boolean = false, val messages: List<ChatMsg> = emptyList())
+data class ChatSendBody(val body: String? = null, val image: String? = null)
+data class ChatSendResp(val id: Int = 0)
 data class ProfileBody(val name: String? = null, val email: String? = null, val avatar: String? = null, val search_radius_km: Double? = null)
 data class AddressDto(val id: Int, val type: String, val label: String, val address: String? = null, val lat: Double? = null, val lng: Double? = null, val is_default: Boolean = false)
 data class AddressesResp(val addresses: List<AddressDto>)
@@ -76,6 +80,8 @@ interface CustomerApi {
     @GET("customer/favorite-ids") suspend fun favoriteIds(): IdsResp
     @POST("customer/favorites/{id}") suspend fun toggleFavorite(@Path("id") id: Int): FavResp
     @Multipart @POST("customer/uploads") suspend fun upload(@Part file: MultipartBody.Part): UploadResp
+    @GET("customer/chat/{kind}/{id}/{type}") suspend fun chatShow(@Path("kind") kind: String, @Path("id") id: Int, @Path("type") type: String, @Query("after") after: Int = 0): ChatResp
+    @POST("customer/chat/{kind}/{id}/{type}") suspend fun chatSend(@Path("kind") kind: String, @Path("id") id: Int, @Path("type") type: String, @Body b: ChatSendBody): ChatSendResp
     @PATCH("customer/profile") suspend fun updateProfile(@Body b: ProfileBody): AuthResp
     @GET("customer/addresses") suspend fun addresses(): AddressesResp
     @POST("customer/addresses") suspend fun addAddress(@Body b: AddressBody): MsgResp

@@ -328,7 +328,7 @@ private fun DetailRow(label: String, value: String, strong: Boolean = false) {
 }
 
 @Composable
-private fun DriverCard(name: String?, rating: Double, vehicle: String?, phone: String?) {
+private fun DriverCard(name: String?, rating: Double, vehicle: String?, phone: String?, onChat: (() -> Unit)? = null) {
     OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), PaddingValues(14.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(46.dp).clip(CircleShape).background(Grad.sand), contentAlignment = Alignment.Center) { T((name ?: "?").take(2), 15, FontWeight.ExtraBold, Color(0xFF6B5335)) }
@@ -338,6 +338,10 @@ private fun DriverCard(name: String?, rating: Double, vehicle: String?, phone: S
                 Spacer(Modifier.height(2.dp))
                 T("\u2605 " + String.format("%.1f", rating) + (if (!vehicle.isNullOrBlank()) " \u00b7 " + vehLabel(vehicle) else ""), 11, FontWeight.Normal, C.muted)
                 if (!phone.isNullOrBlank()) { val dialCtx = androidx.compose.ui.platform.LocalContext.current; val ph = phone; T(ph, 11, FontWeight.Medium, C.blueText, Modifier.clickable { runCatching { dialCtx.startActivity(android.content.Intent(android.content.Intent.ACTION_DIAL, android.net.Uri.parse("tel:" + ph)).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)) } }) }
+            }
+            if (onChat != null) {
+                Spacer(Modifier.width(8.dp))
+                Box(Modifier.size(42.dp).clip(RoundedCornerShape(14.dp)).background(Grad.green).clickable { onChat() }, contentAlignment = Alignment.Center) { Ic(R.drawable.ic_msg, 16.dp, Color.White) }
             }
         }
     }
@@ -355,7 +359,15 @@ private fun StoreDetail(o: OrderDetail, onAction: (String, Int) -> Unit) {
         }
     }
     Spacer(Modifier.height(12.dp))
-    if (o.driver != null) { DriverCard(o.driver.name, o.driver.rating, o.driver.vehicle_type, o.driver.phone); Spacer(Modifier.height(12.dp)) }
+    OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), PaddingValues(12.dp)) {
+        Row(Modifier.clickable { onAction("chatM", o.id) }, verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(40.dp).clip(RoundedCornerShape(13.dp)).background(Grad.green), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_msg, 16.dp, Color.White) }
+            Spacer(Modifier.width(11.dp))
+            Column(Modifier.weight(1f)) { T("محادثة المتجر", 13, FontWeight.Bold, C.head); T("راسل ${o.store} حول طلبك", 10, FontWeight.Normal, C.muted) }
+        }
+    }
+    Spacer(Modifier.height(12.dp))
+    if (o.driver != null) { DriverCard(o.driver.name, o.driver.rating, o.driver.vehicle_type, o.driver.phone, onChat = { onAction("chatD", o.id) }); Spacer(Modifier.height(12.dp)) }
     if (o.items.isNotEmpty()) {
         OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), PaddingValues(14.dp)) {
             T("المنتجات", 12, FontWeight.ExtraBold, C.head); Spacer(Modifier.height(8.dp))
@@ -393,7 +405,7 @@ private fun TransportDetail(t: TOrder, onAction: (String, Int) -> Unit) {
         }
     }
     Spacer(Modifier.height(12.dp))
-    if (t.driver != null) { DriverCard(t.driver.name, t.driver.rating, t.driver.vehicle_type, t.driver.phone); Spacer(Modifier.height(12.dp)) }
+    if (t.driver != null) { DriverCard(t.driver.name, t.driver.rating, t.driver.vehicle_type, t.driver.phone, onChat = { onAction("chatD", t.id) }); Spacer(Modifier.height(12.dp)) }
     OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), PaddingValues(14.dp)) {
         if (!t.from.isNullOrBlank()) DetailRow("من", t.from!!)
         if (!t.to.isNullOrBlank()) DetailRow("إلى", t.to!!)

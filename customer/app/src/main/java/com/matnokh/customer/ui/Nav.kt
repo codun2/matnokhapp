@@ -38,6 +38,11 @@ object Sel {
     var trackStep by mutableStateOf(3)
     var deeplink by mutableStateOf<String?>(null)
     var deeplinkOrderId by mutableStateOf<Int?>(null)
+    var chatKind by mutableStateOf("store")
+    var chatId by mutableStateOf<Int?>(null)
+    var chatType by mutableStateOf("driver")
+    var chatTitle by mutableStateOf("محادثة")
+    var chatBack by mutableStateOf("orders")
     val service get() = CData.services.firstOrNull { it.id == serviceId } ?: CData.services[0]
 }
 

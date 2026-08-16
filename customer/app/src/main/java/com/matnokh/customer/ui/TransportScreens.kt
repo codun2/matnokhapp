@@ -271,7 +271,7 @@ fun OffersScreen(onBack: () -> Unit, onMenu: () -> Unit, onPick: (String, String
 private val steps = listOf("تم القبول" to R.drawable.ic_check, "تم التحميل" to R.drawable.ic_box, "في الطريق" to R.drawable.ic_van, "التسليم" to R.drawable.ic_flag)
 
 @Composable
-fun TrackScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit) {
+fun TrackScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit, onChat: () -> Unit = {}) {
     var step by remember { mutableStateOf(Sel.trackStep) }
     var rated by remember { mutableStateOf(0) }
     LaunchedEffect(rated) { if (rated > 0) runCatching { com.matnokh.customer.net.Net.api.rate(com.matnokh.customer.net.RateBody(Sel.transportId ?: 0, true, rated)) } }
@@ -320,7 +320,7 @@ fun TrackScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit)
                     Box(Modifier.size(52.dp).clip(RoundedCornerShape(17.dp)).background(Grad.sand), contentAlignment = Alignment.Center) { T(ord?.driver?.name?.take(2) ?: "؟", 16, FontWeight.ExtraBold, Color(0xFF6B5335)) }
                     Spacer(Modifier.width(13.dp))
                     Column(Modifier.weight(1f)) { T(ord?.driver?.name ?: "بانتظار تعيين السائق", 14, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); Row(verticalAlignment = Alignment.CenterVertically) { Text("★", color = Color(0xFFD9A441), fontSize = 11.sp); Spacer(Modifier.width(4.dp)); T(ord?.driver?.let { String.format("%.1f", it.rating) + " · " + (it.vehicle_type ?: "") } ?: "—", 11, FontWeight.Normal, C.muted, maxLines = 1) } }
-                    Box(Modifier.size(44.dp).clip(RoundedCornerShape(15.dp)).background(Color(0xFFF2EFE9)).border(1.dp, C.line, RoundedCornerShape(15.dp)).clickable { toast("محادثة السائق") }, contentAlignment = Alignment.Center) { Ic(R.drawable.ic_msg, 17.dp, Color(0xFF5D6B62)) }
+                    Box(Modifier.size(44.dp).clip(RoundedCornerShape(15.dp)).background(Color(0xFFF2EFE9)).border(1.dp, C.line, RoundedCornerShape(15.dp)).clickable { onChat() }, contentAlignment = Alignment.Center) { Ic(R.drawable.ic_msg, 17.dp, Color(0xFF5D6B62)) }
                     Spacer(Modifier.width(9.dp))
                     Box(Modifier.size(44.dp).clip(RoundedCornerShape(15.dp)).background(Grad.green).clickable { toast("الاتصال بالسائق") }, contentAlignment = Alignment.Center) { Ic(R.drawable.ic_phone, 17.dp, Color.White) }
                 }
