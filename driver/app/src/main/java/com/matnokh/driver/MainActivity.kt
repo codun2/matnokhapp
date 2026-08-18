@@ -51,7 +51,13 @@ fun Root() {
     var screen by remember { mutableStateOf(if (Session.isLoggedIn()) "home" else "splash") }
     LaunchedEffect(DrvNotif.open) { DrvNotif.open?.let { o -> if (Session.isLoggedIn()) screen = o; DrvNotif.open = null } }
     val fcmCtx = androidx.compose.ui.platform.LocalContext.current
-    LaunchedEffect(Unit) { com.matnokh.driver.net.Fcm.registerToken(fcmCtx) }
+    val permLauncher = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()) { }
+    LaunchedEffect(Unit) {
+        val perms = mutableListOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) perms.add(android.Manifest.permission.POST_NOTIFICATIONS)
+        permLauncher.launch(perms.toTypedArray())
+        com.matnokh.driver.net.Fcm.registerToken(fcmCtx)
+    }
     var drawerOpen by remember { mutableStateOf(false) }
     var bidJob by remember { mutableStateOf<Job?>(null) }
     var toastMsg by remember { mutableStateOf<String?>(null) }
