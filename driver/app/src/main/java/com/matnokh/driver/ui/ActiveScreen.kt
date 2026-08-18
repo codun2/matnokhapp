@@ -63,6 +63,7 @@ fun ActiveScreen(job: Job?, fare: Int, onBack: () -> Unit, onMenu: () -> Unit, t
                     Ic(R.drawable.ic_nav, 15.dp, C.green); Spacer(Modifier.width(7.dp)); T("#" + job.id, 12, FontWeight.ExtraBold, Color(0xFF4B5A51))
                 }
                 Box(Modifier.align(Alignment.TopEnd).padding(14.dp).clip(RoundedCornerShape(50.dp)).background(Color(0xF2FFFFFF)).clickable(onClick = onExpand).padding(horizontal = 12.dp, vertical = 8.dp)) { T("🗺️ ملء الشاشة", 11, FontWeight.ExtraBold, C.greenD) }
+                if (me != null && target != null && step < 4) Row(Modifier.align(Alignment.BottomStart).padding(14.dp).clip(RoundedCornerShape(15.dp)).background(Color(0xE6FFFFFF)).padding(horizontal = 12.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_clock, 14.dp, C.green); Spacer(Modifier.width(6.dp)); T((if (step >= 2) "للتسليم: " else "للاستلام: ") + etaText(haversineKm(me, target)), 12, FontWeight.ExtraBold, C.greenD) }
             }
             // اللوحة السفلية
             Column(Modifier.fillMaxWidth().offset(y = (-24).dp).clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)).background(C.bg).padding(horizontal = 22.dp, vertical = 14.dp)) {
