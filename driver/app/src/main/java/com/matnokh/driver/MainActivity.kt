@@ -89,8 +89,8 @@ fun Root() {
             if (Session.isLoggedIn() && (Drv.available.value || Drv.nowOrders.isNotEmpty())) {
                 currentLatLng(locCtx)?.let { runCatching { com.matnokh.driver.net.Net.api.location(com.matnokh.driver.net.LocBody(it.first, it.second)) } }
             }
-            val mins = if (Drv.nowOrders.isNotEmpty()) Drv.trackIntervalMin.value.coerceAtLeast(1) else 1
-            delay((mins * 60_000).toLong())
+            val ms = if (Drv.nowOrders.isNotEmpty()) 15_000L else 60_000L
+            delay(ms)
         }
     }
     Box(Modifier.fillMaxSize().background(C.bg)) {
