@@ -295,7 +295,7 @@ fun TrackScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit,
                     dTo?.let { Marker(state = MarkerState(it), title = "الوجهة", icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)) }
                     oo?.driver?.let { dd -> if (dd.lat != null && dd.lng != null) {
                         if (dTo != null) Polyline(points = listOf(LatLng(dd.lat, dd.lng), dTo), color = C.green, width = 9f)
-                        AnimatedCarMarker(LatLng(dd.lat, dd.lng), dd.name ?: "المندوب", trkCtx)
+                        AnimatedCarMarker(LatLng(dd.lat, dd.lng), dd.name ?: "المندوب", trkCtx, dTo)
                     } }
                 }
                 Box(Modifier.align(Alignment.TopStart).padding(14.dp).clip(RoundedCornerShape(15.dp)).background(Color.White.copy(alpha = .9f)).padding(horizontal = 15.dp, vertical = 9.dp)) { Row(verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_nav, 15.dp, C.green); Spacer(Modifier.width(7.dp)); T("مباشر", 12, FontWeight.ExtraBold, Color(0xFF4B5A51)) } }

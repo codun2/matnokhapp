@@ -212,7 +212,7 @@ fun OrderBidsScreen(order: OrderRowDto, onBack: () -> Unit, onMenu: () -> Unit, 
                             r.driver?.let { d -> if (d.lat != null && d.lng != null) {
                                 val dr = r.drop
                                 if (dr?.lat != null && dr.lng != null) Polyline(points = listOf(LatLng(d.lat, d.lng), LatLng(dr.lat, dr.lng)), color = C.green, width = 9f)
-                                AnimatedCarMarker(LatLng(d.lat, d.lng), d.name ?: "المندوب", ctx)
+                                AnimatedCarMarker(LatLng(d.lat, d.lng), d.name ?: "المندوب", ctx, if (dr?.lat != null && dr.lng != null) LatLng(dr.lat, dr.lng) else null)
                             } }
                         }
                         Box(Modifier.align(Alignment.TopStart).padding(14.dp).clip(RoundedCornerShape(15.dp)).background(Color.White.copy(alpha = .9f)).padding(horizontal = 15.dp, vertical = 9.dp)) { Row(verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_nav, 15.dp, C.green); Spacer(Modifier.width(7.dp)); T("مباشر", 12, FontWeight.ExtraBold, Color(0xFF4B5A51)) } }

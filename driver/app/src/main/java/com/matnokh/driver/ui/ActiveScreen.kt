@@ -57,7 +57,7 @@ fun ActiveScreen(job: Job?, fare: Int, onBack: () -> Unit, onMenu: () -> Unit, t
                     from?.let { com.google.maps.android.compose.Marker(state = com.google.maps.android.compose.MarkerState(it), title = "الاستلام — " + job.cust) }
                     to?.let { com.google.maps.android.compose.Marker(state = com.google.maps.android.compose.MarkerState(it), title = "التسليم") }
                     if (me != null && target != null) com.google.maps.android.compose.Polyline(points = listOf(me, target), color = C.green, width = 9f)
-                    me?.let { AnimatedCarMarker(it, "أنا", ctx) }
+                    me?.let { AnimatedCarMarker(it, "أنا", ctx, target) }
                 }
                 Row(Modifier.align(Alignment.TopStart).padding(14.dp).clip(RoundedCornerShape(15.dp)).background(Color(0xE6FFFFFF)).padding(horizontal = 12.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
                     Ic(R.drawable.ic_nav, 15.dp, C.green); Spacer(Modifier.width(7.dp)); T("#" + job.id, 12, FontWeight.ExtraBold, Color(0xFF4B5A51))

@@ -5,13 +5,13 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color as AColor
 import android.graphics.Paint
+import android.graphics.RectF
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
@@ -26,21 +26,25 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-/** أيقونة السيارة (شعار فان أبيض على دائرة خضراء) كعلامة على الخريطة — مُخزّنة بعد أول بناء. */
+/** سيارة صغيرة مصمتة (منظر علوي) مقدّمتها للأعلى (شمال عند الدوران 0). */
 private var carCache: BitmapDescriptor? = null
 fun carMarker(ctx: Context): BitmapDescriptor {
     carCache?.let { return it }
-    val size = (32 * ctx.resources.displayMetrics.density).toInt()
-    val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
-    val canvas = Canvas(bmp)
-    val d = ContextCompat.getDrawable(ctx, com.matnokh.customer.R.drawable.ic_van)!!
-    d.setBounds(0, 0, size, size)
-    d.setTint(AColor.parseColor("#1d9e75"))
-    d.draw(canvas)
+    val s = (26 * ctx.resources.displayMetrics.density).toInt()
+    val bmp = Bitmap.createBitmap(s, s, Bitmap.Config.ARGB_8888)
+    val c = Canvas(bmp)
+    val body = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = AColor.parseColor("#1d9e75") }
+    val glass = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = AColor.parseColor("#CFEADE") }
+    val w = s * 0.50f; val h = s * 0.86f
+    val l = (s - w) / 2f; val t = (s - h) / 2f
+    c.drawRoundRect(RectF(l, t, l + w, t + h), w * 0.36f, w * 0.36f, body)
+    val gw = w * 0.64f; val gl = (s - gw) / 2f
+    c.drawRoundRect(RectF(gl, t + h * 0.12f, gl + gw, t + h * 0.32f), gw * 0.25f, gw * 0.25f, glass) // زجاج أمامي (المقدّمة)
+    c.drawRoundRect(RectF(gl, t + h * 0.60f, gl + gw, t + h * 0.80f), gw * 0.25f, gw * 0.25f, glass) // زجاج خلفي
     return BitmapDescriptorFactory.fromBitmap(bmp).also { carCache = it }
 }
 
-/** زاوية اتجاه الحركة من a إلى b (لتدوير السيارة). */
+/** زاوية الاتجاه من a إلى b (بوصلة، 0=شمال، باتجاه عقارب الساعة). */
 fun bearingBetween(a: LatLng, b: LatLng): Float {
     val dLon = Math.toRadians(b.longitude - a.longitude)
     val la1 = Math.toRadians(a.latitude); val la2 = Math.toRadians(b.latitude)
@@ -49,7 +53,6 @@ fun bearingBetween(a: LatLng, b: LatLng): Float {
     return ((Math.toDegrees(atan2(y, x)) + 360.0) % 360.0).toFloat()
 }
 
-/** المسافة بالكيلومترات بين نقطتين (هافرسين). */
 fun haversineKm(a: LatLng, b: LatLng): Double {
     val R = 6371.0
     val dLa = Math.toRadians(b.latitude - a.latitude)
@@ -58,7 +61,6 @@ fun haversineKm(a: LatLng, b: LatLng): Double {
     return R * 2 * atan2(sqrt(h), sqrt(1 - h))
 }
 
-/** نص الوقت المتوقّع للوصول من المسافة (متوسط 25 كم/س داخل المدينة). */
 fun etaText(km: Double): String {
     if (km < 0.12) return "وصل تقريباً"
     val mins = max(1, (km / 25.0 * 60.0).roundToInt())
@@ -66,21 +68,25 @@ fun etaText(km: Double): String {
     return "يصل خلال $mins دقيقة · $dist"
 }
 
-/** علامة سيارة تنزلق بنعومة من موقعها الحالي إلى الموقع الجديد وتدور نحو الاتجاه. */
+/** علامة سيارة تنزلق بنعومة، ومقدّمتها تتّجه نحو الوجهة (toward) إن وُجدت وإلا اتجاه الحركة. */
 @Composable
-fun AnimatedCarMarker(target: LatLng, title: String, ctx: Context) {
+fun AnimatedCarMarker(target: LatLng, title: String, ctx: Context, toward: LatLng? = null) {
     val state = remember { MarkerState(target) }
-    var rot by remember { mutableStateOf(0f) }
-    LaunchedEffect(target.latitude, target.longitude) {
+    var rot by remember { mutableStateOf(if (toward != null) bearingBetween(target, toward) else 0f) }
+    LaunchedEffect(target.latitude, target.longitude, toward?.latitude, toward?.longitude) {
         val start = state.position
+        rot = when {
+            toward != null -> bearingBetween(target, toward)
+            start.latitude != target.latitude || start.longitude != target.longitude -> bearingBetween(start, target)
+            else -> rot
+        }
         if (start.latitude == target.latitude && start.longitude == target.longitude) return@LaunchedEffect
-        rot = bearingBetween(start, target)
         val frames = 25
         repeat(frames) { i ->
-            val t = (i + 1) / frames.toFloat()
+            val tt = (i + 1) / frames.toFloat()
             state.position = LatLng(
-                start.latitude + (target.latitude - start.latitude) * t,
-                start.longitude + (target.longitude - start.longitude) * t,
+                start.latitude + (target.latitude - start.latitude) * tt,
+                start.longitude + (target.longitude - start.longitude) * tt,
             )
             delay(48)
         }
