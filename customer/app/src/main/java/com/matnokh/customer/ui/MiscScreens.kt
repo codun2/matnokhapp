@@ -28,6 +28,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
@@ -208,7 +209,11 @@ fun OrderBidsScreen(order: OrderRowDto, onBack: () -> Unit, onMenu: () -> Unit, 
                         GoogleMap(modifier = Modifier.fillMaxSize(), cameraPositionState = cam, uiSettings = MapUiSettings(zoomControlsEnabled = false, mapToolbarEnabled = false, compassEnabled = false)) {
                             r.pickup?.let { if (it.lat != null && it.lng != null) Marker(state = MarkerState(LatLng(it.lat, it.lng)), title = r.store ?: "المتجر", icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)) }
                             r.drop?.let { if (it.lat != null && it.lng != null) Marker(state = MarkerState(LatLng(it.lat, it.lng)), title = "التسليم", icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)) }
-                            r.driver?.let { d -> if (d.lat != null && d.lng != null) Marker(state = MarkerState(LatLng(d.lat, d.lng)), title = (d.name ?: "المندوب") + " 🛵", icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)) }
+                            r.driver?.let { d -> if (d.lat != null && d.lng != null) {
+                                val dr = r.drop
+                                if (dr?.lat != null && dr.lng != null) Polyline(points = listOf(LatLng(d.lat, d.lng), LatLng(dr.lat, dr.lng)), color = C.green, width = 9f)
+                                AnimatedCarMarker(LatLng(d.lat, d.lng), d.name ?: "المندوب", ctx)
+                            } }
                         }
                         Box(Modifier.align(Alignment.TopStart).padding(14.dp).clip(RoundedCornerShape(15.dp)).background(Color.White.copy(alpha = .9f)).padding(horizontal = 15.dp, vertical = 9.dp)) { Row(verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_nav, 15.dp, C.green); Spacer(Modifier.width(7.dp)); T("مباشر", 12, FontWeight.ExtraBold, Color(0xFF4B5A51)) } }
                     }
@@ -216,6 +221,16 @@ fun OrderBidsScreen(order: OrderRowDto, onBack: () -> Unit, onMenu: () -> Unit, 
                         Box(Modifier.align(Alignment.CenterHorizontally).padding(top = 4.dp, bottom = 16.dp).width(44.dp).height(5.dp).clip(CircleShape).background(Color(0xFFDDD6C9)))
                         T(if (step >= 4) "تم توصيل طلبك بنجاح ✓" else "مندوبك في الطريق لإتمام طلبك", 17, FontWeight.Bold, C.head)
                         T("طلب #" + (r.order_no ?: "") + " · " + (r.store ?: ""), 12, FontWeight.Normal, C.muted)
+                        run {
+                            val dv = r.driver; val dp = r.drop
+                            if (step < 4 && dv?.lat != null && dv.lng != null && dp?.lat != null && dp.lng != null) {
+                                Spacer(Modifier.height(7.dp))
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Ic(R.drawable.ic_clock, 14.dp, C.green); Spacer(Modifier.width(6.dp))
+                                    T(etaText(haversineKm(LatLng(dv.lat, dv.lng), LatLng(dp.lat, dp.lng))), 13, FontWeight.ExtraBold, C.green)
+                                }
+                            }
+                        }
                         Spacer(Modifier.height(16.dp))
                         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
                             steps.forEachIndexed { i, st ->
