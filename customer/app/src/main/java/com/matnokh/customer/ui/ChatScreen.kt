@@ -94,7 +94,7 @@ fun ChatScreen(kind: String, orderId: Int, type: String, title: String, onBack: 
         }
     }
 
-    Column(Modifier.fillMaxSize().background(C.bg).imePadding()) {
+    Column(Modifier.fillMaxSize().background(C.bg).windowInsetsPadding(WindowInsets.ime.exclude(WindowInsets.navigationBars))) {
         ScreenHeader(title, onBack, onMenu)
         hint?.let { Box(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 6.dp), contentAlignment = Alignment.Center) { T(it, 11, FontWeight.Bold, C.muted) } }
         LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)) {
