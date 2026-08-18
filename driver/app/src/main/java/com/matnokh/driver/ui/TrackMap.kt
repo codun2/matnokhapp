@@ -1,10 +1,9 @@
-package com.matnokh.customer.ui
+package com.matnokh.driver.ui
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color as AColor
-import android.graphics.Paint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,21 +25,20 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-/** أيقونة السيارة (شعار فان أبيض على دائرة خضراء) كعلامة على الخريطة — مُخزّنة بعد أول بناء. */
+/** أيقونة سيارة صغيرة (بلا دائرة) خضراء اللون. */
 private var carCache: BitmapDescriptor? = null
 fun carMarker(ctx: Context): BitmapDescriptor {
     carCache?.let { return it }
     val size = (32 * ctx.resources.displayMetrics.density).toInt()
     val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bmp)
-    val d = ContextCompat.getDrawable(ctx, com.matnokh.customer.R.drawable.ic_van)!!
+    val d = ContextCompat.getDrawable(ctx, com.matnokh.driver.R.drawable.ic_van)!!
     d.setBounds(0, 0, size, size)
     d.setTint(AColor.parseColor("#1d9e75"))
     d.draw(canvas)
     return BitmapDescriptorFactory.fromBitmap(bmp).also { carCache = it }
 }
 
-/** زاوية اتجاه الحركة من a إلى b (لتدوير السيارة). */
 fun bearingBetween(a: LatLng, b: LatLng): Float {
     val dLon = Math.toRadians(b.longitude - a.longitude)
     val la1 = Math.toRadians(a.latitude); val la2 = Math.toRadians(b.latitude)
@@ -49,7 +47,6 @@ fun bearingBetween(a: LatLng, b: LatLng): Float {
     return ((Math.toDegrees(atan2(y, x)) + 360.0) % 360.0).toFloat()
 }
 
-/** المسافة بالكيلومترات بين نقطتين (هافرسين). */
 fun haversineKm(a: LatLng, b: LatLng): Double {
     val R = 6371.0
     val dLa = Math.toRadians(b.latitude - a.latitude)
@@ -58,15 +55,13 @@ fun haversineKm(a: LatLng, b: LatLng): Double {
     return R * 2 * atan2(sqrt(h), sqrt(1 - h))
 }
 
-/** نص الوقت المتوقّع للوصول من المسافة (متوسط 25 كم/س داخل المدينة). */
 fun etaText(km: Double): String {
-    if (km < 0.12) return "وصل تقريباً"
+    if (km < 0.12) return "وصلت تقريباً"
     val mins = max(1, (km / 25.0 * 60.0).roundToInt())
     val dist = if (km < 1.0) "${(km * 1000).toInt()} م" else String.format("%.1f كم", km)
-    return "يصل خلال $mins دقيقة · $dist"
+    return "$mins دقيقة · $dist"
 }
 
-/** علامة سيارة تنزلق بنعومة من موقعها الحالي إلى الموقع الجديد وتدور نحو الاتجاه. */
 @Composable
 fun AnimatedCarMarker(target: LatLng, title: String, ctx: Context) {
     val state = remember { MarkerState(target) }

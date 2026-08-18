@@ -42,6 +42,7 @@ fun ActiveScreen(job: Job?, fare: Int, onBack: () -> Unit, onMenu: () -> Unit, t
                 val from = if (fLat != null && fLng != null) com.google.android.gms.maps.model.LatLng(fLat, fLng) else null
                 val to = if (tLat != null && tLng != null) com.google.android.gms.maps.model.LatLng(tLat, tLng) else null
                 val me = if (meLat != null && meLng != null) com.google.android.gms.maps.model.LatLng(meLat, meLng) else null
+                val target = (if (step >= 2) to else from) ?: to ?: from
                 val focus = me ?: from ?: to ?: com.google.android.gms.maps.model.LatLng(24.7136, 46.6753)
                 val camera = com.google.maps.android.compose.rememberCameraPositionState { position = com.google.android.gms.maps.model.CameraPosition.fromLatLngZoom(focus, 13f) }
                 val pts = listOfNotNull(from, to, me)
@@ -55,7 +56,8 @@ fun ActiveScreen(job: Job?, fare: Int, onBack: () -> Unit, onMenu: () -> Unit, t
                     OsmTiles()
                     from?.let { com.google.maps.android.compose.Marker(state = com.google.maps.android.compose.MarkerState(it), title = "الاستلام — " + job.cust) }
                     to?.let { com.google.maps.android.compose.Marker(state = com.google.maps.android.compose.MarkerState(it), title = "التسليم") }
-                    me?.let { com.google.maps.android.compose.Marker(state = com.google.maps.android.compose.MarkerState(it), title = "موقعي", snippet = "أنت هنا") }
+                    if (me != null && target != null) com.google.maps.android.compose.Polyline(points = listOf(me, target), color = C.green, width = 9f)
+                    me?.let { AnimatedCarMarker(it, "أنا", ctx) }
                 }
                 Row(Modifier.align(Alignment.TopStart).padding(14.dp).clip(RoundedCornerShape(15.dp)).background(Color(0xE6FFFFFF)).padding(horizontal = 12.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
                     Ic(R.drawable.ic_nav, 15.dp, C.green); Spacer(Modifier.width(7.dp)); T("#" + job.id, 12, FontWeight.ExtraBold, Color(0xFF4B5A51))
