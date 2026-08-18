@@ -63,7 +63,7 @@ fun ChatScreen(kind: String, orderId: Int, type: String, title: String, onBack: 
             hint = null; locked = r.locked
             if (r.messages.isNotEmpty()) {
                 msgs.addAll(r.messages.filter { m -> msgs.none { it.id == m.id } })
-                runCatching { listState.scrollToItem(0) }
+                runCatching { listState.scrollToItem((msgs.size + 1).coerceAtLeast(0)) }
             }
         }
     }
@@ -97,9 +97,9 @@ fun ChatScreen(kind: String, orderId: Int, type: String, title: String, onBack: 
     Column(Modifier.fillMaxSize().background(C.bg).imePadding()) {
         ScreenHeader(title, onBack, onMenu)
         hint?.let { Box(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 6.dp), contentAlignment = Alignment.Center) { T(it, 11, FontWeight.Bold, C.muted) } }
-        LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, reverseLayout = true, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)) {
             item { Spacer(Modifier.height(4.dp)) }
-            items(msgs.reversed(), key = { it.id }) { m ->
+            items(msgs, key = { it.id }) { m ->
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = if (m.mine) Arrangement.End else Arrangement.Start) {
                     Column(
                         Modifier.widthIn(max = 290.dp).clip(RoundedCornerShape(16.dp))
