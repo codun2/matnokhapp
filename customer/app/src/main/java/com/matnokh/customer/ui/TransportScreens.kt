@@ -41,6 +41,7 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.matnokh.customer.R
 import com.matnokh.customer.net.call
@@ -289,7 +290,13 @@ fun TrackScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit,
             Box(Modifier.fillMaxWidth().height(300.dp)) {
                 GoogleMap(modifier = Modifier.fillMaxSize(), cameraPositionState = trkCam, uiSettings = MapUiSettings(zoomControlsEnabled = false, mapToolbarEnabled = false, compassEnabled = false)) {
                     trkHere?.let { Marker(state = MarkerState(LatLng(it.first, it.second)), title = "موقعك", icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)) }
-                    ord?.driver?.let { dd -> if (dd.lat != null && dd.lng != null) Marker(state = MarkerState(LatLng(dd.lat, dd.lng)), title = (dd.name + " 🚗"), icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)) }
+                    val oo = ord
+                    val dTo = if (oo?.to_lat != null && oo.to_lng != null) LatLng(oo.to_lat, oo.to_lng) else null
+                    dTo?.let { Marker(state = MarkerState(it), title = "الوجهة", icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)) }
+                    oo?.driver?.let { dd -> if (dd.lat != null && dd.lng != null) {
+                        if (dTo != null) Polyline(points = listOf(LatLng(dd.lat, dd.lng), dTo), color = C.green, width = 9f)
+                        AnimatedCarMarker(LatLng(dd.lat, dd.lng), dd.name ?: "المندوب", trkCtx)
+                    } }
                 }
                 Box(Modifier.align(Alignment.TopStart).padding(14.dp).clip(RoundedCornerShape(15.dp)).background(Color.White.copy(alpha = .9f)).padding(horizontal = 15.dp, vertical = 9.dp)) { Row(verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_nav, 15.dp, C.green); Spacer(Modifier.width(7.dp)); T("مباشر", 12, FontWeight.ExtraBold, Color(0xFF4B5A51)) } }
             }
@@ -297,7 +304,7 @@ fun TrackScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit,
             Column(Modifier.offset(y = (-26).dp).fillMaxWidth().clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)).background(C.bg).padding(horizontal = 22.dp, vertical = 10.dp)) {
                 Box(Modifier.align(Alignment.CenterHorizontally).padding(top = 4.dp, bottom = 16.dp).width(44.dp).height(5.dp).clip(CircleShape).background(Color(0xFFDDD6C9)))
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) { T(if (step >= 4) "وصلت شحنتك بأمان ✓" else "سائقك في الطريق إليك", 17, FontWeight.Bold, C.head); T("طلب #" + (ord?.order_no ?: "") + " · " + (ord?.service_name ?: Sel.svcName), 12, FontWeight.Normal, C.muted) }
+                    Column(Modifier.weight(1f)) { T(if (step >= 4) "وصلت شحنتك بأمان ✓" else "سائقك في الطريق إليك", 17, FontWeight.Bold, C.head); T("طلب #" + (ord?.order_no ?: "") + " · " + (ord?.service_name ?: Sel.svcName), 12, FontWeight.Normal, C.muted); run { val oo = ord; val dd = oo?.driver; val tlat = oo?.to_lat; val tlng = oo?.to_lng; if (step < 4 && dd?.lat != null && dd.lng != null && tlat != null && tlng != null) { Spacer(Modifier.height(5.dp)); Row(verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_clock, 13.dp, C.green); Spacer(Modifier.width(5.dp)); T(etaText(haversineKm(LatLng(dd.lat, dd.lng), LatLng(tlat, tlng))), 12, FontWeight.ExtraBold, C.green) } } } }
                     Column(Modifier.clip(RoundedCornerShape(16.dp)).background(C.pillLive).padding(horizontal = 16.dp, vertical = 9.dp), horizontalAlignment = Alignment.CenterHorizontally) { T("18 د", 20, FontWeight.Black, C.greenD); T("وقت الوصول", 10, FontWeight.Normal, C.muted) }
                 }
                 Spacer(Modifier.height(16.dp))

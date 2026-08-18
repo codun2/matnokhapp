@@ -63,7 +63,7 @@ data class SvcDto(val id: Int, val name: String, val key: String, val point_type
 data class SvcResp(val services: List<SvcDto>)
 data class TBidDriver(val id: Int, val name: String, val rating: Double = 5.0, val vehicle_type: String? = null, val lat: Double? = null, val lng: Double? = null, val phone: String? = null)
 data class TBid(val id: Int, val amount: Double, val driver: TBidDriver)
-data class TOrder(val id: Int, val order_no: String, val service_name: String?, val from: String?, val to: String?, val status: String, val proposed_price: Double = 0.0, val final_fare: Double? = null, val driver: TBidDriver? = null, val bids: List<TBid> = emptyList(), val ts: Long = 0)
+data class TOrder(val id: Int, val order_no: String, val service_name: String?, val from: String?, val to: String?, val status: String, val proposed_price: Double = 0.0, val final_fare: Double? = null, val driver: TBidDriver? = null, val bids: List<TBid> = emptyList(), val ts: Long = 0, val from_lat: Double? = null, val from_lng: Double? = null, val to_lat: Double? = null, val to_lng: Double? = null)
 data class TOrdersResp(val orders: List<TOrder>)
 data class OrderDetailDriver(val name: String? = null, val phone: String? = null, val rating: Double = 5.0, val vehicle_type: String? = null)
 data class OrderDetailItem(val name: String = "", val qty: Int = 1, val price: Double = 0.0, val addons: List<String> = emptyList())
