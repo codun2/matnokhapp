@@ -5,6 +5,9 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <application
         android:allowBackup="false"
@@ -29,6 +32,7 @@
         </activity>
 
             <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyCVQ2EajXkUQUUd4tlrVFq5ASNz1a76PDs" />
+        <service android:name=".LocationService" android:foregroundServiceType="location" android:exported="false" />
         <service android:name=".MatnokhMessagingService" android:exported="false">
             <intent-filter><action android:name="com.google.firebase.MESSAGING_EVENT" /></intent-filter>
         </service>

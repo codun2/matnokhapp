@@ -82,17 +82,9 @@ fun Root() {
 
     LaunchedEffect(Unit) { if (Session.isLoggedIn()) { repoMe(toast); repoActive(toast); repoDash(toast); if (Drv.available.value) { Drv.received.clear(); repoNearby(toast); repoStoreOrders(toast) } } }
     val locCtx = androidx.compose.ui.platform.LocalContext.current
-    LaunchedEffect(Unit) {
-        runCatching { Drv.trackIntervalMin.value = com.matnokh.driver.net.Net.api.config().tracking_interval_min }
-        while (true) {
-            // أرسل الموقع كلما كان المندوب متاحاً (لإسناد أقرب مندوب) أو أثناء رحلة نشطة (للتتبّع)
-            if (Session.isLoggedIn() && (Drv.available.value || Drv.nowOrders.isNotEmpty())) {
-                currentLatLng(locCtx)?.let { runCatching { com.matnokh.driver.net.Net.api.location(com.matnokh.driver.net.LocBody(it.first, it.second)) } }
-            }
-            val ms = if (Drv.nowOrders.isNotEmpty()) 15_000L else 60_000L
-            delay(ms)
-        }
-    }
+    LaunchedEffect(Unit) { runCatching { Drv.trackIntervalMin.value = com.matnokh.driver.net.Net.api.config().tracking_interval_min } }
+    // إرسال الموقع صار عبر خدمة أمامية مستقلّة (تعمل حتى مع قفل الشاشة)
+    LaunchedEffect(Session.isLoggedIn(), Drv.available.value, Drv.nowOrders.size) { com.matnokh.driver.LocationService.sync(locCtx) }
     Box(Modifier.fillMaxSize().background(C.bg)) {
         when (screen) {
             "splash" -> SplashScreen(onStart = { if (Session.isLoggedIn()) { com.matnokh.driver.net.Fcm.registerToken(fcmCtx); goHomeLoaded() } else screen = "login" })
