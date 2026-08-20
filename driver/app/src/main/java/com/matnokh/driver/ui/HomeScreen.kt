@@ -34,6 +34,7 @@ fun HomeScreen(onMenu: () -> Unit, onNotifications: () -> Unit, onBid: (Job) -> 
     val avail = Drv.available.value
     var headsUp by remember { mutableStateOf<Job?>(null) }
     var lastTop by remember { mutableStateOf<Int?>(null) }
+    var shiftMenu by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { repoMe(toast) }
     LaunchedEffect(Unit) { repoShiftToday(toast) }
@@ -62,24 +63,27 @@ fun HomeScreen(onMenu: () -> Unit, onNotifications: () -> Unit, onBid: (Job) -> 
             }
             Drv.shiftToday.value?.shift?.let { sh ->
                 val st = Drv.shiftToday.value
-                Column(Modifier.padding(horizontal = 22.dp).padding(top = 14.dp).fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(C.card).border(1.5.dp, C.line, RoundedCornerShape(20.dp)).padding(16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        T("⏰ وردية اليوم: ${sh.name}", 14, FontWeight.Bold, C.head, modifier = Modifier.weight(1f))
-                        T("${sh.start} - ${sh.end}", 12, FontWeight.Normal, C.muted)
+                if (st?.status == "not_started") {
+                    Row(Modifier.padding(horizontal = 22.dp).padding(top = 10.dp)) {
+                        Box(Modifier.clip(RoundedCornerShape(20.dp)).background(Grad.green).clickable { scope.launch { repoShiftCheckIn(toast) } }.padding(horizontal = 14.dp, vertical = 8.dp)) {
+                            T("\u25B6  \u0627\u0628\u062F\u0623 \u0648\u0631\u062F\u064A\u0629 ${sh.name}", 12, FontWeight.ExtraBold, Color.White)
+                        }
                     }
-                    Spacer(Modifier.height(12.dp))
-                    when (st?.status) {
-                        "not_started" -> Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Grad.green).clickable { scope.launch { repoShiftCheckIn(toast) } }.padding(vertical = 13.dp), contentAlignment = Alignment.Center) { T("▶  بدء الوردية", 14, FontWeight.ExtraBold, Color.White) }
-                        "present", "late" -> {
-                            if (st.check_out == null) {
-                                T(if (st.status == "late") "حضورك: ${st.check_in} (متأخّر)" else "حضورك: ${st.check_in} ✓", 12, FontWeight.Bold, C.greenD)
-                                Spacer(Modifier.height(10.dp))
-                                Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Grad.terra).clickable { scope.launch { repoShiftCheckOut(toast) } }.padding(vertical = 13.dp), contentAlignment = Alignment.Center) { T("⏹  إنهاء الوردية", 14, FontWeight.ExtraBold, Color.White) }
-                            } else {
-                                T("انتهت وردية اليوم · ${st.check_in} ← ${st.check_out} ✓", 12, FontWeight.Bold, C.muted)
+                } else if (st != null && (st.status == "present" || st.status == "late") && st.check_out == null) {
+                    Column(Modifier.padding(horizontal = 22.dp).padding(top = 10.dp)) {
+                        Box(Modifier.clip(RoundedCornerShape(20.dp)).background(Color(0xFFE1F5EE)).border(1.dp, Color(0xFFBFE6D5), RoundedCornerShape(20.dp)).clickable { shiftMenu = !shiftMenu }.padding(horizontal = 14.dp, vertical = 8.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(Modifier.size(7.dp).clip(CircleShape).background(C.green))
+                                Spacer(Modifier.width(6.dp))
+                                T("\u23F0 ${sh.name} \u00B7 \u062C\u0627\u0631\u064A\u0629", 12, FontWeight.ExtraBold, C.greenD)
                             }
                         }
-                        else -> {}
+                        if (shiftMenu) {
+                            Spacer(Modifier.height(8.dp))
+                            Box(Modifier.clip(RoundedCornerShape(14.dp)).background(Grad.terra).clickable { shiftMenu = false; scope.launch { repoShiftCheckOut(toast) } }.padding(horizontal = 16.dp, vertical = 9.dp)) {
+                                T("\u23F9  \u0625\u0646\u0647\u0627\u0621 \u0627\u0644\u0648\u0631\u062F\u064A\u0629", 13, FontWeight.ExtraBold, Color.White)
+                            }
+                        }
                     }
                 }
             }
