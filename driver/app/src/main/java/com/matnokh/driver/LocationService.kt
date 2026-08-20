@@ -10,53 +10,62 @@ import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
+import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.matnokh.driver.net.LocBody
 import com.matnokh.driver.net.Net
 import com.matnokh.driver.net.Session
 import com.matnokh.driver.ui.Drv
-import com.matnokh.driver.ui.currentLatLng
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 /**
- * خدمة أمامية تبثّ موقع المندوب بشكل مستقلّ عن الواجهة (تستمر حتى مع قفل الشاشة).
- * التردّد متكيّف: كل 15 ثانية أثناء طلب نشط، وكل 75 ثانية إذا كان متاحاً بلا طلب.
- * تتوقّف تلقائياً عند تسجيل الخروج أو إذا صار غير متاح ولا يوجد طلب نشط.
+ * خدمة أمامية تبثّ موقع المندوب باستمرار (عبر requestLocationUpdates) فتستمر حتى مع قفل الشاشة.
+ * كل تحديث موقع يُرسَل للسيرفر (يحدّث lat/lng + last_seen_at → يبقى «متصلاً»).
+ * تتوقّف تلقائياً عند تسجيل الخروج، أو إذا صار غير متاح ولا يوجد طلب نشط، أو عند إغلاق التطبيق (السحب).
  */
 class LocationService : Service() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private var loop: Job? = null
+    private var fused: FusedLocationProviderClient? = null
+    private var cb: LocationCallback? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         runCatching { goForeground() }
-        if (loop?.isActive != true) {
-            loop = scope.launch {
-                while (isActive) {
-                    if (!Session.isLoggedIn()) break
-                    if (!Drv.available.value && Drv.nowOrders.isEmpty()) break
-                    runCatching {
-                        currentLatLng(applicationContext)?.let { p ->
-                            Net.api.location(LocBody(p.first, p.second))
-                            Drv.driverLat.value = p.first
-                            Drv.driverLng.value = p.second
-                        }
-                    }
-                    delay(if (Drv.nowOrders.isNotEmpty()) 15_000L else 75_000L)
-                }
-                stopSelf()
+        startUpdates()
+        return START_STICKY
+    }
+
+    private fun startUpdates() {
+        if (cb != null) return
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            stopSelf(); return
+        }
+        fused = LocationServices.getFusedLocationProviderClient(this)
+        val req = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 20_000L)
+            .setMinUpdateIntervalMillis(10_000L)
+            .build()
+        cb = object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                if (!Session.isLoggedIn() || (!Drv.available.value && Drv.nowOrders.isEmpty())) { stopSelf(); return }
+                val loc = result.lastLocation ?: return
+                Drv.driverLat.value = loc.latitude
+                Drv.driverLng.value = loc.longitude
+                scope.launch { runCatching { Net.api.location(LocBody(loc.latitude, loc.longitude)) } }
             }
         }
-        return START_STICKY
+        runCatching { fused?.requestLocationUpdates(req, cb!!, Looper.getMainLooper()) }
     }
 
     private fun goForeground() {
@@ -80,15 +89,23 @@ class LocationService : Service() {
         }
     }
 
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        stopSelf()
+        super.onTaskRemoved(rootIntent)
+    }
+
     override fun onDestroy() {
-        loop?.cancel(); scope.cancel(); super.onDestroy()
+        cb?.let { c -> runCatching { fused?.removeLocationUpdates(c) } }
+        cb = null
+        scope.cancel()
+        runCatching { stopForeground(Service.STOP_FOREGROUND_REMOVE) }
+        super.onDestroy()
     }
 
     companion object {
         const val CHANNEL = "loc_tracking"
         const val NOTIF_ID = 4711
 
-        /** يشغّل/يوقف الخدمة حسب حالة المندوب (يُنادى من الواجهة عند أي تغيّر). */
         fun sync(ctx: Context) {
             val run = Session.isLoggedIn() && (Drv.available.value || Drv.nowOrders.isNotEmpty())
             val hasLoc = ContextCompat.checkSelfPermission(ctx, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
