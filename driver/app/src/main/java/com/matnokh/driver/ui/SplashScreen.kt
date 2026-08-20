@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -18,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.matnokh.driver.R
 
 @Composable
-fun SplashScreen(onStart: () -> Unit) {
+fun SplashScreen(onStart: () -> Unit, onRegister: () -> Unit = {}) {
     Column(
         Modifier.fillMaxSize().background(C.bg).padding(40.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -46,7 +47,7 @@ fun SplashScreen(onStart: () -> Unit) {
         Spacer(Modifier.height(34.dp))
         WideButton("ابدأ الاستقبال", R.drawable.ic_back, modifier = Modifier.widthIn(max = 300.dp), onClick = onStart)
         Spacer(Modifier.height(12.dp))
-        T("التسجيل كسائق جديد", 13, FontWeight.Bold, C.muted)
+        T("التسجيل كسائق جديد", 13, FontWeight.Bold, C.greenD, modifier = Modifier.clickable { onRegister() }.padding(8.dp))
     }
 }
 
