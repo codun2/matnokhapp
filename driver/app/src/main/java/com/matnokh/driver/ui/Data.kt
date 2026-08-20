@@ -111,6 +111,7 @@ object Drv {
     var companyName = mutableStateOf("")
     var driverLat = mutableStateOf<Double?>(null)
     var driverLng = mutableStateOf<Double?>(null)
+    var shiftToday = mutableStateOf<com.matnokh.driver.net.ShiftTodayResp?>(null)
 
     fun reset() {
         received.clear(); nowOrders.clear(); pastDone.clear(); hidden.clear()
@@ -205,3 +206,7 @@ suspend fun repoStoreReject(oid: Int, toast: (String) -> Unit): Boolean =
 suspend fun repoLocation(lat: Double, lng: Double, toast: (String) -> Unit) {
     call({ Net.api.location(LocBody(lat, lng)) }, toast)
 }
+
+suspend fun repoShiftToday(toast: (String) -> Unit) { Drv.shiftToday.value = call({ Net.api.shiftToday() }, toast) }
+suspend fun repoShiftCheckIn(toast: (String) -> Unit) { call({ Net.api.shiftCheckIn() }, toast)?.let { toast(it.message ?: "") }; repoShiftToday(toast) }
+suspend fun repoShiftCheckOut(toast: (String) -> Unit) { call({ Net.api.shiftCheckOut() }, toast)?.let { toast(it.message ?: "") }; repoShiftToday(toast) }

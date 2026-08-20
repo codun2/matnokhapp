@@ -72,6 +72,8 @@ data class EarnOp(val title: String = "", val dt: String = "", val amount: Doubl
 data class EarnResp(val balance: Double = 0.0, val week: Double = 0.0, val trips_week: Int = 0, val days: List<EarnDay> = emptyList(), val operations: List<EarnOp> = emptyList())
 data class AvailResp(val is_available: Boolean, val message: String?)
 data class LocBody(val lat: Double, val lng: Double)
+data class ShiftInfo(val id: Int, val name: String, val start: String, val end: String)
+data class ShiftTodayResp(val shift: ShiftInfo?, val status: String?, val check_in: String?, val check_out: String?)
 data class ConfigResp(val tracking_interval_min: Int = 5, val dispatch_radius_km: Double = 0.0)
 data class BidBody(val amount: Double)
 data class StatusBody(val status: String)
@@ -100,6 +102,9 @@ interface DriverApi {
     @POST("driver/device-token") suspend fun registerDeviceToken(@Body b: Map<String, String>): MsgResp
     @PATCH("driver/availability") suspend fun availability(@Body b: AvailBody): AvailResp
     @PATCH("driver/location") suspend fun location(@Body b: LocBody): MsgResp
+    @GET("driver/shift/today") suspend fun shiftToday(): ShiftTodayResp
+    @POST("driver/shift/check-in") suspend fun shiftCheckIn(): MsgResp
+    @POST("driver/shift/check-out") suspend fun shiftCheckOut(): MsgResp
     @GET("config") suspend fun config(): ConfigResp
     @GET("driver/orders/nearby") suspend fun nearby(): OrdersResp
     @GET("driver/store-orders") suspend fun storeOrders(): StoreOrdersResp

@@ -36,6 +36,7 @@ fun HomeScreen(onMenu: () -> Unit, onNotifications: () -> Unit, onBid: (Job) -> 
     var lastTop by remember { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(Unit) { repoMe(toast) }
+    LaunchedEffect(Unit) { repoShiftToday(toast) }
     // استطلاع دوري: الطلبات القريبة + اللوحة + الطلب النشط
     LaunchedEffect(Unit) {
         while (true) {
@@ -58,6 +59,29 @@ fun HomeScreen(onMenu: () -> Unit, onNotifications: () -> Unit, onBid: (Job) -> 
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) { T("أهلاً كابتن 🚚", 11, FontWeight.Normal, C.muted); T(Drv.name.value, 15, FontWeight.Bold, C.head, maxLines = 1) }
                 HeaderBtn(R.drawable.ic_menu, onClick = onMenu); Spacer(Modifier.width(9.dp)); HeaderBtn(R.drawable.ic_bell, badge = true, onClick = onNotifications)
+            }
+            Drv.shiftToday.value?.shift?.let { sh ->
+                val st = Drv.shiftToday.value
+                Column(Modifier.padding(horizontal = 22.dp).padding(top = 14.dp).fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(C.card).border(1.5.dp, C.line, RoundedCornerShape(20.dp)).padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        T("⏰ وردية اليوم: ${sh.name}", 14, FontWeight.Bold, C.head, modifier = Modifier.weight(1f))
+                        T("${sh.start} - ${sh.end}", 12, FontWeight.Normal, C.muted)
+                    }
+                    Spacer(Modifier.height(12.dp))
+                    when (st?.status) {
+                        "not_started" -> Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Grad.green).clickable { scope.launch { repoShiftCheckIn(toast) } }.padding(vertical = 13.dp), contentAlignment = Alignment.Center) { T("▶  بدء الوردية", 14, FontWeight.ExtraBold, Color.White) }
+                        "present", "late" -> {
+                            if (st.check_out == null) {
+                                T(if (st.status == "late") "حضورك: ${st.check_in} (متأخّر)" else "حضورك: ${st.check_in} ✓", 12, FontWeight.Bold, C.greenD)
+                                Spacer(Modifier.height(10.dp))
+                                Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Grad.terra).clickable { scope.launch { repoShiftCheckOut(toast) } }.padding(vertical = 13.dp), contentAlignment = Alignment.Center) { T("⏹  إنهاء الوردية", 14, FontWeight.ExtraBold, Color.White) }
+                            } else {
+                                T("انتهت وردية اليوم · ${st.check_in} ← ${st.check_out} ✓", 12, FontWeight.Bold, C.muted)
+                            }
+                        }
+                        else -> {}
+                    }
+                }
             }
             RadarBox(avail, onExpandMap)
             Row(
