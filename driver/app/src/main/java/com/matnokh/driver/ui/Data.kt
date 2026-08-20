@@ -18,7 +18,7 @@ data class Job(
     val oid: Int, val id: String, val cust: String, val av: String, val svc: String, val iconId: Int,
     val gradient: Int, val from: String, val to: String, val km: String, val weight: String,
     val opts: String, val price: Int, val bid: Boolean, val status: String = "broadcasting", val note: String? = null,
-    val fromLat: Double? = null, val fromLng: Double? = null, val toLat: Double? = null, val toLng: Double? = null, val isStore: Boolean = false,
+    val fromLat: Double? = null, val fromLng: Double? = null, val toLat: Double? = null, val toLng: Double? = null, val isStore: Boolean = false, val companyFixed: Boolean = false,
 )
 
 data class DoneOrder(
@@ -58,7 +58,7 @@ private fun JobDto.toJob() = Job(
     from = from ?: "-", to = to ?: "-",
     km = km?.let { String.format("%.1f", it) } ?: "؟",
     weight = weight ?: "-", opts = options?.ifBlank { "—" } ?: "—", note = note,
-    price = ((final_fare ?: price)).toInt(), bid = mode != "direct",
+    price = ((offer_price ?: final_fare ?: price)).toInt(), bid = if (company_fixed == true) false else (mode != "direct"), companyFixed = (company_fixed == true),
     status = status ?: "broadcasting",
     fromLat = from_lat, fromLng = from_lng, toLat = to_lat, toLng = to_lng,
 )
@@ -66,7 +66,7 @@ private fun StoreOrderDto.toJob() = Job(
     oid = id, id = order_no ?: "WS-$id", cust = store ?: "متجر", av = (store ?: "مت").take(2),
     svc = "توصيل: " + (store ?: "متجر"), iconId = R.drawable.ic_box, gradient = 2,
     from = from ?: "-", to = to ?: "-", km = km?.let { String.format("%.1f", it) } ?: "؟",
-    weight = "-", opts = "—", price = fee.toInt(), bid = false, status = status ?: "ready",
+    weight = "-", opts = "—", price = (offer_price ?: fee).toInt(), bid = false, companyFixed = (company_fixed == true), status = status ?: "ready",
     fromLat = from_lat, fromLng = from_lng, toLat = to_lat, toLng = to_lng, isStore = true,
 )
 

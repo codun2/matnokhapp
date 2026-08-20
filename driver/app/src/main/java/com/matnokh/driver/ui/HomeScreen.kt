@@ -109,7 +109,7 @@ fun HomeScreen(onMenu: () -> Unit, onNotifications: () -> Unit, onBid: (Job) -> 
             SecTitle("الطلبات الواردة") { if (avail) Row(verticalAlignment = Alignment.CenterVertically) { Box(Modifier.size(9.dp).clip(CircleShape).background(C.green)); Spacer(Modifier.width(5.dp)); T("بثّ مباشر", 11, FontWeight.ExtraBold, C.greenD) } }
             if (!avail) CenterNote("أنت غير متاح حالياً — فعّل التوفّر ليصلك بثّ الطلبات القريبة")
             else if (Drv.received.isEmpty()) CenterNote("بانتظار وصول أول طلب…")
-            else Drv.received.forEach { job -> JobCard(job, onBid = { onBid(job) }, onAccept = { onAcceptDirect(job) }, onReject = { onStoreReject(job) }) }
+            else Drv.received.forEach { job -> JobCard(job, onBid = { onBid(job) }, onAccept = { onAcceptDirect(job) }, onReject = { if (job.isStore) onStoreReject(job) else { Drv.hidden.add(job.oid); Drv.received.removeAll { it.oid == job.oid } } }) }
             Spacer(Modifier.height(120.dp))
         }
 
@@ -162,12 +162,12 @@ private fun JobCard(job: Job, onBid: () -> Unit, onAccept: () -> Unit, onReject:
             GradBadge(job.iconId, jobGradients[job.gradient])
             Spacer(Modifier.width(11.dp))
             Column(Modifier.weight(1f)) { T(job.svc, 13, FontWeight.Bold, C.head, maxLines = 1); T("#${job.id} · ${job.cust} · ${job.km} كم عنك", 10, FontWeight.Normal, C.muted, maxLines = 1) }
-            StatusPill(if (job.bid) "مزايدة" else "قبول مباشر", if (job.bid) PillKind.Wait else PillKind.Live)
+            StatusPill(if (job.bid) "مزايدة" else if (job.companyFixed) "سعر الشركة" else "قبول مباشر", if (job.bid) PillKind.Wait else PillKind.Live)
         }
         Spacer(Modifier.height(11.dp)); RouteBox(job.from, job.to); Spacer(Modifier.height(11.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) { T("${if (job.bid) "سعر مقترح" else "الأجرة"}: ﷼${job.price}", 11, FontWeight.Bold, C.head, maxLines = 1); T(job.opts, 10, FontWeight.Normal, C.muted, maxLines = 1) }
-            if (job.isStore) {
+            if (job.isStore || job.companyFixed) {
                 Box(Modifier.clip(RoundedCornerShape(13.dp)).background(Color(0xFFFAF8F4)).border(1.dp, C.line, RoundedCornerShape(13.dp)).clickable(onClick = onReject).padding(horizontal = 15.dp, vertical = 10.dp), contentAlignment = Alignment.Center) { T("رفض", 12, FontWeight.ExtraBold, C.muted) }
                 Spacer(Modifier.width(8.dp))
             }

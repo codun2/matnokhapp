@@ -40,7 +40,7 @@ data class RegisterBody(val name: String, val phone: String, val email: String?,
 data class DocItem(val document_type_id: Int, val value: String)
 data class DocType(val id: Int, val key: String? = null, val name: String, val description: String? = null, val field: String? = null, val required: Boolean = false, val transport_only: Boolean = false)
 data class DocTypesResp(val data: List<DocType> = emptyList())
-data class StoreOrderDto(val id: Int, val order_no: String?, val store: String?, val store_logo: String?, val from: String?, val to: String?, val items_total: Double = 0.0, val fee: Double = 0.0, val payment_method: String?, val km: Double?, val my_bid: Double?, val from_lat: Double? = null, val from_lng: Double? = null, val to_lat: Double?, val to_lng: Double?, val status: String?, val dt: String?)
+data class StoreOrderDto(val id: Int, val order_no: String?, val store: String?, val store_logo: String?, val from: String?, val to: String?, val items_total: Double = 0.0, val fee: Double = 0.0, val payment_method: String?, val km: Double?, val my_bid: Double?, val from_lat: Double? = null, val from_lng: Double? = null, val to_lat: Double?, val to_lng: Double?, val status: String?, val dt: String?, val company_fixed: Boolean? = null, val offer_price: Double? = null)
 data class StoreOrdersResp(val orders: List<StoreOrderDto>)
 data class MsgResp(val message: String?, val status: String?, val dev_code: String?)
 data class MeResp(val driver: DriverBrief?)
@@ -59,6 +59,7 @@ data class JobDto(
     val customer: String?, val from: String?, val to: String?, val weight: String?, val options: String?,
     val note: String?, val mode: String?, val price: Double = 0.0, val payment_method: String?,
     val status: String?, val final_fare: Double?, val km: Double?, val my_bid: Double?, val dt: String?,
+    val company_fixed: Boolean? = null, val offer_price: Double? = null,
     val from_lat: Double? = null, val from_lng: Double? = null, val to_lat: Double? = null, val to_lng: Double? = null,
     val driver_rating: Double? = null,
 )
