@@ -116,6 +116,8 @@ interface DriverApi {
     @PATCH("driver/store-orders/{id}/status") suspend fun storeStatus(@Path("id") id: Int, @Body b: StatusBody): MsgResp
     @POST("driver/store-orders/{id}/accept") suspend fun storeAccept(@Path("id") id: Int): MsgResp
     @POST("driver/store-orders/{id}/reject") suspend fun storeReject(@Path("id") id: Int): MsgResp
+    @POST("driver/store-orders/{id}/relinquish") suspend fun storeRelinquish(@Path("id") id: Int): MsgResp
+    @POST("driver/orders/{id}/relinquish") suspend fun transportRelinquish(@Path("id") id: Int): MsgResp
     @GET("driver/orders") suspend fun myOrders(@Query("tab") tab: String): OrdersResp
     @GET("driver/dashboard") suspend fun dashboard(): DashResp
     @POST("driver/orders/{id}/bid") suspend fun bid(@Path("id") id: Int, @Body b: BidBody): MsgResp

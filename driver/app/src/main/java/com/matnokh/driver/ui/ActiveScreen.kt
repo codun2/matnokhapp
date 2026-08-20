@@ -29,6 +29,8 @@ fun ActiveScreen(job: Job?, fare: Int, onBack: () -> Unit, onMenu: () -> Unit, t
         return
     }
     val step = Drv.activeStep.value
+    val scope = rememberCoroutineScope()
+    var showGiveUp by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize().background(C.bg)) {
         ScreenHeader("الطلب النشط", onBack, onMenu)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
@@ -95,7 +97,23 @@ fun ActiveScreen(job: Job?, fare: Int, onBack: () -> Unit, onMenu: () -> Unit, t
                 Spacer(Modifier.height(14.dp))
                 // زر المرحلة
                 when (step) {
-                    1 -> WideButton("حمّلت الشحنة — انطلق", R.drawable.ic_check) { onStatus("loaded") }
+                    1 -> Column {
+                        WideButton("حمّلت الشحنة — انطلق", R.drawable.ic_check) { onStatus("loaded") }
+                        Spacer(Modifier.height(10.dp))
+                        if (!showGiveUp) {
+                            WideButton("تخلّي عن الطلب", ghost = true) { showGiveUp = true }
+                        } else {
+                            Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(18.dp)).padding(14.dp)) {
+                                T("التخلّي عن الطلب سيُسنده لمندوب آخر ويُسجّل عليك. متأكد؟", 12, FontWeight.Bold, C.head)
+                                Spacer(Modifier.height(10.dp))
+                                Row {
+                                    Box(Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).background(Grad.terra).clickable { showGiveUp = false; scope.launch { val ok = if (job.isStore) repoStoreRelinquish(job.oid, toast) else repoTransportRelinquish(job.oid, toast); if (ok) onFinish() } }.padding(vertical = 11.dp), contentAlignment = Alignment.Center) { T("نعم، تخلّيت", 13, FontWeight.ExtraBold, Color.White) }
+                                    Spacer(Modifier.width(10.dp))
+                                    Box(Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).background(C.card2).clickable { showGiveUp = false }.padding(vertical = 11.dp), contentAlignment = Alignment.Center) { T("تراجع", 13, FontWeight.ExtraBold, C.muted) }
+                                }
+                            }
+                        }
+                    }
                     2 -> WideButton("بدأت الرحلة — في الطريق", R.drawable.ic_nav) { onStatus("on_the_way") }
                     3 -> WideButton("تم التسليم للزبون", R.drawable.ic_flag) { onStatus("delivered") }
                     else -> Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp)).padding(18.dp), horizontalAlignment = Alignment.CenterHorizontally) {

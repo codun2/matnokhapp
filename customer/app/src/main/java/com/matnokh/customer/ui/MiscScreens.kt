@@ -406,6 +406,10 @@ private fun StoreDetail(o: OrderDetail, onAction: (String, Int) -> Unit) {
         Spacer(Modifier.height(14.dp))
         Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(RoundedCornerShape(17.dp)).background(Grad.green).clickable { onAction("pickStore", o.id) }.padding(vertical = 15.dp), horizontalArrangement = Arrangement.Center) { T("متابعة حالة الطلب", 14, FontWeight.ExtraBold, Color.White) }
     }
+    if (o.status == "pending" || o.status == "accepted" || o.status == "ready") {
+        Spacer(Modifier.height(10.dp))
+        Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(RoundedCornerShape(17.dp)).background(Color(0xFFFDEEE9)).clickable { onAction("cancel", o.id) }.padding(vertical = 14.dp), horizontalArrangement = Arrangement.Center) { T("إلغاء الطلب", 14, FontWeight.ExtraBold, Color(0xFFC0533B)) }
+    }
 }
 
 @Composable
@@ -425,6 +429,10 @@ private fun TransportDetail(t: TOrder, onAction: (String, Int) -> Unit) {
         if (!t.from.isNullOrBlank()) DetailRow("من", t.from!!)
         if (!t.to.isNullOrBlank()) DetailRow("إلى", t.to!!)
         DetailRow("السعر", "\uFDFC${money(t.final_fare ?: t.proposed_price)}", strong = true)
+    }
+    if (t.status == "broadcasting" || t.status == "assigned") {
+        Spacer(Modifier.height(10.dp))
+        Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(RoundedCornerShape(17.dp)).background(Color(0xFFFDEEE9)).clickable { onAction("cancelT", t.id) }.padding(vertical = 14.dp), horizontalArrangement = Arrangement.Center) { T("إلغاء الطلب", 14, FontWeight.ExtraBold, Color(0xFFC0533B)) }
     }
     when (t.status) {
         "broadcasting" -> { Spacer(Modifier.height(14.dp)); Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(RoundedCornerShape(17.dp)).background(Grad.green).clickable { onAction("bidsT", t.id) }.padding(vertical = 15.dp), horizontalArrangement = Arrangement.Center) { T("عرض العروض واختيار مندوب", 14, FontWeight.ExtraBold, Color.White) } }

@@ -203,6 +203,12 @@ suspend fun repoStoreAccept(oid: Int, toast: (String) -> Unit): Boolean =
     call({ Net.api.storeAccept(oid) }, toast)?.let { toast(it.message ?: "تم إسناد الطلب إليك"); true } ?: false
 suspend fun repoStoreReject(oid: Int, toast: (String) -> Unit): Boolean =
     call({ Net.api.storeReject(oid) }, toast)?.let { true } ?: false
+
+suspend fun repoStoreRelinquish(oid: Int, toast: (String) -> Unit): Boolean =
+    call({ Net.api.storeRelinquish(oid) }, toast)?.let { toast(it.message ?: ""); true } ?: false
+
+suspend fun repoTransportRelinquish(oid: Int, toast: (String) -> Unit): Boolean =
+    call({ Net.api.transportRelinquish(oid) }, toast)?.let { toast(it.message ?: ""); true } ?: false
 suspend fun repoLocation(lat: Double, lng: Double, toast: (String) -> Unit) {
     call({ Net.api.location(LocBody(lat, lng)) }, toast)
 }
