@@ -48,6 +48,8 @@ fun SplashScreen(onStart: () -> Unit, onRegister: () -> Unit = {}) {
         WideButton("ابدأ الاستقبال", R.drawable.ic_back, modifier = Modifier.widthIn(max = 300.dp), onClick = onStart)
         Spacer(Modifier.height(12.dp))
         T("التسجيل كسائق جديد", 13, FontWeight.Bold, C.greenD, modifier = Modifier.clickable { onRegister() }.padding(8.dp))
+        Spacer(Modifier.height(10.dp))
+        T("الإصدار 3.2", 11, FontWeight.Normal, C.muted)
     }
 }
 
