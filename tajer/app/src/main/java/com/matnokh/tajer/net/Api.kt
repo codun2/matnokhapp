@@ -48,6 +48,7 @@ data class StoreData(
     val is_open: Boolean = false, val prep_mode: Boolean = false, val auto_accept: Boolean = false,
     val delivery_mode: String? = null, val delivery_fixed: Double = 0.0, val delivery_per_km: Double = 0.0,
     val branches_count: Int = 0, val sections_count: Int = 0, val products_count: Int = 0,
+    val iban: String? = null, val bank_name: String? = null, val account_name: String? = null,
 )
 data class StoreResp(val store: StoreData, val message: String? = null)
 data class StoreUpdate(
@@ -55,6 +56,7 @@ data class StoreUpdate(
     val city_id: Int? = null, val lat: Double? = null, val lng: Double? = null, val logo: String? = null,
     val is_open: Boolean? = null, val prep_mode: Boolean? = null, val auto_accept: Boolean? = null,
     val delivery_mode: String? = null, val delivery_fixed: Double? = null, val delivery_per_km: Double? = null,
+    val iban: String? = null, val bank_name: String? = null, val account_name: String? = null,
 )
 
 data class BranchDto(
@@ -83,11 +85,11 @@ data class UploadResp(val url: String)
 
 
 // ── الطلبات ──
-data class OrderRow(val id: Int, val order_no: String?, val customer: String, val branch: String?, val items_count: Int, val total: Double, val status: String, val dt: String?, val driver: String?, val payment_method: String?, val is_paid: Boolean = false)
+data class OrderRow(val id: Int, val order_no: String?, val customer: String, val branch: String?, val items_count: Int, val total: Double, val status: String, val dt: String?, val driver: String?, val payment_method: String?, val is_paid: Boolean = false, val payment_status: String? = null, val payment_proof: String? = null)
 data class OrdersResp(val orders: List<OrderRow>)
 data class OrderAddon(val name: String, val price: Double)
 data class OrderItemDto(val id: Int, val name: String, val price: Double, val qty: Int, val addons: List<OrderAddon> = emptyList(), val line_total: Double)
-data class OrderDetail(val id: Int, val order_no: String?, val customer: String, val phone: String?, val branch: String?, val status: String, val items_total: Double, val delivery_fee: Double, val discount: Double, val total: Double, val payment_method: String?, val is_paid: Boolean, val drop_address: String?, val dt: String?)
+data class OrderDetail(val id: Int, val order_no: String?, val customer: String, val phone: String?, val branch: String?, val status: String, val items_total: Double, val delivery_fee: Double, val discount: Double, val total: Double, val payment_method: String?, val is_paid: Boolean, val drop_address: String?, val dt: String?, val payment_status: String? = null, val payment_proof: String? = null)
 data class OrderDetailResp(val order: OrderDetail, val items: List<OrderItemDto>)
 data class ChatMsg(val id: Int, val sender: String? = null, val body: String? = null, val image: String? = null, val at: String? = null, val mine: Boolean = false)
 data class ChatResp(val thread_id: Int = 0, val locked: Boolean = false, val messages: List<ChatMsg> = emptyList())
@@ -165,6 +167,8 @@ interface MerchantApi {
     @POST("merchant/orders/{id}/accept") suspend fun acceptOrder(@Path("id") id: Int): MsgResp
     @POST("merchant/orders/{id}/reject") suspend fun rejectOrder(@Path("id") id: Int): MsgResp
     @POST("merchant/orders/{id}/ready") suspend fun readyOrder(@Path("id") id: Int): MsgResp
+    @POST("merchant/orders/{id}/confirm-payment") suspend fun confirmPayment(@Path("id") id: Int): MsgResp
+    @POST("merchant/orders/{id}/reject-payment") suspend fun rejectPayment(@Path("id") id: Int): MsgResp
 
     @GET("merchant/payments") suspend fun payments(): PaymentsResp
     @POST("merchant/payments") suspend fun linkPayment(@Body body: LinkPayBody): MsgResp

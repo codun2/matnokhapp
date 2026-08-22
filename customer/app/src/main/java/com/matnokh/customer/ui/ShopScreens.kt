@@ -26,6 +26,15 @@ import com.matnokh.customer.R
 import com.matnokh.customer.net.*
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 
 @Composable
 fun StoreScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, onProduct: (UiProduct) -> Unit, toast: (String) -> Unit) {
@@ -173,14 +182,45 @@ private fun QBtn(ch: String, onClick: () -> Unit) { Box(Modifier.size(46.dp).cli
 private fun AddStep(ch: String, onClick: () -> Unit) { Box(Modifier.size(34.dp).clip(RoundedCornerShape(11.dp)).background(Color(0xFFFAF8F4)).border(1.dp, C.line, RoundedCornerShape(11.dp)).clickable(onClick = onClick), contentAlignment = Alignment.Center) { Text(ch, fontFamily = Cairo, fontSize = 17.sp, fontWeight = FontWeight.Black, color = C.greenD) } }
 
 @Composable
+@Composable
+private fun PayChip(label: String, selected: Boolean, modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
+    Box(modifier.clip(RoundedCornerShape(14.dp)).background(if (selected) Grad.green else androidx.compose.ui.graphics.SolidColor(C.card)).border(1.5.dp, if (selected) Color.Transparent else C.line, RoundedCornerShape(14.dp)).alpha(if (enabled) 1f else 0.45f).clickable(enabled = enabled, onClick = onClick).padding(vertical = 13.dp), contentAlignment = Alignment.Center) {
+        T(label, 13, FontWeight.ExtraBold, if (selected) Color.White else C.head)
+    }
+}
+
 fun CartScreen(onBack: () -> Unit, onMenu: () -> Unit, onOrdered: (String, Int?) -> Unit, onDest: () -> Unit, toast: (String) -> Unit) {
     val scope = rememberCoroutineScope()
     var sending by remember { mutableStateOf(false) }
     var fee by remember { mutableStateOf<Double?>(null) }
     var feeMode by remember { mutableStateOf<String?>(null) }
+    val ctx = LocalContext.current
+    val clipboard = LocalClipboardManager.current
+    var payMethod by remember { mutableStateOf("card") }
+    var bankIban by remember { mutableStateOf<String?>(null) }
+    var bankName by remember { mutableStateOf<String?>(null) }
+    var bankAccount by remember { mutableStateOf<String?>(null) }
+    var proofUrl by remember { mutableStateOf<String?>(null) }
+    var uploading by remember { mutableStateOf(false) }
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            uploading = true
+            try {
+                val bytes = ctx.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                if (bytes == null) { toast("تعذّرت قراءة الصورة"); uploading = false; return@launch }
+                val part = MultipartBody.Part.createFormData("file", "receipt.jpg", bytes.toRequestBody("image/*".toMediaTypeOrNull()))
+                call({ Net.api.upload(part) }, toast)?.url?.let { proofUrl = it; toast("تم رفع الإيصال ✓") }
+            } finally { uploading = false }
+        }
+    }
     LaunchedEffect(Cart.merchantId, Sel.destLat, Sel.destLng) {
         val mid = Cart.merchantId
         if (mid != null) runCatching { Net.api.quoteDelivery(com.matnokh.customer.net.QuoteBody(mid, Sel.destLat, Sel.destLng)) }.getOrNull()?.let { fee = it.delivery_fee; feeMode = it.delivery_mode }
+    }
+    LaunchedEffect(Cart.merchantId) {
+        val mid = Cart.merchantId
+        if (mid != null) runCatching { Net.api.storeDetail(mid) }.getOrNull()?.store?.let { bankIban = it.iban; bankName = it.bank_name; bankAccount = it.account_name }
     }
     Column(Modifier.fillMaxSize().background(C.bg)) {
         Row(Modifier.fillMaxWidth().background(C.bg.copy(alpha = .96f)).statusBarsPadding().padding(start = 22.dp, end = 22.dp, top = 10.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -214,19 +254,46 @@ fun CartScreen(onBack: () -> Unit, onMenu: () -> Unit, onOrdered: (String, Int?)
             }
             Column(Modifier.padding(horizontal = 22.dp, vertical = 12.dp).fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(Color(0xFFF2F8F3)).border(1.dp, Color(0xFFCFE0D4), RoundedCornerShape(18.dp)).padding(horizontal = 15.dp, vertical = 12.dp)) { T("بعد تأكيد الطلب يُرسَل للمتجر، وبعد تجهيزه يُسنَد لأقرب مندوب لتوصيله إليك.", 11, FontWeight.Medium, Color(0xFF4B5A51), lineHeight = 20) }
             DestRow(onDest)
+            Column(Modifier.padding(horizontal = 22.dp, vertical = 4.dp).fillMaxWidth()) {
+                T("وسيلة الدفع", 13, FontWeight.Bold, C.head)
+                Spacer(Modifier.height(8.dp))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    PayChip("بطاقة", payMethod == "card", Modifier.weight(1f)) { payMethod = "card" }
+                    val hasIban = !bankIban.isNullOrBlank()
+                    PayChip("تحويل بنكي", payMethod == "bank_transfer", Modifier.weight(1f), enabled = hasIban) { if (hasIban) payMethod = "bank_transfer" else toast("هذا المتجر لم يُضِف رقم آيبان للتحويل") }
+                }
+                if (payMethod == "bank_transfer") {
+                    Spacer(Modifier.height(10.dp))
+                    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color(0xFFF2F8F3)).border(1.dp, Color(0xFFCFE0D4), RoundedCornerShape(16.dp)).padding(14.dp)) {
+                        bankName?.takeIf { it.isNotBlank() }?.let { T("البنك: " + it, 12, FontWeight.Bold, C.head); Spacer(Modifier.height(4.dp)) }
+                        bankAccount?.takeIf { it.isNotBlank() }?.let { T("اسم المستفيد: " + it, 12, FontWeight.Medium, C.head); Spacer(Modifier.height(4.dp)) }
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                            Column(Modifier.weight(1f)) { T("رقم الآيبان (IBAN)", 10, FontWeight.Normal, C.muted); T(bankIban ?: "—", 13, FontWeight.Black, C.greenD) }
+                            Box(Modifier.clip(RoundedCornerShape(10.dp)).background(Grad.green).clickable { bankIban?.let { clipboard.setText(AnnotatedString(it)); toast("نُسخ الآيبان ✓") } }.padding(horizontal = 12.dp, vertical = 8.dp)) { T("نسخ", 11, FontWeight.ExtraBold, Color.White) }
+                        }
+                        Spacer(Modifier.height(10.dp))
+                        T("حوّل المبلغ ثم ارفع صورة الإيصال. يجهّز المتجر الطلب بعد تأكيد استلام تحويلك.", 10, FontWeight.Normal, Color(0xFF4B5A51), lineHeight = 16)
+                        Spacer(Modifier.height(10.dp))
+                        Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(C.card).border(1.dp, if (proofUrl != null) C.greenD else C.line, RoundedCornerShape(12.dp)).clickable(enabled = !uploading) { picker.launch("image/*") }.padding(vertical = 12.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                            T(if (uploading) "جارٍ الرفع…" else if (proofUrl != null) "تم رفع الإيصال ✓ — تغيير" else "ارفع صورة إيصال التحويل", 12, FontWeight.ExtraBold, if (proofUrl != null) C.greenD else C.head)
+                        }
+                    }
+                }
+            }
             if (Cart.lines.isNotEmpty()) Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(RoundedCornerShape(17.dp)).background(Grad.green).clickable {
                 if (sending) return@clickable
                 val mid = Cart.merchantId
                 if (mid == null) { toast("خطأ في المتجر"); return@clickable }
                 if (!Session.isLoggedIn()) { toast("سجّل الدخول لإتمام الطلب"); return@clickable }
+                if (payMethod == "bank_transfer" && proofUrl == null) { toast("ارفع صورة إيصال التحويل أولاً"); return@clickable }
                 val sn = Cart.storeName
                 scope.launch {
                     sending = true
-                    val body = CreateOrderBody(mid, Cart.branchId, "cash", Sel.destAddr ?: Sel.destLabel, Cart.lines.map { OrderItemBody(it.productId, it.name, (it.price.toDouble() / it.qty), it.qty, it.addons) }, Sel.destLat, Sel.destLng)
+                    val body = CreateOrderBody(mid, Cart.branchId, payMethod, Sel.destAddr ?: Sel.destLabel, Cart.lines.map { OrderItemBody(it.productId, it.name, (it.price.toDouble() / it.qty), it.qty, it.addons) }, Sel.destLat, Sel.destLng, payment_proof = if (payMethod == "bank_transfer") proofUrl else null)
                     call({ Net.api.createOrder(body) }, toast)?.let { Cart.clear(); onOrdered(sn, it.order_id) }
                     sending = false
                 }
-            }.padding(vertical = 16.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) { T(if (sending) "جارٍ الإرسال…" else "تأكيد الطلب وإرساله للمتجر", 14, FontWeight.ExtraBold, Color.White); Spacer(Modifier.width(8.dp)); Ic(R.drawable.ic_check, 16.dp, Color.White) }
+            }.padding(vertical = 16.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) { T(if (sending) "جارٍ الإرسال…" else if (payMethod == "bank_transfer") "تأكيد الطلب وإرسال الإيصال" else "تأكيد الطلب وإرساله للمتجر", 14, FontWeight.ExtraBold, Color.White); Spacer(Modifier.width(8.dp)); Ic(R.drawable.ic_check, 16.dp, Color.White) }
             Spacer(Modifier.height(24.dp))
         }
     }

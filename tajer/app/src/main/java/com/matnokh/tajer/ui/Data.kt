@@ -81,6 +81,7 @@ fun statusLabel(st: String): Pair<String, PillKind> = when (st) {
 
 // حالة الطلب → (التسمية، نوع الشارة)
 fun orderStatus(st: String): Pair<String, PillKind> = when (st) {
+    "await_pay" -> "بانتظار تأكيد التحويل" to PillKind.Wait
     "new" -> "جديد" to PillKind.Wait
     "prep" -> "قيد التجهيز" to PillKind.Live
     "ready" -> "جاهز — بانتظار مندوب" to PillKind.Live

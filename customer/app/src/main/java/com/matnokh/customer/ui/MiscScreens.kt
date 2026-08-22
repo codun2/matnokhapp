@@ -86,6 +86,7 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, onTrack: () -> Unit, to
 
 fun orderStatus(st: String): Pair<String, PillKind> = when (st) {
     "pending" -> "قيد المراجعة" to PillKind.Wait
+    "awaiting_payment" -> "بانتظار تأكيد الدفع" to PillKind.Wait
     "accepted" -> "قيد التجهيز" to PillKind.Live
     "ready" -> "جاهز" to PillKind.Live
     "broadcasting" -> "بانتظار عروض" to PillKind.Wait
@@ -193,6 +194,7 @@ fun OrderBidsScreen(order: OrderRowDto, onBack: () -> Unit, onMenu: () -> Unit, 
                 Box(Modifier.fillMaxWidth().padding(top = 40.dp, bottom = 16.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = C.green) }
                 CenterHint(when (r.status) {
                     "pending" -> "بانتظار قبول المتجر لطلبك…"
+                    "awaiting_payment" -> "بانتظار تأكيد المتجر لتحويلك البنكي…"
                     "accepted" -> "يجهّز المتجر طلبك الآن…\nوبعد التجهيز يُسنَد لأقرب مندوب لتوصيله."
                     else -> "جارٍ إسناد طلبك لأقرب مندوب…\nسنُعلمك فور قبوله واستلامه طلبك."
                 })

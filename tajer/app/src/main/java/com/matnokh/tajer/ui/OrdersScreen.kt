@@ -38,6 +38,7 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit
     var tab by remember { mutableStateOf("open") }
     var orders by remember { mutableStateOf<List<OrderRow>?>(null) }
     var detail by remember { mutableStateOf<OrderDetailResp?>(null) }
+    var proofImg by remember { mutableStateOf<String?>(null) }
     var chatFor by remember { mutableStateOf<Pair<Int, String>?>(null) }
 
     suspend fun load() { orders = null; call({ Net.api.orders(tab) }, toast)?.let { orders = it.orders } }
@@ -100,7 +101,10 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit
                     onOpen = { scope.launch { call({ Net.api.orderDetail(o.id) }, toast)?.let { detail = it } } },
                     onAccept = { act { call({ Net.api.acceptOrder(o.id) }, toast)?.let { toast(it.message ?: "") } } },
                     onReject = { act { call({ Net.api.rejectOrder(o.id) }, toast)?.let { toast(it.message ?: "") } } },
-                    onReady = { act { call({ Net.api.readyOrder(o.id) }, toast)?.let { toast(it.message ?: "") } } })
+                    onReady = { act { call({ Net.api.readyOrder(o.id) }, toast)?.let { toast(it.message ?: "") } } },
+                    onConfirmPay = { act { call({ Net.api.confirmPayment(o.id) }, toast)?.let { toast(it.message ?: "") } } },
+                    onRejectPay = { act { call({ Net.api.rejectPayment(o.id) }, toast)?.let { toast(it.message ?: "") } } },
+                    onViewProof = { o.payment_proof?.let { proofImg = it } ?: toast("لا يوجد إيصال مرفوع") })
             }
             item {
                 Column(Modifier.padding(start = 22.dp, end = 22.dp, top = 2.dp).fillMaxWidth().clip(RoundedCornerShape(18.dp))
@@ -115,6 +119,7 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit
     }
 
     detail?.let { OrderDetailDialog(it, onClose = { detail = null }, onChat = { d -> detail = null; chatFor = d.order.id to d.order.customer }) }
+    proofImg?.let { url -> ProofDialog(url) { proofImg = null } }
 }
 
 @Composable
@@ -133,7 +138,7 @@ private fun ModeBar(iconId: Int, prep: Boolean, bold: String, rest: String) {
 }
 
 @Composable
-private fun OrderCard(o: OrderRow, onOpen: () -> Unit, onAccept: () -> Unit, onReject: () -> Unit, onReady: () -> Unit) {
+private fun OrderCard(o: OrderRow, onOpen: () -> Unit, onAccept: () -> Unit, onReject: () -> Unit, onReady: () -> Unit, onConfirmPay: () -> Unit = {}, onRejectPay: () -> Unit = {}, onViewProof: () -> Unit = {}) {
     val (lbl, kind) = orderStatus(o.status)
     val st = o.status
     val iconId = when (st) { "withdriver" -> R.drawable.ic_van; "done" -> R.drawable.ic_check; else -> R.drawable.ic_list }
@@ -156,6 +161,11 @@ private fun OrderCard(o: OrderRow, onOpen: () -> Unit, onAccept: () -> Unit, onR
             StatusPill(lbl, kind)
         }
         when (st) {
+            "await_pay" -> ActionRow {
+                ActBtn("الإيصال", R.drawable.ic_img, ActKind.Ghost, Modifier.weight(1f), onViewProof)
+                ActBtn("تأكيد", R.drawable.ic_check, ActKind.Ok, Modifier.weight(1f), onConfirmPay)
+                ActBtn("رفض", R.drawable.ic_x, ActKind.Rj, Modifier.weight(1f), onRejectPay)
+            }
             "new" -> ActionRow {
                 ActBtn("قبول وتجهيز", R.drawable.ic_check, ActKind.Ok, Modifier.weight(1f), onAccept)
                 ActBtn("رفض", R.drawable.ic_x, ActKind.Rj, Modifier.weight(1f), onReject)
@@ -166,7 +176,20 @@ private fun OrderCard(o: OrderRow, onOpen: () -> Unit, onAccept: () -> Unit, onR
     }
 }
 
-private fun payLabel(m: String?): String = when (m) { "card", "tap" -> "بطاقة ✓"; "cash" -> "نقداً"; else -> m ?: "—" }
+private fun payLabel(m: String?): String = when (m) { "card", "tap" -> "بطاقة ✓"; "cash" -> "نقداً"; "bank_transfer" -> "تحويل بنكي"; else -> m ?: "—" }
+
+@Composable
+private fun ProofDialog(url: String, onClose: () -> Unit) {
+    androidx.compose.ui.window.Dialog(onDismissRequest = onClose) {
+        Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(C.card).padding(14.dp)) {
+            T("إيصال التحويل البنكي", 14, FontWeight.ExtraBold, C.head)
+            Spacer(Modifier.height(10.dp))
+            coil.compose.AsyncImage(model = url, contentDescription = null, contentScale = androidx.compose.ui.layout.ContentScale.Fit, modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp, max = 460.dp).clip(RoundedCornerShape(12.dp)).background(C.card2))
+            Spacer(Modifier.height(12.dp))
+            Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(C.greenD).clickable(onClick = onClose).padding(vertical = 12.dp), contentAlignment = Alignment.Center) { T("إغلاق", 13, FontWeight.ExtraBold, Color.White) }
+        }
+    }
+}
 
 @Composable
 private fun OrderDetailDialog(d: OrderDetailResp, onClose: () -> Unit, onChat: ((OrderDetailResp) -> Unit)? = null) {

@@ -66,6 +66,9 @@ fun StoreDataScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> U
     var deliveryMode by remember { mutableStateOf("fixed") }
     var deliveryFixed by remember { mutableStateOf("") }
     var deliveryPerKm by remember { mutableStateOf("") }
+    var iban by remember { mutableStateOf("") }
+    var bankName by remember { mutableStateOf("") }
+    var accountName by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         call({ Net.api.store() }, toast)?.let {
@@ -80,6 +83,9 @@ fun StoreDataScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> U
             deliveryMode = it.store.delivery_mode ?: "fixed"
             deliveryFixed = it.store.delivery_fixed.takeIf { v -> v > 0 }?.let { v -> if (v % 1.0 == 0.0) v.toInt().toString() else v.toString() } ?: ""
             deliveryPerKm = it.store.delivery_per_km.takeIf { v -> v > 0 }?.let { v -> if (v % 1.0 == 0.0) v.toInt().toString() else v.toString() } ?: ""
+            iban = it.store.iban ?: ""
+            bankName = it.store.bank_name ?: ""
+            accountName = it.store.account_name ?: ""
             StoreInfo.logo.value = it.store.logo
         }
         call({ Net.api.cities() }, toast)?.let { cities = it.cities }
@@ -144,6 +150,19 @@ fun StoreDataScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> U
             }
             Spacer(Modifier.height(12.dp))
 
+            OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
+                OcTitle(R.drawable.ic_shop, "الحساب البنكي (للتحويل)")
+                FieldLabel("رقم الآيبان (IBAN)")
+                FinField(iban, { iban = it }, "SA00 0000 0000 0000 0000 0000")
+                FieldLabel("اسم البنك")
+                FinField(bankName, { bankName = it }, "مثال: مصرف الراجحي")
+                FieldLabel("اسم المستفيد")
+                FinField(accountName, { accountName = it }, "اسم صاحب الحساب")
+                Spacer(Modifier.height(6.dp))
+                T("يظهر هذا الحساب للزبون عند اختيار الدفع بتحويل بنكي. اتركه فارغاً لتعطيل التحويل.", 10, FontWeight.Normal, C.muted, lineHeight = 15)
+            }
+            Spacer(Modifier.height(12.dp))
+
             StoreLocationCard(lat, lng) { la, ln -> lat = la; lng = ln }
             Spacer(Modifier.height(12.dp))
 
@@ -164,7 +183,7 @@ fun StoreDataScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> U
                     if (name.isBlank()) { toast("اسم المتجر مطلوب"); return@WideButton }
                     scope.launch {
                         saving = true
-                        call({ Net.api.updateStore(StoreUpdate(store_name = name.trim(), owner_name = owner.trim(), address = address.trim(), city_id = cityId, lat = lat, lng = lng, logo = logo)) }, toast)?.let {
+                        call({ Net.api.updateStore(StoreUpdate(store_name = name.trim(), owner_name = owner.trim(), address = address.trim(), city_id = cityId, lat = lat, lng = lng, logo = logo, iban = iban.trim(), bank_name = bankName.trim(), account_name = accountName.trim())) }, toast)?.let {
                             store = it.store; com.matnokh.tajer.net.Session.logo = logo; StoreInfo.logo.value = logo; toast("تم حفظ بيانات المتجر ✓"); onBack()
                         }
                         saving = false
