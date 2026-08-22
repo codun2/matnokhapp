@@ -38,11 +38,13 @@ class LocationService : Service() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var fused: FusedLocationProviderClient? = null
     private var cb: LocationCallback? = null
+    private var wakeLock: android.os.PowerManager.WakeLock? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         runCatching { goForeground() }
+        runCatching { acquireWakeLock() }
         startUpdates()
         return START_STICKY
     }
@@ -66,6 +68,14 @@ class LocationService : Service() {
             }
         }
         runCatching { fused?.requestLocationUpdates(req, cb!!, Looper.getMainLooper()) }
+    }
+
+    private fun acquireWakeLock() {
+        if (wakeLock?.isHeld == true) return
+        val pm = getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+        wakeLock = pm.newWakeLock(android.os.PowerManager.PARTIAL_WAKE_LOCK, "matnokh:loc")
+        wakeLock?.setReferenceCounted(false)
+        runCatching { wakeLock?.acquire() }
     }
 
     private fun goForeground() {
@@ -97,6 +107,7 @@ class LocationService : Service() {
     override fun onDestroy() {
         cb?.let { c -> runCatching { fused?.removeLocationUpdates(c) } }
         cb = null
+        runCatching { if (wakeLock?.isHeld == true) wakeLock?.release() }
         scope.cancel()
         runCatching { stopForeground(Service.STOP_FOREGROUND_REMOVE) }
         super.onDestroy()

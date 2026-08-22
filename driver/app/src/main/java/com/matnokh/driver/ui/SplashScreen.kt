@@ -49,7 +49,7 @@ fun SplashScreen(onStart: () -> Unit, onRegister: () -> Unit = {}) {
         Spacer(Modifier.height(12.dp))
         T("التسجيل كسائق جديد", 13, FontWeight.Bold, C.greenD, modifier = Modifier.clickable { onRegister() }.padding(8.dp))
         Spacer(Modifier.height(10.dp))
-        T("الإصدار 3.2", 11, FontWeight.Normal, C.muted)
+        T("الإصدار 3.3", 11, FontWeight.Normal, C.muted)
     }
 }
 
