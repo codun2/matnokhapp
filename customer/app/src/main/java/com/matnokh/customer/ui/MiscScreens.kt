@@ -39,7 +39,7 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, onTrack: () -> Unit, to
     if (bo != null) { OrderBidsScreen(bo, { bidsOrder = null }, onMenu, toast); return }
     var orders by remember { mutableStateOf<List<OrderRowDto>?>(null) }
     var torders by remember { mutableStateOf<List<TOrder>>(emptyList()) }
-    LaunchedEffect(RefreshBus.tick) { if (Session.isLoggedIn()) { call({ Net.api.orders() }, toast)?.let { orders = it.orders }; runCatching { torders = Net.api.transportOrders().orders } } else { orders = emptyList(); torders = emptyList() } }
+    LaunchedEffect(RefreshBus.tick) { if (Session.isLoggedIn()) { val o = call({ Net.api.orders() }, toast)?.orders ?: emptyList(); val t = runCatching { Net.api.transportOrders().orders }.getOrNull() ?: emptyList(); torders = t; orders = o } else { orders = emptyList(); torders = emptyList() } }
     Column(Modifier.fillMaxSize().background(C.bg)) {
         ScreenHeader(if (activeOnly) "العروض الجارية" else "طلباتي", onBack, onMenu)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
@@ -384,7 +384,17 @@ private fun StoreDetail(o: OrderDetail, onAction: (String, Int) -> Unit) {
         }
     }
     Spacer(Modifier.height(12.dp))
-    if (o.driver != null) { DriverCard(o.driver.name, o.driver.rating, o.driver.vehicle_type, o.driver.phone, onChat = { onAction("chatD", o.id) }); Spacer(Modifier.height(12.dp)) }
+    if (o.driver != null) {
+        DriverCard(o.driver.name, o.driver.rating, o.driver.vehicle_type, o.driver.phone); Spacer(Modifier.height(12.dp))
+        OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), PaddingValues(12.dp)) {
+            Row(Modifier.clickable { onAction("chatD", o.id) }, verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(40.dp).clip(RoundedCornerShape(13.dp)).background(Grad.green), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_msg, 16.dp, Color.White) }
+                Spacer(Modifier.width(11.dp))
+                Column(Modifier.weight(1f)) { T("محادثة المندوب", 13, FontWeight.Bold, C.head); T("اعرض محادثتك مع " + (o.driver.name ?: "المندوب"), 10, FontWeight.Normal, C.muted) }
+            }
+        }
+        Spacer(Modifier.height(12.dp))
+    }
     if (o.items.isNotEmpty()) {
         OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), PaddingValues(14.dp)) {
             T("المنتجات", 12, FontWeight.ExtraBold, C.head); Spacer(Modifier.height(8.dp))
@@ -426,7 +436,17 @@ private fun TransportDetail(t: TOrder, onAction: (String, Int) -> Unit) {
         }
     }
     Spacer(Modifier.height(12.dp))
-    if (t.driver != null) { DriverCard(t.driver.name, t.driver.rating, t.driver.vehicle_type, t.driver.phone, onChat = { onAction("chatD", t.id) }); Spacer(Modifier.height(12.dp)) }
+    if (t.driver != null) {
+        DriverCard(t.driver.name, t.driver.rating, t.driver.vehicle_type, t.driver.phone); Spacer(Modifier.height(12.dp))
+        OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), PaddingValues(12.dp)) {
+            Row(Modifier.clickable { onAction("chatD", t.id) }, verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(40.dp).clip(RoundedCornerShape(13.dp)).background(Grad.green), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_msg, 16.dp, Color.White) }
+                Spacer(Modifier.width(11.dp))
+                Column(Modifier.weight(1f)) { T("محادثة المندوب", 13, FontWeight.Bold, C.head); T("اعرض محادثتك مع " + (t.driver.name ?: "المندوب"), 10, FontWeight.Normal, C.muted) }
+            }
+        }
+        Spacer(Modifier.height(12.dp))
+    }
     OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), PaddingValues(14.dp)) {
         if (!t.from.isNullOrBlank()) DetailRow("من", t.from!!)
         if (!t.to.isNullOrBlank()) DetailRow("إلى", t.to!!)
