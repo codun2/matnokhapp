@@ -182,13 +182,13 @@ private fun QBtn(ch: String, onClick: () -> Unit) { Box(Modifier.size(46.dp).cli
 private fun AddStep(ch: String, onClick: () -> Unit) { Box(Modifier.size(34.dp).clip(RoundedCornerShape(11.dp)).background(Color(0xFFFAF8F4)).border(1.dp, C.line, RoundedCornerShape(11.dp)).clickable(onClick = onClick), contentAlignment = Alignment.Center) { Text(ch, fontFamily = Cairo, fontSize = 17.sp, fontWeight = FontWeight.Black, color = C.greenD) } }
 
 @Composable
-@Composable
 private fun PayChip(label: String, selected: Boolean, modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
     Box(modifier.clip(RoundedCornerShape(14.dp)).background(if (selected) Grad.green else androidx.compose.ui.graphics.SolidColor(C.card)).border(1.5.dp, if (selected) Color.Transparent else C.line, RoundedCornerShape(14.dp)).alpha(if (enabled) 1f else 0.45f).clickable(enabled = enabled, onClick = onClick).padding(vertical = 13.dp), contentAlignment = Alignment.Center) {
         T(label, 13, FontWeight.ExtraBold, if (selected) Color.White else C.head)
     }
 }
 
+@Composable
 fun CartScreen(onBack: () -> Unit, onMenu: () -> Unit, onOrdered: (String, Int?) -> Unit, onDest: () -> Unit, toast: (String) -> Unit) {
     val scope = rememberCoroutineScope()
     var sending by remember { mutableStateOf(false) }
