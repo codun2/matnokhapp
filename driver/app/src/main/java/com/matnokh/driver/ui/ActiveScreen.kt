@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.matnokh.driver.R
+import kotlinx.coroutines.launch
 
 @Composable
 fun ActiveScreen(job: Job?, fare: Int, onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit, onStatus: (String) -> Unit, onFinish: () -> Unit, onExpand: () -> Unit, onChat: () -> Unit = {}) {
