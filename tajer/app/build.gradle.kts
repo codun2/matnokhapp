@@ -12,8 +12,8 @@ android {
         applicationId = "com.matnokh.tajer"
         minSdk = 26
         targetSdk = 34
-        versionCode = 21
-        versionName = "2.8"
+        versionCode = 22
+        versionName = "2.9"
     }
 
     signingConfigs {

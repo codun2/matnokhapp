@@ -31,6 +31,20 @@ import com.matnokh.tajer.net.Net
 import com.matnokh.tajer.net.call
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun BranchesScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit) {
@@ -73,7 +87,7 @@ fun BranchesScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Un
                         Box(Modifier.weight(1f)) { FinField(to, { to = it }, keyboard = KeyboardType.Number) }
                     }
                     FieldLabel("موقع الفرع على الخريطة", required = true)
-                    MapPick(loc) { off, la, ln -> loc = off; latLng = la to ln }
+                    BranchMapPick(latLng?.first, latLng?.second) { la, ln -> latLng = la to ln }
                     Spacer(Modifier.height(9.dp))
                     LocBox(latLng)
                     Spacer(Modifier.height(14.dp))
@@ -146,36 +160,31 @@ private fun ConfirmNameDialog(suggested: String, onYes: () -> Unit, onNo: () -> 
 }
 
 @Composable
-private fun MapPick(loc: Offset?, onPick: (Offset, Double, Double) -> Unit) {
-    val density = LocalDensity.current
-    Box(
-        Modifier.fillMaxWidth().height(150.dp).clip(RoundedCornerShape(16.dp)).background(Color(0xFFE9EFE7))
-            .border(1.dp, C.line, RoundedCornerShape(16.dp))
-            .pointerInput(Unit) {
-                detectTapGestures { off ->
-                    val yDp = with(density) { off.y.toDp().value.roundToInt() }
-                    val xDp = with(density) { off.x.toDp().value.roundToInt() }
-                    // إحداثيات تقريبية (نطاق السعودية) من موضع اللمس
-                    val lat = 24.7 + yDp / 1000.0
-                    val lng = 46.6 + xDp / 1000.0
-                    onPick(off, lat, lng)
-                }
-            },
-    ) {
-        Canvas(Modifier.fillMaxSize()) {
-            val step = 30.dp.toPx(); var x = 0f
-            while (x < size.width) { drawLine(Color(0x147A9684), Offset(x, 0f), Offset(x, size.height), 1f); x += step }
-            var y = 0f
-            while (y < size.height) { drawLine(Color(0x147A9684), Offset(0f, y), Offset(size.width, y), 1f); y += step }
-        }
-        Box(Modifier.fillMaxWidth().height(18.dp).offset(y = 70.dp).background(C.bg))
-        Box(Modifier.width(18.dp).fillMaxHeight().offset(x = 80.dp).background(C.bg))
-        if (loc != null) {
-            val xdp = with(density) { loc.x.toDp() }; val ydp = with(density) { loc.y.toDp() }
-            Box(Modifier.offset(x = xdp - 16.dp, y = ydp - 16.dp).size(32.dp).clip(RoundedCornerShape(11.dp)).background(Grad.green), contentAlignment = Alignment.Center) {
-                Ic(R.drawable.ic_shop, 17.dp, Color.White)
+private fun BranchMapPick(lat: Double?, lng: Double?, onPick: (Double, Double) -> Unit) {
+    val ctx = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var granted by remember { mutableStateOf(ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) }
+    val camera = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(LatLng(lat ?: 24.7136, lng ?: 46.6753), if (lat != null) 16f else 10f) }
+    fun useHere() { scope.launch { currentLatLng(ctx)?.let { onPick(it.first, it.second); camera.position = CameraPosition.fromLatLngZoom(LatLng(it.first, it.second), 16f) } } }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { g -> granted = g; if (g) useHere() }
+    Column {
+        Box(Modifier.fillMaxWidth().height(180.dp).clip(RoundedCornerShape(16.dp))) {
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = camera,
+                properties = MapProperties(isMyLocationEnabled = granted),
+                uiSettings = MapUiSettings(myLocationButtonEnabled = false, zoomControlsEnabled = false, mapToolbarEnabled = false),
+                onMapClick = { ll -> onPick(ll.latitude, ll.longitude) },
+            ) {
+                if (lat != null && lng != null) Marker(state = MarkerState(LatLng(lat, lng)), title = "موقع الفرع")
             }
         }
+        Spacer(Modifier.height(10.dp))
+        Box(
+            Modifier.clip(RoundedCornerShape(12.dp)).background(Color(0xFFEEF4EF))
+                .clickable { if (granted) useHere() else launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION) }
+                .padding(horizontal = 14.dp, vertical = 9.dp),
+        ) { T("📍 استخدام موقعي الحالي", 11, FontWeight.ExtraBold, C.greenD) }
     }
 }
 
