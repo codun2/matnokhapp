@@ -72,7 +72,7 @@ fun StoreRow(s: UiStore, onClick: () -> Unit) {
             }
         }
         Spacer(Modifier.width(6.dp))
-        StorePill(if (s.isOpen) "متاح" else "مغلق", if (s.isOpen) C.pillLive else C.pillOff, if (s.isOpen) C.greenD else Color(0xFF9AA198))
+        StorePill(if (s.isOpen) "متاح" else "مغلق", if (s.isOpen) C.pillLive else C.pillOff, if (s.isOpen) C.ok else Color(0xFF9AA198))
         Spacer(Modifier.width(6.dp)); FavHeart(s.id)
     }
 }

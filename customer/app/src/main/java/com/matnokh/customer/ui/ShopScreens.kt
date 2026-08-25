@@ -52,7 +52,7 @@ fun StoreScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, onPr
         }
     }
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        CustBackHeader(s.name, onBack, onCart, onMenu) { StorePill(if (s.isOpen) "متاح" else "مغلق", if (s.isOpen) C.pillLive else C.pillOff, if (s.isOpen) C.greenD else Color(0xFF9AA198)) }
+        CustBackHeader(s.name, onBack, onCart, onMenu) { StorePill(if (s.isOpen) "متاح" else "مغلق", if (s.isOpen) C.pillLive else C.pillOff, if (s.isOpen) C.ok else Color(0xFF9AA198)) }
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp)).padding(13.dp), verticalAlignment = Alignment.CenterVertically) {
                 StoreLogo(s.logo, 52.dp, 16.dp, s.categoryName)
