@@ -33,8 +33,6 @@ fun OrderSentScreen(storeName: String, onTrack: () -> Unit, onPayment: () -> Uni
             fontFamily = Cairo, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = C.muted, textAlign = TextAlign.Center, lineHeight = 26.sp, modifier = Modifier.widthIn(max = 320.dp))
         Spacer(Modifier.height(28.dp))
         WideButton("تتبّع الطلب", R.drawable.ic_pin, modifier = Modifier.widthIn(max = 300.dp), onClick = onTrack)
-        Spacer(Modifier.height(10.dp))
-        WideButton("طرق الدفع المتاحة", R.drawable.ic_card, ghost = true, modifier = Modifier.widthIn(max = 300.dp), onClick = onPayment)
         Spacer(Modifier.height(14.dp))
         T("متابعة طلباتي", 13, FontWeight.Bold, C.muted, Modifier.clickable(onClick = onOrders))
         Spacer(Modifier.height(10.dp))

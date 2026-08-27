@@ -272,7 +272,7 @@ fun CartScreen(onBack: () -> Unit, onMenu: () -> Unit, onOrdered: (String, Int?)
                             Box(Modifier.clip(RoundedCornerShape(10.dp)).background(Grad.green).clickable { bankIban?.let { clipboard.setText(AnnotatedString(it)); toast("نُسخ الآيبان ✓") } }.padding(horizontal = 12.dp, vertical = 8.dp)) { T("نسخ", 11, FontWeight.ExtraBold, Color.White) }
                         }
                         Spacer(Modifier.height(10.dp))
-                        T("حوّل المبلغ ثم ارفع صورة الإيصال. يجهّز المتجر الطلب بعد تأكيد استلام تحويلك.", 10, FontWeight.Normal, Color(0xFF4B5A51), lineHeight = 16)
+                        T("المبلغ المطلوب تحويله (قيمة المنتجات فقط)", 10, FontWeight.Normal, C.muted); T("﷼${money(Cart.total())}", 18, FontWeight.Black, C.greenD); Spacer(Modifier.height(6.dp)); T("حوّل هذا المبلغ لحساب المتجر ثم ارفع صورة الإيصال. أمّا أجرة التوصيل ﷼${money(fee ?: 0.0)} فتُدفع للمندوب نقدًا عند استلامك الطلب.", 10, FontWeight.Normal, Color(0xFF4B5A51), lineHeight = 16)
                         Spacer(Modifier.height(10.dp))
                         Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(C.card).border(1.dp, if (proofUrl != null) C.greenD else C.line, RoundedCornerShape(12.dp)).clickable(enabled = !uploading) { picker.launch("image/*") }.padding(vertical = 12.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
                             T(if (uploading) "جارٍ الرفع…" else if (proofUrl != null) "تم رفع الإيصال ✓ — تغيير" else "ارفع صورة إيصال التحويل", 12, FontWeight.ExtraBold, if (proofUrl != null) C.greenD else C.head)
@@ -290,7 +290,7 @@ fun CartScreen(onBack: () -> Unit, onMenu: () -> Unit, onOrdered: (String, Int?)
                 scope.launch {
                     sending = true
                     val body = CreateOrderBody(mid, Cart.branchId, payMethod, Sel.destAddr ?: Sel.destLabel, Cart.lines.map { OrderItemBody(it.productId, it.name, (it.price.toDouble() / it.qty), it.qty, it.addons) }, Sel.destLat, Sel.destLng, payment_proof = if (payMethod == "bank_transfer") proofUrl else null)
-                    call({ Net.api.createOrder(body) }, toast)?.let { Cart.clear(); onOrdered(sn, it.order_id) }
+                    call({ Net.api.createOrder(body) }, toast)?.let { r -> Cart.clear(); r.payment_url?.let { u -> runCatching { ctx.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(u)).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)) } }; onOrdered(sn, r.order_id) }
                     sending = false
                 }
             }.padding(vertical = 16.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) { T(if (sending) "جارٍ الإرسال…" else if (payMethod == "bank_transfer") "تأكيد الطلب وإرسال الإيصال" else "تأكيد الطلب وإرساله للمتجر", 14, FontWeight.ExtraBold, Color.White); Spacer(Modifier.width(8.dp)); Ic(R.drawable.ic_check, 16.dp, Color.White) }

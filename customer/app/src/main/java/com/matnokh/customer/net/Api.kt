@@ -13,7 +13,7 @@ data class CustomerBrief(val id: Int, val name: String?, val phone: String?, val
 data class AuthResp(val token: String?, val customer: CustomerBrief?, val message: String?)
 data class RegisterBody(val name: String, val phone: String, val email: String?, val password: String)
 data class LoginBody(val method: String = "phone_password", val phone: String, val password: String? = null, val code: String? = null)
-data class MsgResp(val message: String?, val order_no: String?, val order_id: Int?, val dev_code: String?)
+data class MsgResp(val message: String?, val order_no: String?, val order_id: Int?, val dev_code: String?, val payment_url: String? = null)
 data class PricingResp(val km_price_min: Double = 1.0, val km_price_max: Double = 3.0)
 data class FavResp(val favorite: Boolean = false)
 data class IdsResp(val ids: List<Int> = emptyList())
