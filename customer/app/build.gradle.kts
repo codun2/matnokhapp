@@ -8,7 +8,7 @@ android {
     compileSdk = 34
     defaultConfig {
         applicationId = "com.matnokh.customer"
-        minSdk = 26; targetSdk = 34; versionCode = 16; versionName = "2.6"
+        minSdk = 26; targetSdk = 34; versionCode = 17; versionName = "2.7"
     }
     signingConfigs {
         getByName("debug") {

@@ -14,6 +14,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,9 +37,11 @@ private data class Itm(val name: String, val icon: Int, val view: String?, val t
 
 @Composable
 fun CustomerDrawer(open: Boolean, current: String, onClose: () -> Unit, onNavigate: (String) -> Unit, toast: (String) -> Unit) {
-    val anim by animateFloatAsState(if (open) 1f else 0f, tween(300), label = "d")
-    if (anim <= 0.001f) return
-    val menu = listOf(
+    var visible by remember { mutableStateOf(open) }
+    LaunchedEffect(open) { if (open) visible = true }
+    val anim by animateFloatAsState(if (open) 1f else 0f, tween(300), label = "d", finishedListener = { if (!open) visible = false })
+    if (!visible) return
+    val menu = remember(com.matnokh.customer.net.Repo.offers.size, Cart.count()) { listOf(
         Grp("التصفّح"),
         Itm("الرئيسية", R.drawable.ic_home, "home", null),
         Itm("كل المتاجر", R.drawable.ic_shop, "stores", null),
@@ -60,7 +65,7 @@ fun CustomerDrawer(open: Boolean, current: String, onClose: () -> Unit, onNaviga
         Itm("حول التطبيق", R.drawable.ic_info, null, "مطنوخ — الإصدار 1.1"),
         Itm("مشاركة التطبيق", R.drawable.ic_share, null, "تم نسخ رابط التطبيق ✓"),
         Itm("تسجيل الخروج", R.drawable.ic_out, "splash", null, out = true),
-    )
+    ) }
     val width = (LocalConfiguration.current.screenWidthDp * 0.8f).coerceAtMost(302f).dp
     Box(Modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize().graphicsLayer { alpha = anim }.background(Color(0x6B2D3A34)).clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClose))
