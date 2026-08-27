@@ -1,6 +1,5 @@
 package com.matnokh.tajer.ui
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,89 +14,128 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.matnokh.tajer.R
-import com.matnokh.tajer.net.LinkPayBody
+import com.matnokh.tajer.net.AddPayoutBody
 import com.matnokh.tajer.net.Net
-import com.matnokh.tajer.net.PayProvider
-import com.matnokh.tajer.net.TogglePayBody
+import com.matnokh.tajer.net.PayoutAccountDto
 import com.matnokh.tajer.net.call
 import kotlinx.coroutines.launch
 
+// شاشة «حساب استلام الأرباح» — الحساب البنكي/STC Pay الذي يحوِّل إليه مطنوخ عند طلب السحب.
 @Composable
 fun PaymentsScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit) {
     val scope = rememberCoroutineScope()
-    var providers by remember { mutableStateOf<List<PayProvider>?>(null) }
-    var openKey by remember { mutableStateOf<String?>(null) }
+    var accounts by remember { mutableStateOf<List<PayoutAccountDto>?>(null) }
+    var adding by remember { mutableStateOf(false) }
 
-    suspend fun load() { call({ Net.api.payments() }, toast)?.let { providers = it.providers } }
+    suspend fun load() { call({ Net.api.payoutAccounts() }, toast)?.let { accounts = it.accounts } }
     LaunchedEffect(Unit) { load() }
 
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("بوابات الدفع", onBack, onMenu)
-        val list = providers
+        ScreenHeader("حساب استلام الأرباح", onBack, onMenu)
+        val list = accounts
         if (list == null) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = C.green) }; return@Column }
         LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(top = 4.dp, bottom = 24.dp)) {
             item {
                 Box(Modifier.padding(start = 22.dp, end = 22.dp, bottom = 12.dp).fillMaxWidth().clip(RoundedCornerShape(16.dp))
                     .background(Color(0xFFEEF4EF)).padding(horizontal = 14.dp, vertical = 12.dp)) {
-                    T("اربط حسابك في بوابة الدفع لاستقبال مدفوعات الزبائن مباشرة. البوابات المتاحة يحدّدها مشرف النظام.", 11, FontWeight.Medium, C.greenD, lineHeight = 19)
+                    T("أضِف حساب استلام أرباحك (آيبان بنكي أو STC Pay). عند طلب السحب من محفظتك نحوّل المبلغ إلى هذا الحساب.", 11, FontWeight.Medium, C.greenD, lineHeight = 19)
                 }
             }
-            items(list) { p ->
-                ProviderCard(p, expanded = openKey == p.key,
-                    onExpand = { openKey = if (openKey == p.key) null else p.key },
-                    onLink = { creds -> scope.launch { call({ Net.api.linkPayment(LinkPayBody(p.key, creds)) }, toast)?.let { toast(it.message ?: "تم الربط"); openKey = null; load() } } },
-                    onToggle = { en -> scope.launch { call({ Net.api.togglePayment(TogglePayBody(p.key, en)) }, toast)?.let { toast(it.message ?: ""); load() } } },
-                    onUnlink = { scope.launch { call({ Net.api.unlinkPayment(p.key) }, toast)?.let { toast(it.message ?: "أُلغي الربط"); load() } } })
+            items(list) { a ->
+                PayoutCard(a, onDelete = { scope.launch { call({ Net.api.deletePayoutAccount(a.id) }, toast)?.let { toast(it.message ?: "حُذفت"); load() } } })
+            }
+            if (list.isEmpty()) item {
+                Box(Modifier.fillMaxWidth().padding(30.dp), contentAlignment = Alignment.Center) { T("لم تُضِف حساب استلام بعد", 12, FontWeight.Medium, C.muted) }
+            }
+            item {
+                Spacer(Modifier.height(6.dp))
+                Box(Modifier.padding(horizontal = 22.dp)) {
+                    WideButton("إضافة حساب استلام", R.drawable.ic_check) { adding = true }
+                }
+            }
+        }
+    }
+
+    if (adding) AddPayoutDialog(
+        isFirst = (accounts?.isEmpty() ?: true),
+        onClose = { adding = false },
+        onSave = { body -> scope.launch { call({ Net.api.addPayoutAccount(body) }, toast)?.let { toast(it.message ?: "أُضيف"); adding = false; load() } } }
+    )
+}
+
+@Composable
+private fun PayoutCard(a: PayoutAccountDto, onDelete: () -> Unit) {
+    OCard(Modifier.padding(start = 22.dp, end = 22.dp, bottom = 12.dp).fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(44.dp).clip(RoundedCornerShape(14.dp)).background(C.pillLive), contentAlignment = Alignment.Center) {
+                Ic(R.drawable.ic_card, 22.dp, C.greenD)
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    T(if (a.method == "stcpay") "STC Pay" else (a.bank_name ?: "حساب بنكي"), 13, FontWeight.Bold, C.head)
+                    if (a.is_default) { Spacer(Modifier.width(6.dp)); StatusPill("افتراضي", PillKind.Ok) }
+                }
+                Spacer(Modifier.height(2.dp))
+                T((a.account_name ?: "") + (a.account_number?.let { " · $it" } ?: ""), 10, FontWeight.Medium, C.muted)
+            }
+            Box(Modifier.clip(RoundedCornerShape(12.dp)).background(C.redBg).clickable(onClick = onDelete).padding(horizontal = 12.dp, vertical = 8.dp)) {
+                T("حذف", 11, FontWeight.ExtraBold, C.redText)
             }
         }
     }
 }
 
 @Composable
-private fun ProviderCard(p: PayProvider, expanded: Boolean, onExpand: () -> Unit, onLink: (Map<String, String>) -> Unit, onToggle: (Boolean) -> Unit, onUnlink: () -> Unit) {
-    val creds = remember(p.key) { mutableStateMapOf<String, String>() }
-    OCard(Modifier.padding(start = 22.dp, end = 22.dp, bottom = 12.dp).fillMaxWidth()) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable(onClick = onExpand)) {
-            Box(Modifier.size(44.dp).clip(RoundedCornerShape(14.dp)).background(if (p.linked) C.pillLive else C.card2), contentAlignment = Alignment.Center) {
-                Ic(R.drawable.ic_card, 22.dp, if (p.linked) C.greenD else C.muted)
+private fun AddPayoutDialog(isFirst: Boolean, onClose: () -> Unit, onSave: (AddPayoutBody) -> Unit) {
+    var method by remember { mutableStateOf("bank") }
+    var name by remember { mutableStateOf("") }
+    var number by remember { mutableStateOf("") }
+    var bank by remember { mutableStateOf("") }
+    var def by remember { mutableStateOf(isFirst) }
+    androidx.compose.ui.window.Dialog(onDismissRequest = onClose) {
+        Column(Modifier.clip(RoundedCornerShape(22.dp)).background(C.bg).padding(20.dp).fillMaxWidth()) {
+            T("إضافة حساب استلام", 16, FontWeight.ExtraBold, C.head)
+            Spacer(Modifier.height(14.dp))
+            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(C.card2).padding(4.dp)) {
+                SegBtn("حساب بنكي", method == "bank", Modifier.weight(1f)) { method = "bank" }
+                SegBtn("STC Pay", method == "stcpay", Modifier.weight(1f)) { method = "stcpay" }
             }
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) {
-                T(p.name, 13, FontWeight.Bold, C.head)
-                Spacer(Modifier.height(2.dp))
-                T(if (p.linked) (if (p.enabled) "مربوطة ومفعّلة" else "مربوطة — معطّلة") else "غير مربوطة", 10, FontWeight.Bold, if (p.linked) C.greenD else C.muted)
-            }
-            if (p.linked) Sw(p.enabled) { onToggle(!p.enabled) }
-            else StatusPill("ربط", PillKind.Wait)
-        }
-        AnimatedVisibility(expanded) {
-            Column {
+            Spacer(Modifier.height(12.dp))
+            FieldLabel("اسم صاحب الحساب", required = true)
+            FinField(name, { name = it }, placeholder = "الاسم الكامل")
+            Spacer(Modifier.height(10.dp))
+            FieldLabel(if (method == "stcpay") "رقم STC Pay" else "رقم الآيبان (IBAN)", required = true)
+            FinField(number, { number = it }, placeholder = if (method == "stcpay") "05xxxxxxxx" else "SA...", align = TextAlign.Left)
+            if (method == "bank") {
                 Spacer(Modifier.height(10.dp))
-                if (p.fields.isEmpty()) {
-                    T("لا تحتاج هذه الطريقة بيانات — فعّلها فقط.", 11, FontWeight.Medium, C.muted)
-                } else {
-                    p.fields.forEach { f ->
-                        FieldLabel(f.label, required = true)
-                        val masked = p.masked?.get(f.key)
-                        FinField(creds[f.key] ?: "", { creds[f.key] = it },
-                            placeholder = if (!masked.blankOrNull()) "الحالي: $masked" else if (f.secret) "••••••••" else "",
-                            keyboard = if (f.secret) KeyboardType.Password else KeyboardType.Text)
-                    }
-                }
-                Spacer(Modifier.height(12.dp))
-                WideButton(if (p.linked) "تحديث الربط" else "ربط الحساب", R.drawable.ic_check) { onLink(creds.toMap()) }
-                if (p.linked) {
-                    Spacer(Modifier.height(8.dp))
-                    Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(C.redBg).clickable(onClick = onUnlink).padding(vertical = 12.dp), contentAlignment = Alignment.Center) {
-                        T("إلغاء الربط", 12, FontWeight.ExtraBold, C.redText)
-                    }
-                }
+                FieldLabel("اسم البنك")
+                FinField(bank, { bank = it }, placeholder = "مثال: الراجحي")
             }
+            Spacer(Modifier.height(14.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Sw(def) { def = !def }
+                Spacer(Modifier.width(10.dp))
+                T("اجعله الحساب الافتراضي", 12, FontWeight.Bold, C.head)
+            }
+            Spacer(Modifier.height(16.dp))
+            WideButton("حفظ", R.drawable.ic_check) {
+                if (name.isBlank() || number.isBlank()) return@WideButton
+                onSave(AddPayoutBody(method, name.trim(), number.trim(), if (method == "bank") bank.trim().ifBlank { null } else null, def))
+            }
+            Spacer(Modifier.height(8.dp))
+            WideButton("إلغاء", ghost = true) { onClose() }
         }
     }
 }
 
-private fun String?.blankOrNull() = this == null || this.isBlank()
+@Composable
+private fun SegBtn(label: String, on: Boolean, modifier: Modifier, onClick: () -> Unit) {
+    Box(modifier.clip(RoundedCornerShape(11.dp)).background(if (on) Color.White else Color.Transparent).clickable(onClick = onClick).padding(vertical = 10.dp), contentAlignment = Alignment.Center) {
+        T(label, 12, if (on) FontWeight.ExtraBold else FontWeight.Medium, if (on) C.greenD else C.muted)
+    }
+}

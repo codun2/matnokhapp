@@ -25,9 +25,7 @@ data class MerchantBrief(
     val auto_accept: Boolean = false, val balance: Double = 0.0, val rating: Double = 0.0,
 )
 data class MethodsResp(val methods: List<String>)
-data class LoginBody(val method: String, val phone: String? = null, val email: String? = null, val password: String? = null, val code: String? = null)
 data class LoginResp(val token: String?, val merchant: MerchantBrief?, val message: String?, val status: String?)
-data class RegisterBody(val store_name: String, val owner_name: String, val phone: String, val email: String?, val password: String, val store_category_id: Int? = null, val lat: Double? = null, val lng: Double? = null, val license_photo: String? = null, val commercial_register_photo: String? = null, val manager_phone: String? = null, val manager_id_photo: String? = null, val subscription_plan_id: Int? = null)
 data class MsgResp(val message: String?, val status: String?, val dev_code: String?)
 data class MeResp(val merchant: MerchantBrief?)
 data class NotifItem(val id: Int, val title: String, val body: String, val dt: String?)
@@ -119,6 +117,15 @@ data class DashResp(val sales_month: Double, val orders_month: Int, val growth_p
 
 data class WalletTx(val id: Int, val title: String, val dt: String? = null, val amount: Double)
 data class WalletResp(val balance: Double, val transactions: List<WalletTx> = emptyList())
+
+// ---- payout / withdrawals ----
+data class PayoutAccountDto(val id: Int, val method: String, val account_name: String? = null, val account_number: String? = null, val bank_name: String? = null, val is_default: Boolean = false, val label: String? = null)
+data class PayoutAccountsResp(val accounts: List<PayoutAccountDto> = emptyList())
+data class AddPayoutBody(val method: String, val account_name: String, val account_number: String, val bank_name: String? = null, val is_default: Boolean = false)
+data class WalletSummaryResp(val available: Double = 0.0, val accrued: Double = 0.0, val withdrawn: Double = 0.0, val pending: Double = 0.0, val min_withdraw: Double = 0.0)
+data class WithdrawRow(val id: Int, val amount: Double, val method: String? = null, val account: String? = null, val status: String = "pending", val proof: String? = null, val admin_note: String? = null, val dt: String? = null)
+data class WithdrawsResp(val withdraws: List<WithdrawRow> = emptyList())
+data class RequestWithdrawBody(val amount: Double, val payout_account_id: Int)
 data class Period(val sales: Double, val orders: Int)
 data class ReportsResp(val today: Period, val week: Period, val month: Period, val year: Period, val all: Period)
 
@@ -161,6 +168,12 @@ interface MerchantApi {
 
     @GET("merchant/dashboard") suspend fun dashboard(): DashResp
     @GET("merchant/wallet") suspend fun wallet(): WalletResp
+    @GET("merchant/wallet-summary") suspend fun walletSummary(): WalletSummaryResp
+    @GET("merchant/payout-accounts") suspend fun payoutAccounts(): PayoutAccountsResp
+    @POST("merchant/payout-accounts") suspend fun addPayoutAccount(@Body body: AddPayoutBody): MsgResp
+    @DELETE("merchant/payout-accounts/{id}") suspend fun deletePayoutAccount(@Path("id") id: Int): MsgResp
+    @GET("merchant/withdraws") suspend fun withdraws(): WithdrawsResp
+    @POST("merchant/withdraws") suspend fun requestWithdraw(@Body body: RequestWithdrawBody): MsgResp
     @GET("merchant/reports") suspend fun reports(): ReportsResp
     @GET("merchant/orders") suspend fun orders(@Query("tab") tab: String): OrdersResp
     @GET("merchant/orders/{id}") suspend fun orderDetail(@Path("id") id: Int): OrderDetailResp
