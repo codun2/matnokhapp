@@ -34,7 +34,7 @@ data class PayMethodBody(val type: String, val label: String? = null)
 data class CatDto(val id: Int, val name: String, val icon: String?)
 data class CatsResp(val categories: List<CatDto>)
 data class StoreDto(val id: Int, val store_name: String, val category_id: Int?, val category_name: String?, val logo: String?, val rating: Double = 0.0, val is_open: Boolean = false, val branches_count: Int = 0, val lat: Double? = null, val lng: Double? = null, val iban: String? = null, val bank_name: String? = null, val account_name: String? = null)
-data class StoresResp(val stores: List<StoreDto>)
+data class StoresResp(val stores: List<StoreDto>, val has_more: Boolean = false)
 data class AddonDto(val name: String, val price: Double)
 data class StockDto(val branch_id: Int, val in_stock: Int)
 data class ProdDto(val id: Int, val name: String, val description: String?, val section_id: Int?, val price: Double, val price_before: Double = 0.0, val images: List<String> = emptyList(), val addons: List<AddonDto> = emptyList(), val stock: List<StockDto> = emptyList())
@@ -91,7 +91,7 @@ interface CustomerApi {
     @POST("customer/payment-methods") suspend fun addPayMethod(@Body b: PayMethodBody): MsgResp
     @DELETE("customer/payment-methods/{id}") suspend fun delPayMethod(@Path("id") id: Int): MsgResp
     @GET("customer/categories") suspend fun categories(): CatsResp
-    @GET("customer/stores") suspend fun stores(@Query("category_id") cat: Int? = null): StoresResp
+    @GET("customer/stores") suspend fun stores(@Query("category_id") cat: Int? = null, @Query("page") page: Int? = null, @Query("per") per: Int? = null, @Query("q") q: String? = null): StoresResp
     @GET("customer/stores/{id}") suspend fun storeDetail(@Path("id") id: Int): StoreDetailResp
     @GET("customer/offers") suspend fun offers(): OffersResp
     @POST("customer/orders") suspend fun createOrder(@Body b: CreateOrderBody): MsgResp

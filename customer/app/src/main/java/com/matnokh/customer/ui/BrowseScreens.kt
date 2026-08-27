@@ -8,6 +8,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,19 +33,41 @@ import com.matnokh.customer.net.UiStore
 fun StoresScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, onStore: (UiStore) -> Unit) {
     var cat by remember { mutableStateOf<Int?>(null) }
     var query by remember { mutableStateOf("") }
-    val base = if (cat == null) Repo.stores else Repo.stores.filter { s -> Repo.categories.firstOrNull { it.id == cat }?.let { s.categoryName == it.name } ?: true }
-    val list = if (query.isBlank()) base else base.filter { it.name.contains(query.trim(), true) || it.categoryName.contains(query.trim(), true) }
+    var stores by remember { mutableStateOf<List<UiStore>>(emptyList()) }
+    var page by remember { mutableStateOf(0) }
+    var hasMore by remember { mutableStateOf(true) }
+    var loading by remember { mutableStateOf(false) }
+    val listState = rememberLazyListState()
+    suspend fun loadPage(reset: Boolean) {
+        if (loading) return
+        loading = true
+        val next = if (reset) 1 else page + 1
+        val r = runCatching { com.matnokh.customer.net.Net.api.stores(cat, next, 20, query.trim().ifBlank { null }) }.getOrNull()
+        if (r != null) {
+            val ui = Repo.toUiStores(r.stores)
+            stores = if (reset) ui else stores + ui
+            page = next
+            hasMore = r.has_more
+        }
+        loading = false
+    }
+    LaunchedEffect(cat, query) { kotlinx.coroutines.delay(300); stores = emptyList(); page = 0; hasMore = true; loadPage(true) }
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1 }
+            .collect { last -> if (hasMore && !loading && stores.isNotEmpty() && last >= stores.size - 4) loadPage(false) }
+    }
     Column(Modifier.fillMaxSize().background(C.bg)) {
         CustBackHeader("المتاجر", onBack, onCart, onMenu)
         CatBar(cat, Repo.categories) { cat = it }
         FinField(query, { query = it }, placeholder = "ابحث عن متجر بالاسم أو القسم\u2026", modifier = Modifier.padding(start = 22.dp, end = 22.dp, top = 4.dp, bottom = 6.dp))
         Row(Modifier.fillMaxWidth().padding(start = 22.dp, end = 22.dp, top = 8.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             T(if (cat == null) "كل المتاجر" else Repo.categories.firstOrNull { it.id == cat }?.name ?: "متاجر", 15, FontWeight.ExtraBold, C.head, Modifier.weight(1f))
-            StorePill("${list.size} متجراً", C.pillLive, C.greenD)
+            StorePill("${stores.size}${if (hasMore) "+" else ""} متجراً", C.pillLive, C.greenD)
         }
-        LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(bottom = 24.dp)) {
-            items(list) { s -> StoreRow(s) { onStore(s) } }
-            if (list.isEmpty()) item { CenterHint("لا توجد متاجر في هذا القسم") }
+        LazyColumn(Modifier.weight(1f), state = listState, contentPadding = PaddingValues(bottom = 24.dp)) {
+            items(stores, key = { it.id }) { s -> StoreRow(s) { onStore(s) } }
+            if (loading) item { Box(Modifier.fillMaxWidth().padding(vertical = 18.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = C.green) } }
+            if (!loading && stores.isEmpty()) item { CenterHint("لا توجد متاجر") }
         }
     }
 }

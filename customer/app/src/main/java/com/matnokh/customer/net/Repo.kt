@@ -41,6 +41,7 @@ object Repo {
     var here by mutableStateOf<Pair<Double, Double>?>(null)
 
     private fun StoreDto.toUi() = UiStore(id, store_name, category_name ?: "متجر", logo, String.format("%.1f", rating.coerceAtLeast(0.0)).let { if (rating <= 0) "جديد" else it }, is_open, branches_count, "%.1f".format((id % 4 + 5) / 10.0 + id % 3), lat, lng)
+    fun toUiStores(list: List<StoreDto>): List<UiStore> = list.map { it.toUi() }
     private fun ProdDto.toUi(outB: List<Int> = emptyList()) = UiProduct(id, name, description ?: "", price, price_before, images, addons.map { UiAddon(it.name, it.price) }, outB)
 
     suspend fun loadHome() {
