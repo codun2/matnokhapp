@@ -259,8 +259,7 @@ fun CartScreen(onBack: () -> Unit, onMenu: () -> Unit, onOrdered: (String, Int?)
                 Spacer(Modifier.height(8.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     PayChip("بطاقة", payMethod == "card", Modifier.weight(1f)) { payMethod = "card" }
-                    val hasIban = !bankIban.isNullOrBlank()
-                    PayChip("تحويل بنكي", payMethod == "bank_transfer", Modifier.weight(1f), enabled = hasIban) { if (hasIban) payMethod = "bank_transfer" else toast("هذا المتجر لم يُضِف رقم آيبان للتحويل") }
+                    if (!bankIban.isNullOrBlank()) PayChip("تحويل بنكي", payMethod == "bank_transfer", Modifier.weight(1f)) { payMethod = "bank_transfer" }
                 }
                 if (payMethod == "bank_transfer") {
                     Spacer(Modifier.height(10.dp))
