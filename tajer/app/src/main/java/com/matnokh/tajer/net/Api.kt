@@ -25,6 +25,8 @@ data class MerchantBrief(
     val auto_accept: Boolean = false, val balance: Double = 0.0, val rating: Double = 0.0,
 )
 data class MethodsResp(val methods: List<String>)
+data class LoginBody(val method: String, val phone: String? = null, val email: String? = null, val password: String? = null, val code: String? = null)
+data class RegisterBody(val store_name: String, val owner_name: String, val phone: String, val email: String?, val password: String, val store_category_id: Int? = null, val lat: Double? = null, val lng: Double? = null, val license_photo: String? = null, val commercial_register_photo: String? = null, val manager_phone: String? = null, val manager_id_photo: String? = null, val subscription_plan_id: Int? = null)
 data class LoginResp(val token: String?, val merchant: MerchantBrief?, val message: String?, val status: String?)
 data class MsgResp(val message: String?, val status: String?, val dev_code: String?)
 data class MeResp(val merchant: MerchantBrief?)
