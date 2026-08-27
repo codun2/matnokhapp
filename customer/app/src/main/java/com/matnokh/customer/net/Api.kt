@@ -106,6 +106,7 @@ interface CustomerApi {
     @GET("customer/orders/{id}") suspend fun orderDetail(@Path("id") id: Int): OrderDetail
     @POST("customer/orders/{id}/cancel") suspend fun cancelOrder(@Path("id") id: Int): MsgResp
     @POST("customer/transport-orders/{id}/cancel") suspend fun cancelTransport(@Path("id") id: Int): MsgResp
+    @POST("customer/transport-orders/{id}/rebroadcast") suspend fun rebroadcastTransport(@Path("id") id: Int): MsgResp
     @GET("customer/orders/{id}/bids") suspend fun orderBids(@Path("id") id: Int): OrderBidsResp
     @POST("customer/orders/{id}/pick-bid") suspend fun pickBid(@Path("id") id: Int, @Body b: PickBidBody): MsgResp
     @POST("customer/device-token") suspend fun registerDeviceToken(@Body b: Map<String, String>): MsgResp

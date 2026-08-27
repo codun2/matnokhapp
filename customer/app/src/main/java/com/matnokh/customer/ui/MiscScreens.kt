@@ -459,5 +459,6 @@ private fun TransportDetail(t: TOrder, onAction: (String, Int) -> Unit) {
     when (t.status) {
         "broadcasting" -> { Spacer(Modifier.height(14.dp)); Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(RoundedCornerShape(17.dp)).background(Grad.green).clickable { onAction("bidsT", t.id) }.padding(vertical = 15.dp), horizontalArrangement = Arrangement.Center) { T("عرض العروض واختيار مندوب", 14, FontWeight.ExtraBold, Color.White) } }
         "assigned", "loaded", "on_the_way" -> { Spacer(Modifier.height(14.dp)); Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(RoundedCornerShape(17.dp)).background(Grad.green).clickable { onAction("trackT", t.id) }.padding(vertical = 15.dp), horizontalArrangement = Arrangement.Center) { T("تتبّع الطلب على الخريطة", 14, FontWeight.ExtraBold, Color.White) } }
+        "expired" -> { Spacer(Modifier.height(14.dp)); Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(RoundedCornerShape(17.dp)).background(Grad.green).clickable { onAction("rebroadcastT", t.id) }.padding(vertical = 15.dp), horizontalArrangement = Arrangement.Center) { Ic(R.drawable.ic_nav, 17.dp, Color.White); Spacer(Modifier.width(8.dp)); T("أعد بثّ الطلب", 14, FontWeight.ExtraBold, Color.White) } }
     }
 }
