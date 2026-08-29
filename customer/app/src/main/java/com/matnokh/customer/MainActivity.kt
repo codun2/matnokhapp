@@ -1,4 +1,5 @@
 package com.matnokh.customer
+import com.matnokh.customer.ui.tr
 
 import android.Manifest
 import android.os.Build
@@ -32,10 +33,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Session.init(this)
+        com.matnokh.customer.ui.Lang.init(this)
         Fcm.init(this)
         readNotif(intent)
         enableEdgeToEdge()
-        setContent { MatnokhTheme { Root() } }
+        setContent { MatnokhTheme { androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides if (com.matnokh.customer.ui.Lang.isAr) androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr) { Root() } } }
     }
 
     override fun onNewIntent(intent: android.content.Intent) {
@@ -76,11 +78,11 @@ fun Root() {
 
     LaunchedEffect(screen, Sel.deeplink) {
         val d = Sel.deeplink
-        if (d != null && Session.isLoggedIn() && screen !in setOf("splash", "login", "register")) { if (d == "transportbids") Sel.transportId = Sel.deeplinkOrderId; if (d == "chat") { Sel.chatKind = Sel.deeplinkKind ?: "store"; Sel.chatId = Sel.deeplinkOrderId; Sel.chatType = if (Sel.deeplinkChatType == "cm") "merchant" else "driver"; Sel.chatTitle = if (Sel.deeplinkChatType == "cm") "محادثة المتجر" else "محادثة المندوب"; Sel.chatBack = "orders" }; screen = d; Sel.deeplink = null }
+        if (d != null && Session.isLoggedIn() && screen !in setOf("splash", "login", "register")) { if (d == "transportbids") Sel.transportId = Sel.deeplinkOrderId; if (d == "chat") { Sel.chatKind = Sel.deeplinkKind ?: "store"; Sel.chatId = Sel.deeplinkOrderId; Sel.chatType = if (Sel.deeplinkChatType == "cm") "merchant" else "driver"; Sel.chatTitle = if (Sel.deeplinkChatType == "cm") tr("محادثة المتجر", "Store chat") else tr("محادثة المندوب", "Courier chat"); Sel.chatBack = "orders" }; screen = d; Sel.deeplink = null }
     }
     fun openStore(s: UiStore) { Sel.store = s; Sel.sectionIdx = 0; Sel.sectionStoreId = s.id; Sel.storeBack = if (screen in setOf("home", "stores", "nearby")) screen else "home"; screen = "store"; scope.launch { call({ Repo.loadStore(s.id) }, toast) } }
     fun openOffer(o: UiOffer) { Sel.store = UiStore(o.storeId, o.storeName, o.storeCategory, o.storeLogo, "", true, 0, ""); Sel.product = o.product; Sel.prodBack = "offersall"; screen = "product" }
-    val onCart = { if (Cart.lines.isEmpty()) toast("سلتك فارغة — تصفّح المتاجر وأضف منتجات") else run { screen = "cart" } }
+    val onCart = { if (Cart.lines.isEmpty()) toast(tr("سلتك فارغة — تصفّح المتاجر وأضف منتجات", "Your cart is empty — browse stores and add products")) else run { screen = "cart" } }
     val logout = { Session.clear(); Cart.clear(); drawerOpen = false; screen = "login" }
     val nav: (String) -> Unit = { if (it == "splash") logout() else screen = it }
 
@@ -108,9 +110,9 @@ fun Root() {
                         "services" -> TransportServicesScreen({ screen = "home" }, openMenu, { Sel.svc = it; screen = "order" })
                         "order" -> OrderScreen({ screen = "services" }, openMenu, { oid -> Sel.transportId = oid; screen = "transportbids" }, toast)
                         "transportbids" -> TransportBidsScreen({ screen = "home" }, openMenu, { screen = "track" }, toast)
-                        "track" -> TrackScreen({ screen = "home" }, openMenu, toast, onChat = { Sel.chatKind = "transport"; Sel.chatId = Sel.transportId; Sel.chatType = "driver"; Sel.chatTitle = "محادثة السائق"; Sel.chatBack = "track"; screen = "chat" })
+                        "track" -> TrackScreen({ screen = "home" }, openMenu, toast, onChat = { Sel.chatKind = "transport"; Sel.chatId = Sel.transportId; Sel.chatType = "driver"; Sel.chatTitle = tr("محادثة السائق", "Driver chat"); Sel.chatBack = "track"; screen = "chat" })
                         "chat" -> Sel.chatId?.let { cid -> ChatScreen(Sel.chatKind, cid, Sel.chatType, Sel.chatTitle, { screen = Sel.chatBack }, openMenu, toast) } ?: run { screen = "home" }
-                        "orderdetails" -> OrderDetailsScreen({ screen = "orders" }, openMenu, { act, oid -> when (act) { "pickStore" -> { Sel.deeplinkOrderId = oid; screen = "orders" }; "bidsT" -> { Sel.transportId = oid; screen = "transportbids" }; "trackT" -> { Sel.transportId = oid; screen = "track" }; "chatD" -> { Sel.chatKind = if (Sel.detailIsTransport) "transport" else "store"; Sel.chatId = oid; Sel.chatType = "driver"; Sel.chatTitle = "محادثة المندوب"; Sel.chatBack = "orderdetails"; screen = "chat" }; "chatM" -> { Sel.chatKind = "store"; Sel.chatId = oid; Sel.chatType = "merchant"; Sel.chatTitle = "محادثة المتجر"; Sel.chatBack = "orderdetails"; screen = "chat" }; "cancel" -> { scope.launch { val r = call({ com.matnokh.customer.net.Net.api.cancelOrder(oid) }, toast); if (r != null) { toast(r.message ?: "تم إلغاء الطلب"); screen = "orders" } } }; "cancelT" -> { scope.launch { val r = call({ com.matnokh.customer.net.Net.api.cancelTransport(oid) }, toast); if (r != null) { toast(r.message ?: "تم إلغاء الطلب"); screen = "orders" } } }; "rebroadcastT" -> { scope.launch { val r = call({ com.matnokh.customer.net.Net.api.rebroadcastTransport(oid) }, toast); if (r != null) { toast(r.message ?: "أُعيد بثّ الطلب"); screen = "orders" } } } } }, toast)
+                        "orderdetails" -> OrderDetailsScreen({ screen = "orders" }, openMenu, { act, oid -> when (act) { "pickStore" -> { Sel.deeplinkOrderId = oid; screen = "orders" }; "bidsT" -> { Sel.transportId = oid; screen = "transportbids" }; "trackT" -> { Sel.transportId = oid; screen = "track" }; "chatD" -> { Sel.chatKind = if (Sel.detailIsTransport) "transport" else "store"; Sel.chatId = oid; Sel.chatType = "driver"; Sel.chatTitle = tr("محادثة المندوب", "Courier chat"); Sel.chatBack = "orderdetails"; screen = "chat" }; "chatM" -> { Sel.chatKind = "store"; Sel.chatId = oid; Sel.chatType = "merchant"; Sel.chatTitle = tr("محادثة المتجر", "Store chat"); Sel.chatBack = "orderdetails"; screen = "chat" }; "cancel" -> { scope.launch { val r = call({ com.matnokh.customer.net.Net.api.cancelOrder(oid) }, toast); if (r != null) { toast(r.message ?: tr("تم إلغاء الطلب", "Order canceled")); screen = "orders" } } }; "cancelT" -> { scope.launch { val r = call({ com.matnokh.customer.net.Net.api.cancelTransport(oid) }, toast); if (r != null) { toast(r.message ?: tr("تم إلغاء الطلب", "Order canceled")); screen = "orders" } } }; "rebroadcastT" -> { scope.launch { val r = call({ com.matnokh.customer.net.Net.api.rebroadcastTransport(oid) }, toast); if (r != null) { toast(r.message ?: tr("أُعيد بثّ الطلب", "Order rebroadcast")); screen = "orders" } } } } }, toast)
                         "orders" -> OrdersScreen({ screen = "home" }, openMenu, { screen = "track" }, toast, onTransport = { tid, st -> Sel.transportId = tid; screen = if (st == "broadcasting") "transportbids" else "track" }, onOpenDetails = { oid, isT -> Sel.detailOrderId = oid; Sel.detailIsTransport = isT; screen = "orderdetails" })
                         "activeoffers" -> OrdersScreen({ screen = "home" }, openMenu, { screen = "track" }, toast, activeOnly = true, onTransport = { tid, st -> Sel.transportId = tid; screen = if (st == "broadcasting") "transportbids" else "track" }, onOpenDetails = { oid, isT -> Sel.detailOrderId = oid; Sel.detailIsTransport = isT; screen = "orderdetails" })
                         "notifications" -> NotificationsScreen({ screen = "home" }, openMenu, onOpen = { t, rid, kind -> when { rid != null && kind == "transport" -> { Sel.detailOrderId = rid; Sel.detailIsTransport = true; screen = "orderdetails" }; rid != null && kind == "order" -> { Sel.detailOrderId = rid; Sel.detailIsTransport = false; screen = "orderdetails" }; t in listOf("chat", "order_update", "new_order", "new_transport", "store_offer", "store_assigned") -> screen = "orders"; else -> {} } }, toast = toast)

@@ -18,10 +18,10 @@ import com.matnokh.customer.R
 fun BottomNav(current: String, onSelect: (String) -> Unit) {
     Row(Modifier.fillMaxWidth().background(C.card.copy(alpha = .96f)).border(1.dp, C.line, RoundedCornerShape(0.dp)).navigationBarsPadding().padding(start = 8.dp, end = 8.dp, top = 10.dp, bottom = 10.dp),
         verticalAlignment = Alignment.Top) {
-        Tab("home", R.drawable.ic_home, "الرئيسية", current, onSelect, Modifier.weight(1f))
-        Tab("stores", R.drawable.ic_shop, "المتاجر", current, onSelect, Modifier.weight(1f))
-        Tab("orders", R.drawable.ic_list, "طلباتي", current, onSelect, Modifier.weight(1f))
-        Tab("profile", R.drawable.ic_user, "حسابي", current, onSelect, Modifier.weight(1f))
+        Tab("home", R.drawable.ic_home, tr("الرئيسية", "Home"), current, onSelect, Modifier.weight(1f))
+        Tab("stores", R.drawable.ic_shop, tr("المتاجر", "Stores"), current, onSelect, Modifier.weight(1f))
+        Tab("orders", R.drawable.ic_list, tr("طلباتي", "My orders"), current, onSelect, Modifier.weight(1f))
+        Tab("profile", R.drawable.ic_user, tr("حسابي", "My account"), current, onSelect, Modifier.weight(1f))
     }
 }
 

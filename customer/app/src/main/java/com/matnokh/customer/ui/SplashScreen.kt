@@ -41,22 +41,22 @@ fun SplashScreen(onStart: () -> Unit) {
                     Ic(R.drawable.ic_truck, 56.dp, Color.White)
                 }
                 Spacer(Modifier.height(28.dp))
-                T("مطنوخ", 42, FontWeight.Black, Color(0xFF33463C))
+                T(tr("مطنوخ", "Matnokh"), 42, FontWeight.Black, Color(0xFF33463C))
                 Spacer(Modifier.height(6.dp))
-                T("كل شي بوصل. بهدوء وأمان.", 15, FontWeight.Bold, C.green)
+                T(tr("كل شي بوصل. بهدوء وأمان.", "Everything arrives. Calmly and safely."), 15, FontWeight.Bold, C.green)
                 Spacer(Modifier.height(14.dp))
-                Text("منصة واحدة لكل احتياجات النقل والتسوّق — اطلب من متاجرك المفضّلة أو انقل أي حمولة، وتتبّع بلحظتها.",
+                Text(tr("منصة واحدة لكل احتياجات النقل والتسوّق — اطلب من متاجرك المفضّلة أو انقل أي حمولة، وتتبّع بلحظتها.", "One platform for all your transport & shopping needs — order from your favorite stores or move any load, and track it in real time."),
                     fontFamily = Cairo, fontSize = 14.sp, color = C.muted, textAlign = TextAlign.Center, lineHeight = 28.sp, modifier = Modifier.widthIn(max = 290.dp))
                 Spacer(Modifier.height(26.dp))
                 FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Feat(R.drawable.ic_zap, "توصيل سريع"); Feat(R.drawable.ic_shield, "شحنات مؤمّنة"); Feat(R.drawable.ic_nav, "تتبّع مباشر")
+                    Feat(R.drawable.ic_zap, tr("توصيل سريع", "Fast delivery")); Feat(R.drawable.ic_shield, tr("شحنات مؤمّنة", "Insured shipments")); Feat(R.drawable.ic_nav, tr("تتبّع مباشر", "Live tracking"))
                 }
                 Spacer(Modifier.height(34.dp))
                 Row(Modifier.widthIn(max = 280.dp).fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(Grad.green).clickable(onClick = onStart).padding(vertical = 17.dp),
                     horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                    T("ابدأ الآن", 16, FontWeight.ExtraBold, Color.White); Spacer(Modifier.width(9.dp)); Ic(R.drawable.ic_back, 17.dp, Color.White)
+                    T(tr("ابدأ الآن", "Get started"), 16, FontWeight.ExtraBold, Color.White); Spacer(Modifier.width(9.dp)); Ic(R.drawable.ic_back, 17.dp, Color.White)
                 }
-                Spacer(Modifier.height(12.dp)); T("لديّ حساب — تسجيل الدخول", 13, FontWeight.Bold, C.muted, maxLines = 1)
+                Spacer(Modifier.height(12.dp)); T(tr("لديّ حساب — تسجيل الدخول", "I have an account — log in"), 13, FontWeight.Bold, C.muted, maxLines = 1)
             }
         }
     }

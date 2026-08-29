@@ -22,11 +22,11 @@ fun NotificationsScreen(onBack: () -> Unit, onMenu: () -> Unit, onOpen: (String?
     var items by remember { mutableStateOf<List<NotifItem>?>(null) }
     LaunchedEffect(RefreshBus.tick) { if (Session.isLoggedIn()) call({ Net.api.notifications() }, toast)?.let { items = it.notifications } else items = emptyList() }
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("الإشعارات", onBack, onMenu)
+        ScreenHeader(tr("الإشعارات", "Notifications"), onBack, onMenu)
         val list = items
         when {
             list == null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = C.green) }
-            list.isEmpty() -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Column(horizontalAlignment = Alignment.CenterHorizontally) { Ic(R.drawable.ic_bell, 40.dp, C.sage); Spacer(Modifier.height(10.dp)); T("لا توجد إشعارات بعد", 13, FontWeight.Bold, C.muted) } }
+            list.isEmpty() -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Column(horizontalAlignment = Alignment.CenterHorizontally) { Ic(R.drawable.ic_bell, 40.dp, C.sage); Spacer(Modifier.height(10.dp)); T(tr("لا توجد إشعارات بعد", "No notifications yet"), 13, FontWeight.Bold, C.muted) } }
             else -> LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(top = 4.dp, bottom = 24.dp)) {
                 items(list) { n ->
                     Row(Modifier.padding(start = 22.dp, end = 22.dp, bottom = 12.dp).fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(20.dp)).clickable { onOpen(n.type, n.ref_id, n.ref_kind) }.padding(15.dp)) {

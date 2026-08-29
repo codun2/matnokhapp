@@ -17,7 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.matnokh.customer.R
 
-private val PAY_OPTIONS = listOf("مدى", "STC Pay", "Apple Pay", "بطاقة ائتمانية", "نقداً عند الاستلام")
+private val PAY_OPTIONS = listOf(tr("مدى", "Mada"), "STC Pay", "Apple Pay", tr("بطاقة ائتمانية", "Credit card"), tr("نقداً عند الاستلام", "Cash on delivery"))
 
 /** طرق الدفع التي تظهر للزبون عند تأكيد الطلب — للمتجر (المشتريات) وللمندوب (التوصيل). */
 @Composable
@@ -25,22 +25,22 @@ fun PaymentMethodsScreen(storeName: String, onDone: () -> Unit, onMenu: () -> Un
     var storePay by remember { mutableStateOf(0) }
     var driverPay by remember { mutableStateOf(4) }
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("طرق الدفع", onDone, onMenu)
+        ScreenHeader(tr("طرق الدفع", "Payment methods"), onDone, onMenu)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             Row(Modifier.padding(horizontal = 22.dp).padding(top = 6.dp).fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(Color(0xFFEEF4EF)).border(1.dp, Color(0xFFCFE0D4), RoundedCornerShape(18.dp)).padding(14.dp), verticalAlignment = Alignment.Top) {
                 Ic(R.drawable.ic_card, 20.dp, C.greenD, Modifier.padding(top = 1.dp))
                 Spacer(Modifier.width(11.dp))
                 Column {
-                    T("اختر كيف تحبّ الدفع", 12, FontWeight.Bold, C.greenD)
-                    Spacer(Modifier.height(3.dp)); T("تدفع قيمة المشتريات للمتجر، وأجرة التوصيل للمندوب — كل واحدة على حدة، إلكترونياً أو نقداً.", 10, FontWeight.Medium, C.greenD, lineHeight = 17)
+                    T(tr("اختر كيف تحبّ الدفع", "Choose how you'd like to pay"), 12, FontWeight.Bold, C.greenD)
+                    Spacer(Modifier.height(3.dp)); T(tr("تدفع قيمة المشتريات للمتجر، وأجرة التوصيل للمندوب — كل واحدة على حدة، إلكترونياً أو نقداً.", "You pay the items value to the store, and the delivery fee to the courier — each separately, online or in cash."), 10, FontWeight.Medium, C.greenD, lineHeight = 17)
                 }
             }
-            PaySection("قيمة المشتريات — تُدفع لـ «$storeName»", storePay) { storePay = it }
-            PaySection("أجرة التوصيل — تُدفع للمندوب", driverPay) { driverPay = it }
+            PaySection(tr("قيمة المشتريات — تُدفع لـ «$storeName»", "Items value — paid to «$storeName»"), storePay) { storePay = it }
+            PaySection(tr("أجرة التوصيل — تُدفع للمندوب", "Delivery fee — paid to the courier"), driverPay) { driverPay = it }
             Spacer(Modifier.height(8.dp))
-            WideButton("تأكيد الدفع", R.drawable.ic_check, modifier = Modifier.padding(horizontal = 22.dp)) { onDone() }
+            WideButton(tr("تأكيد الدفع", "Confirm payment"), R.drawable.ic_check, modifier = Modifier.padding(horizontal = 22.dp)) { onDone() }
             Spacer(Modifier.height(10.dp))
-            T("العودة للرئيسية", 13, FontWeight.Bold, C.muted, Modifier.padding(bottom = 24.dp).fillMaxWidth().clickable(onClick = onDone).padding(4.dp))
+            T(tr("العودة للرئيسية", "Back to home"), 13, FontWeight.Bold, C.muted, Modifier.padding(bottom = 24.dp).fillMaxWidth().clickable(onClick = onDone).padding(4.dp))
         }
     }
 }

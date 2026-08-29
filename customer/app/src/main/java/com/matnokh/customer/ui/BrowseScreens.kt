@@ -57,17 +57,17 @@ fun StoresScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, onS
             .collect { last -> if (hasMore && !loading && stores.isNotEmpty() && last >= stores.size - 4) loadPage(false) }
     }
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        CustBackHeader("المتاجر", onBack, onCart, onMenu)
+        CustBackHeader(tr("المتاجر", "Stores"), onBack, onCart, onMenu)
         CatBar(cat, Repo.categories) { cat = it }
-        FinField(query, { query = it }, placeholder = "ابحث عن متجر بالاسم أو القسم\u2026", modifier = Modifier.padding(start = 22.dp, end = 22.dp, top = 4.dp, bottom = 6.dp))
+        FinField(query, { query = it }, placeholder = tr("ابحث عن متجر بالاسم أو القسم\u2026", "Search stores by name or category\u2026"), modifier = Modifier.padding(start = 22.dp, end = 22.dp, top = 4.dp, bottom = 6.dp))
         Row(Modifier.fillMaxWidth().padding(start = 22.dp, end = 22.dp, top = 8.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            T(if (cat == null) "كل المتاجر" else Repo.categories.firstOrNull { it.id == cat }?.name ?: "متاجر", 15, FontWeight.ExtraBold, C.head, Modifier.weight(1f))
-            StorePill("${stores.size}${if (hasMore) "+" else ""} متجراً", C.pillLive, C.greenD)
+            T(if (cat == null) tr("كل المتاجر", "All stores") else Repo.categories.firstOrNull { it.id == cat }?.name ?: tr("متاجر", "Stores"), 15, FontWeight.ExtraBold, C.head, Modifier.weight(1f))
+            StorePill(tr("${stores.size}${if (hasMore) "+" else ""} متجراً", "${stores.size}${if (hasMore) "+" else ""} stores"), C.pillLive, C.greenD)
         }
         LazyColumn(Modifier.weight(1f), state = listState, contentPadding = PaddingValues(bottom = 24.dp)) {
             items(stores, key = { it.id }) { s -> StoreRow(s) { onStore(s) } }
             if (loading) item { Box(Modifier.fillMaxWidth().padding(vertical = 18.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = C.green) } }
-            if (!loading && stores.isEmpty()) item { CenterHint("لا توجد متاجر") }
+            if (!loading && stores.isEmpty()) item { CenterHint(tr("لا توجد متاجر", "No stores")) }
         }
     }
 }
@@ -75,7 +75,7 @@ fun StoresScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, onS
 @Composable
 fun CatBar(cur: Int?, cats: List<CatDto>, onPick: (Int?) -> Unit) {
     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 22.dp, vertical = 6.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-        CatChip("🏬", "الكل", cur == null) { onPick(null) }
+        CatChip("🏬", tr("الكل", "All"), cur == null) { onPick(null) }
         cats.forEach { c -> CatChip(c.icon ?: "🏬", c.name, cur == c.id) { onPick(c.id) } }
     }
 }
@@ -95,17 +95,17 @@ fun CenterHint(text: String) { Box(Modifier.fillMaxWidth().padding(26.dp), conte
 fun OffersAllScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, onOffer: (UiOffer) -> Unit) {
     val all = Repo.offers
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        CustBackHeader("العروض والخصومات", onBack, onCart, onMenu)
+        CustBackHeader(tr("العروض والخصومات", "Offers & discounts"), onBack, onCart, onMenu)
         LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(bottom = 24.dp)) {
             item {
                 Column(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(RoundedCornerShape(26.dp)).background(Grad.terra).padding(20.dp)) {
-                    T("🔥 وفّر أكثر", 19, FontWeight.Black, Color.White); Spacer(Modifier.height(4.dp)); T("كل المنتجات المخفّضة في متاجر مطنوخ", 12, FontWeight.Normal, Color.White.copy(alpha = .9f), lineHeight = 18)
-                    Spacer(Modifier.height(11.dp)); Box(Modifier.clip(CircleShape).background(Color.White.copy(alpha = .24f)).padding(horizontal = 14.dp, vertical = 5.dp)) { T("${all.size} عرضاً · بتوفير حتى ${all.maxOfOrNull { it.off } ?: 0}٪", 11, FontWeight.ExtraBold, Color.White) }
+                    T(tr("🔥 وفّر أكثر", "🔥 Save more"), 19, FontWeight.Black, Color.White); Spacer(Modifier.height(4.dp)); T(tr("كل المنتجات المخفّضة في متاجر مطنوخ", "All discounted products in Matnokh stores"), 12, FontWeight.Normal, Color.White.copy(alpha = .9f), lineHeight = 18)
+                    Spacer(Modifier.height(11.dp)); Box(Modifier.clip(CircleShape).background(Color.White.copy(alpha = .24f)).padding(horizontal = 14.dp, vertical = 5.dp)) { T(tr("${all.size} عرضاً · بتوفير حتى ${all.maxOfOrNull { it.off } ?: 0}٪", "${all.size} offers · save up to ${all.maxOfOrNull { it.off } ?: 0}%"), 11, FontWeight.ExtraBold, Color.White) }
                 }
                 Spacer(Modifier.height(12.dp))
             }
             items(all) { o -> OfferRowCard(o) { onOffer(o) } }
-            if (all.isEmpty()) item { CenterHint("لا توجد عروض حالياً") }
+            if (all.isEmpty()) item { CenterHint(tr("لا توجد عروض حالياً", "No offers currently")) }
         }
     }
 }
@@ -117,13 +117,13 @@ private fun OfferRowCard(o: UiOffer, onClick: () -> Unit) {
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
             T(o.product.name, 13, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(2.dp)); T("${o.storeName} · ${o.storeCategory}", 10, FontWeight.Normal, C.muted, maxLines = 1)
-            Spacer(Modifier.height(4.dp)); Box(Modifier.clip(CircleShape).background(Color(0xFFF6ECE4)).padding(horizontal = 8.dp, vertical = 2.dp)) { T("وفّر ﷼${money(o.product.oldPrice - o.product.price)}", 9, FontWeight.ExtraBold, C.terraText) }
+            Spacer(Modifier.height(4.dp)); Box(Modifier.clip(CircleShape).background(Color(0xFFF6ECE4)).padding(horizontal = 8.dp, vertical = 2.dp)) { T(tr("وفّر ﷼${money(o.product.oldPrice - o.product.price)}", "Save ﷼${money(o.product.oldPrice - o.product.price)}"), 9, FontWeight.ExtraBold, C.terraText) }
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             T("﷼${money(o.product.price)}", 16, FontWeight.Black, C.greenD)
             Text("﷼${money(o.product.oldPrice)}", fontFamily = Cairo, fontSize = 11.sp, color = Color(0xFF6E776D), textDecoration = TextDecoration.LineThrough)
         }
-        Spacer(Modifier.width(8.dp)); Box(Modifier.clip(CircleShape).background(Grad.terra).padding(horizontal = 9.dp, vertical = 4.dp)) { T("−${o.off}٪", 10, FontWeight.Black, Color.White) }
+        Spacer(Modifier.width(8.dp)); Box(Modifier.clip(CircleShape).background(Grad.terra).padding(horizontal = 9.dp, vertical = 4.dp)) { T(tr("−${o.off}٪", "−${o.off}%"), 10, FontWeight.Black, Color.White) }
     }
 }
 
@@ -132,7 +132,7 @@ fun NearbyStoresLegacy(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Uni
     var cat by remember { mutableStateOf<Int?>(Repo.categories.firstOrNull()?.id) }
     val list = if (cat == null) Repo.stores else Repo.stores.filter { s -> Repo.categories.firstOrNull { it.id == cat }?.let { s.categoryName == it.name } ?: true }
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        CustBackHeader("متاجر قريبة", onBack, onCart, onMenu)
+        CustBackHeader(tr("متاجر قريبة", "Nearby stores"), onBack, onCart, onMenu)
         Box(Modifier.fillMaxWidth().height(280.dp)) {
             val withCoords = list.filter { it.lat != null && it.lng != null }
             val center = withCoords.firstOrNull()?.let { com.google.android.gms.maps.model.LatLng(it.lat!!, it.lng!!) } ?: com.google.android.gms.maps.model.LatLng(24.7136, 46.6753)
@@ -148,7 +148,7 @@ fun NearbyStoresLegacy(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Uni
                     )
                 }
             }
-            Box(Modifier.align(Alignment.TopEnd).padding(12.dp).clip(RoundedCornerShape(50.dp)).background(Color(0xF2FFFFFF)).border(1.dp, C.line, RoundedCornerShape(50.dp)).clickable(onClick = onExpand).padding(horizontal = 12.dp, vertical = 8.dp)) { T("\uD83D\uDDFA\uFE0F ملء الشاشة", 11, FontWeight.ExtraBold, C.greenD) }
+            Box(Modifier.align(Alignment.TopEnd).padding(12.dp).clip(RoundedCornerShape(50.dp)).background(Color(0xF2FFFFFF)).border(1.dp, C.line, RoundedCornerShape(50.dp)).clickable(onClick = onExpand).padding(horizontal = 12.dp, vertical = 8.dp)) { T(tr("\uD83D\uDDFA\uFE0F ملء الشاشة", "\uD83D\uDDFA\uFE0F Fullscreen"), 11, FontWeight.ExtraBold, C.greenD) }
             Row(Modifier.align(Alignment.BottomStart).fillMaxWidth().horizontalScroll(rememberScrollState()).padding(12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Repo.categories.forEach { c ->
                     val on = cat == c.id
@@ -157,12 +157,12 @@ fun NearbyStoresLegacy(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Uni
             }
         }
         Row(Modifier.fillMaxWidth().padding(start = 22.dp, end = 22.dp, top = 16.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            T("${Repo.categories.firstOrNull { it.id == cat }?.name ?: "المتاجر"} قريبة منك", 15, FontWeight.ExtraBold, C.head, Modifier.weight(1f))
+            T(tr("${Repo.categories.firstOrNull { it.id == cat }?.name ?: "المتاجر"} قريبة منك", "${Repo.categories.firstOrNull { it.id == cat }?.name ?: "Stores"} near you"), 15, FontWeight.ExtraBold, C.head, Modifier.weight(1f))
             StorePill("${list.size}", C.pillLive, C.greenD)
         }
         LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(bottom = 24.dp)) {
             items(list) { s -> StoreRow(s) { onStore(s) } }
-            if (list.isEmpty()) item { CenterHint("لا توجد متاجر قريبة في هذا القسم") }
+            if (list.isEmpty()) item { CenterHint(tr("لا توجد متاجر قريبة في هذا القسم", "No nearby stores in this category")) }
         }
     }
 }

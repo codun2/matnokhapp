@@ -1,4 +1,5 @@
 package com.matnokh.customer.net
+import com.matnokh.customer.ui.tr
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -16,15 +17,15 @@ data class UiOffer(val product: UiProduct, val storeId: Int, val storeName: Stri
 data class UiPlace(val id: String, val name: String, val lat: Double, val lng: Double, val address: String, val type: String)
 data class PlaceCat(val label: String, val gtype: String, val emoji: String, val hue: Float)
 val PLACE_CATS = listOf(
-    PlaceCat("مطاعم", "restaurant", "\uD83C\uDF7D\uFE0F", 0f),
-    PlaceCat("وجبات سريعة", "meal_takeaway", "\uD83C\uDF54", 30f),
-    PlaceCat("قهوة وحلويات", "cafe", "\u2615", 45f),
-    PlaceCat("سوبرماركت", "supermarket", "\uD83D\uDED2", 120f),
-    PlaceCat("بقالة", "convenience_store", "\uD83C\uDFEA", 200f),
-    PlaceCat("صيدليات", "pharmacy", "\uD83D\uDC8A", 210f),
-    PlaceCat("مخابز", "bakery", "\uD83E\uDD56", 60f),
-    PlaceCat("ورد وهدايا", "florist", "\uD83C\uDF81", 300f),
-    PlaceCat("إلكترونيات", "electronics_store", "\uD83D\uDCF1", 270f),
+    PlaceCat(tr("مطاعم", "Restaurants"), "restaurant", "\uD83C\uDF7D\uFE0F", 0f),
+    PlaceCat(tr("وجبات سريعة", "Fast food"), "meal_takeaway", "\uD83C\uDF54", 30f),
+    PlaceCat(tr("قهوة وحلويات", "Coffee & sweets"), "cafe", "\u2615", 45f),
+    PlaceCat(tr("سوبرماركت", "Supermarket"), "supermarket", "\uD83D\uDED2", 120f),
+    PlaceCat(tr("بقالة", "Grocery"), "convenience_store", "\uD83C\uDFEA", 200f),
+    PlaceCat(tr("صيدليات", "Pharmacies"), "pharmacy", "\uD83D\uDC8A", 210f),
+    PlaceCat(tr("مخابز", "Bakeries"), "bakery", "\uD83E\uDD56", 60f),
+    PlaceCat(tr("ورد وهدايا", "Flowers & gifts"), "florist", "\uD83C\uDF81", 300f),
+    PlaceCat(tr("إلكترونيات", "Electronics"), "electronics_store", "\uD83D\uDCF1", 270f),
 )
 
 object Repo {
@@ -40,7 +41,7 @@ object Repo {
     val favIds = mutableStateListOf<Int>()
     var here by mutableStateOf<Pair<Double, Double>?>(null)
 
-    private fun StoreDto.toUi() = UiStore(id, store_name, category_name ?: "متجر", logo, String.format("%.1f", rating.coerceAtLeast(0.0)).let { if (rating <= 0) "جديد" else it }, is_open, branches_count, "%.1f".format((id % 4 + 5) / 10.0 + id % 3), lat, lng)
+    private fun StoreDto.toUi() = UiStore(id, store_name, category_name ?: tr("متجر", "Store"), logo, String.format("%.1f", rating.coerceAtLeast(0.0)).let { if (rating <= 0) tr("جديد", "New") else it }, is_open, branches_count, "%.1f".format((id % 4 + 5) / 10.0 + id % 3), lat, lng)
     fun toUiStores(list: List<StoreDto>): List<UiStore> = list.map { it.toUi() }
     private fun ProdDto.toUi(outB: List<Int> = emptyList()) = UiProduct(id, name, description ?: "", price, price_before, images, addons.map { UiAddon(it.name, it.price) }, outB)
 
@@ -68,5 +69,5 @@ object Repo {
 }
 
 suspend fun <T> call(block: suspend () -> T, toast: (String) -> Unit): T? = try { block() }
-catch (e: retrofit2.HttpException) { toast(errorMessage(e) ?: "خطأ في الخادم"); null }
-catch (e: Exception) { toast("تعذّر الاتصال بالخادم"); null }
+catch (e: retrofit2.HttpException) { toast(errorMessage(e) ?: tr("خطأ في الخادم", "Server error")); null }
+catch (e: Exception) { toast(tr("تعذّر الاتصال بالخادم", "Couldn't reach the server")); null }

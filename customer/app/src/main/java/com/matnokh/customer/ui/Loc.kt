@@ -45,7 +45,7 @@ suspend fun reverseName(lat: Double, lng: Double): String? = withContext(Dispatc
             val near = pick("neighbourhood", "suburb", "quarter", "road", "pedestrian", "village")
             val city = pick("city", "town", "municipality", "state_district", "state")
             val parts = listOfNotNull(near, city)
-            if (parts.isNotEmpty()) parts.joinToString("، ") else o.optString("display_name").split(",").take(2).joinToString("،").trim().ifBlank { null }
+            if (parts.isNotEmpty()) parts.joinToString(tr("، ", ", ")) else o.optString("display_name").split(",").take(2).joinToString(tr("،", ",")).trim().ifBlank { null }
         }
     } catch (e: Exception) { null }
 }

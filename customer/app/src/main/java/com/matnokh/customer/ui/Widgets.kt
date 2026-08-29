@@ -34,17 +34,17 @@ fun StoreLogo(logo: String?, size: Dp, corner: Dp, category: String? = null) {
 // أيقونة افتراضية حسب نوع المتجر (تُستبدل بشعار المتجر إن رفعه التاجر)
 fun catEmoji(cat: String?): String = when {
     cat == null -> "\uD83C\uDFEA"
-    "صيدل" in cat -> "\uD83D\uDC8A"
-    "مطعم" in cat || "مطاعم" in cat || "مأكولات" in cat -> "\uD83C\uDF7D\uFE0F"
-    "سوبر" in cat || "بقالة" in cat || "ماركت" in cat || "تسوق" in cat -> "\uD83D\uDED2"
-    "حلوي" in cat || "حلا" in cat -> "\uD83C\uDF70"
-    "قهوة" in cat || "كافيه" in cat || "مشروب" in cat -> "\u2615"
-    "خضار" in cat || "فواكه" in cat -> "\uD83E\uDD6C"
-    "لحوم" in cat || "دجاج" in cat -> "\uD83C\uDF57"
-    "إلكترون" in cat || "الكترون" in cat || "جوال" in cat -> "\uD83D\uDCF1"
-    "ملابس" in cat || "أزياء" in cat -> "\uD83D\uDC55"
-    "ورد" in cat || "هدايا" in cat -> "\uD83C\uDF81"
-    "مخبز" in cat || "خبز" in cat -> "\uD83E\uDD56"
+    tr("صيدل", "Pharmacy") in cat -> "\uD83D\uDC8A"
+    tr("مطعم", "Restaurant") in cat || tr("مطاعم", "Restaurants") in cat || tr("مأكولات", "Food") in cat -> "\uD83C\uDF7D\uFE0F"
+    tr("سوبر", "Super") in cat || tr("بقالة", "Grocery") in cat || tr("ماركت", "Market") in cat || tr("تسوق", "Shop") in cat -> "\uD83D\uDED2"
+    tr("حلوي", "Sweets") in cat || tr("حلا", "Dessert") in cat -> "\uD83C\uDF70"
+    tr("قهوة", "Coffee") in cat || tr("كافيه", "Café") in cat || tr("مشروب", "Drink") in cat -> "\u2615"
+    tr("خضار", "Vegetables") in cat || tr("فواكه", "Fruits") in cat -> "\uD83E\uDD6C"
+    tr("لحوم", "Meats") in cat || tr("دجاج", "Chicken") in cat -> "\uD83C\uDF57"
+    tr("إلكترون", "Electronics") in cat || tr("الكترون", "Electronics") in cat || tr("جوال", "Mobile") in cat -> "\uD83D\uDCF1"
+    tr("ملابس", "Clothing") in cat || tr("أزياء", "Fashion") in cat -> "\uD83D\uDC55"
+    tr("ورد", "Flowers") in cat || tr("هدايا", "Gifts") in cat -> "\uD83C\uDF81"
+    tr("مخبز", "Bakery") in cat || tr("خبز", "Bread") in cat -> "\uD83E\uDD56"
     else -> "\uD83C\uDFEA"
 }
 
@@ -67,12 +67,12 @@ fun StoreRow(s: UiStore, onClick: () -> Unit) {
         com.matnokh.customer.net.Repo.here?.let { h ->
             if (s.lat != null && s.lng != null) {
                 val d = distanceKm(com.google.android.gms.maps.model.LatLng(h.first, h.second), com.google.android.gms.maps.model.LatLng(s.lat, s.lng))
-                Box(Modifier.clip(CircleShape).background(Color(0xFFE9F0F4)).padding(horizontal = 9.dp, vertical = 3.dp)) { T("${"%.1f".format(d)} كم", 10, FontWeight.ExtraBold, C.blueText) }
+                Box(Modifier.clip(CircleShape).background(Color(0xFFE9F0F4)).padding(horizontal = 9.dp, vertical = 3.dp)) { T(tr("${"%.1f".format(d)} كم", "${"%.1f".format(d)} km"), 10, FontWeight.ExtraBold, C.blueText) }
                 Spacer(Modifier.width(6.dp))
             }
         }
         Spacer(Modifier.width(6.dp))
-        StorePill(if (s.isOpen) "متاح" else "مغلق", if (s.isOpen) C.pillLive else C.pillOff, if (s.isOpen) C.ok else Color(0xFF9AA198))
+        StorePill(if (s.isOpen) tr("متاح", "Available") else tr("مغلق", "Closed"), if (s.isOpen) C.pillLive else C.pillOff, if (s.isOpen) C.ok else Color(0xFF9AA198))
         Spacer(Modifier.width(6.dp)); FavHeart(s.id)
     }
 }
@@ -106,7 +106,7 @@ fun CustomerHeader(onMenu: () -> Unit, onCart: () -> Unit, cartCount: Int, onBel
         Row(verticalAlignment = Alignment.CenterVertically) {
             MiniAvatar(46.dp, 16.dp)
             Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) { T("مساء الخير 👋", 11, FontWeight.Normal, C.muted); T(com.matnokh.customer.net.Session.name ?: "زائر", 15, FontWeight.Bold, C.text, maxLines = 1) }
+            Column(Modifier.weight(1f)) { T(tr("مساء الخير 👋", "Good evening 👋"), 11, FontWeight.Normal, C.muted); T(com.matnokh.customer.net.Session.name ?: tr("زائر", "Guest"), 15, FontWeight.Bold, C.text, maxLines = 1) }
             HeaderIcon(R.drawable.ic_menu, onClick = onMenu); Spacer(Modifier.width(9.dp)); CartButton(cartCount, onCart); Spacer(Modifier.width(9.dp))
             Box(Modifier.size(44.dp).clip(RoundedCornerShape(15.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(15.dp)).clickable(onClick = onBell), contentAlignment = Alignment.Center) {
                 Ic(R.drawable.ic_bell, 17.dp, Color(0xFF5D6B62)); Box(Modifier.align(Alignment.TopEnd).padding(top = 10.dp, end = 11.dp).size(8.dp).clip(CircleShape).background(C.terra))

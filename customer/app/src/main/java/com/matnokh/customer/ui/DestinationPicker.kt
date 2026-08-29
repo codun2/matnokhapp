@@ -46,14 +46,14 @@ fun DestRow(onChange: () -> Unit) {
         }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
-            T("عنوان التوصيل", 10, FontWeight.Normal, C.muted)
+            T(tr("عنوان التوصيل", "Delivery address"), 10, FontWeight.Normal, C.muted)
             T(Sel.destLabel, 13, FontWeight.Bold, C.head, maxLines = 1)
             Sel.destAddr?.takeIf { it.isNotBlank() }?.let { T(it, 10, FontWeight.Normal, C.muted, maxLines = 1) }
         }
         Box(
             Modifier.clip(RoundedCornerShape(12.dp)).background(C.pillLive).clickable(onClick = onChange)
                 .padding(horizontal = 15.dp, vertical = 9.dp),
-        ) { T("تغيير", 11, FontWeight.ExtraBold, C.greenD) }
+        ) { T(tr("تغيير", "Change"), 11, FontWeight.ExtraBold, C.greenD) }
     }
 }
 
@@ -98,31 +98,31 @@ fun DestinationScreen(onBack: () -> Unit, toast: (String) -> Unit) {
         Box(
             Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(14.dp).clip(RoundedCornerShape(50.dp))
                 .background(Color(0xF2FFFFFF)).border(1.dp, C.line, RoundedCornerShape(50.dp)).padding(horizontal = 16.dp, vertical = 10.dp),
-        ) { T("حرّك الخريطة لتحديد وجهتك", 12, FontWeight.ExtraBold, C.head) }
+        ) { T(tr("حرّك الخريطة لتحديد وجهتك", "Move the map to set your destination"), 12, FontWeight.ExtraBold, C.head) }
         // زر موقعي الحالي (إعادة التمركز)
         Box(
             Modifier.align(Alignment.CenterEnd).padding(16.dp).size(48.dp).clip(CircleShape).background(C.card)
                 .border(1.dp, C.line, CircleShape).clickable {
                     scope.launch {
                         currentLatLng(ctx)?.let { camera.position = CameraPosition.fromLatLngZoom(LatLng(it.first, it.second), 16f) }
-                            ?: toast("تعذّر تحديد موقعك")
+                            ?: toast(tr("تعذّر تحديد موقعك", "Couldn't determine your location"))
                     }
                 },
             contentAlignment = Alignment.Center,
         ) { Ic(R.drawable.ic_nav, 22.dp, C.greenD) }
         // أزرار التأكيد
         Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth().navigationBarsPadding().padding(18.dp)) {
-            SavedAddrStrip("receive") { a -> Sel.destLat = a.lat; Sel.destLng = a.lng; Sel.destLabel = a.label; Sel.destAddr = a.address; toast("الوجهة: ${a.label} ✓"); onBack() }
+            SavedAddrStrip("receive") { a -> Sel.destLat = a.lat; Sel.destLng = a.lng; Sel.destLabel = a.label; Sel.destAddr = a.address; toast(tr("الوجهة: ${a.label} ✓", "Destination: ${a.label} ✓")); onBack() }
             Row(
                 Modifier.fillMaxWidth().clip(RoundedCornerShape(17.dp)).background(Grad.green).clickable {
                     val t = camera.position.target
                     Sel.destLat = t.latitude; Sel.destLng = t.longitude
-                    Sel.destLabel = "موقع محدد على الخريطة"; Sel.destAddr = null
-                    toast("تم تحديد الوجهة ✓"); onBack()
+                    Sel.destLabel = tr("موقع محدد على الخريطة", "A set location on the map"); Sel.destAddr = null
+                    toast(tr("تم تحديد الوجهة ✓", "Destination set ✓")); onBack()
                 }.padding(vertical = 15.dp),
                 horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
             ) {
-                T("تأكيد هذا الموقع", 14, FontWeight.ExtraBold, Color.White); Spacer(Modifier.width(8.dp)); Ic(R.drawable.ic_check, 16.dp, Color.White)
+                T(tr("تأكيد هذا الموقع", "Confirm this location"), 14, FontWeight.ExtraBold, Color.White); Spacer(Modifier.width(8.dp)); Ic(R.drawable.ic_check, 16.dp, Color.White)
             }
             Spacer(Modifier.height(10.dp))
             Box(
@@ -130,14 +130,14 @@ fun DestinationScreen(onBack: () -> Unit, toast: (String) -> Unit) {
                     .clickable {
                         scope.launch {
                             val loc = currentLatLng(ctx)
-                            if (loc == null) { toast("تعذّر تحديد موقعك"); return@launch }
+                            if (loc == null) { toast(tr("تعذّر تحديد موقعك", "Couldn't determine your location")); return@launch }
                             Sel.destLat = loc.first; Sel.destLng = loc.second
-                            Sel.destLabel = "موقعي الحالي"; Sel.destAddr = null
-                            toast("سيتم التوصيل إلى موقعك الحالي ✓"); onBack()
+                            Sel.destLabel = tr("موقعي الحالي", "My current location"); Sel.destAddr = null
+                            toast(tr("سيتم التوصيل إلى موقعك الحالي ✓", "Delivery will be to your current location ✓")); onBack()
                         }
                     }.padding(vertical = 13.dp),
                 contentAlignment = Alignment.Center,
-            ) { T("استخدم موقعي الحالي", 13, FontWeight.ExtraBold, C.greenD) }
+            ) { T(tr("استخدم موقعي الحالي", "Use my current location"), 13, FontWeight.ExtraBold, C.greenD) }
         }
     }
 }

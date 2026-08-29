@@ -64,11 +64,11 @@ fun StoresMapFull(onBack: () -> Unit, onStore: (UiStore) -> Unit) {
             Ic(R.drawable.ic_back, 20.dp, C.head)
         }
         Box(Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(14.dp).clip(RoundedCornerShape(50.dp)).background(Color(0xF2FFFFFF)).border(1.dp, C.line, RoundedCornerShape(50.dp)).padding(horizontal = 16.dp, vertical = 10.dp)) {
-            T("${stores.size} خدمة قريبة", 13, FontWeight.ExtraBold, C.head)
+            T(tr("${stores.size} خدمة قريبة", "${stores.size} nearby services"), 13, FontWeight.ExtraBold, C.head)
         }
         // فلتر الأنواع
         Row(Modifier.align(Alignment.BottomStart).fillMaxWidth().horizontalScroll(rememberScrollState()).padding(14.dp).navigationBarsPadding(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip("الكل", cat == null) { cat = null }
+            FilterChip(tr("الكل", "All"), cat == null) { cat = null }
             Repo.categories.forEach { c -> FilterChip(catText(c.icon, c.name), cat == c.id) { cat = c.id } }
         }
     }

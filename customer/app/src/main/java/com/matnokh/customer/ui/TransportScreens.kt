@@ -49,7 +49,7 @@ import com.matnokh.customer.net.Session
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 
-private val areas = listOf("حي النرجس", "شارع الملك فهد", "الملقا", "العليا", "الياسمين", "حي الورود")
+private val areas = listOf(tr("حي النرجس", "Al-Narjis district"), tr("شارع الملك فهد", "King Fahd Road"), tr("الملقا", "Al-Malqa"), tr("العليا", "Al-Olaya"), tr("الياسمين", "Al-Yasmin"), tr("حي الورود", "Al-Wurood district"))
 
 /* ── إنشاء طلب نقل ── */
 @Composable
@@ -75,8 +75,8 @@ fun OrderScreen(onBack: () -> Unit, onMenu: () -> Unit, onCreated: (Int) -> Unit
     }
     val handleClick: (LatLng) -> Unit = { ll ->
         val isA = !hasDropoff || target == "a"
-        if (isA) { locA = ll; areaA = "جارٍ تحديد الاسم…"; if (hasDropoff) target = "b" } else { locB = ll; areaB = "جارٍ تحديد الاسم…"; target = "a" }
-        scope.launch { val nm = reverseName(ll.latitude, ll.longitude) ?: "موقع على الخريطة"; if (isA) areaA = nm else areaB = nm }
+        if (isA) { locA = ll; areaA = tr("جارٍ تحديد الاسم…", "Detecting name…"); if (hasDropoff) target = "b" } else { locB = ll; areaB = tr("جارٍ تحديد الاسم…", "Detecting name…"); target = "a" }
+        scope.launch { val nm = reverseName(ll.latitude, ll.longitude) ?: tr("موقع على الخريطة", "Location on the map"); if (isA) areaA = nm else areaB = nm }
     }
     val hasDist = hasDropoff && locA != null && locB != null
     val distExtraMin = if (hasDist) Math.round(distanceKm(locA!!, locB!!) * com.matnokh.customer.net.Repo.kmMin).toInt() else 0
@@ -85,22 +85,22 @@ fun OrderScreen(onBack: () -> Unit, onMenu: () -> Unit, onCreated: (Int) -> Unit
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize().background(C.bg)) {
-            ScreenHeader("طلب — ${svc.name}", onBack, onMenu)
+            ScreenHeader(tr("طلب — ${svc.name}", "Request — ${svc.name}"), onBack, onMenu)
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
                 OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
                     Row(Modifier.clip(RoundedCornerShape(18.dp)).background(Color(0xFFEEF4EF)).border(1.5.dp, Color(0xFFCFE0D4), RoundedCornerShape(18.dp)).padding(horizontal = 15.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.size(46.dp).clip(RoundedCornerShape(15.dp)).background(Grad.green), contentAlignment = Alignment.Center) { val si = svc.icon; when { si != null && si.startsWith("http") -> coil.compose.AsyncImage(model = si, contentDescription = null, contentScale = androidx.compose.ui.layout.ContentScale.Crop, modifier = Modifier.size(46.dp).clip(RoundedCornerShape(15.dp))); !si.isNullOrBlank() -> T(si, 22, FontWeight.Bold, Color.White); else -> Ic(R.drawable.ic_van, 22.dp, Color.White) } }
                         Spacer(Modifier.width(12.dp))
-                        Column { T("خدمة: ${svc.name}", 13, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T(if (hasDropoff) "حدّد نقطة الاستلام والتسليم — يصل طلبك لسائقي هذه الخدمة فقط" else "حدّد نقطة الاستلام فقط — يصل لسائقي هذه الخدمة", 10, FontWeight.Normal, C.muted, lineHeight = 16) }
+                        Column { T(tr("خدمة: ${svc.name}", "Service: ${svc.name}"), 13, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T(if (hasDropoff) tr("حدّد نقطة الاستلام والتسليم — يصل طلبك لسائقي هذه الخدمة فقط", "Set pickup & drop-off — your request reaches this service's drivers only") else tr("حدّد نقطة الاستلام فقط — يصل لسائقي هذه الخدمة", "Set the pickup point only — sent to this service's drivers"), 10, FontWeight.Normal, C.muted, lineHeight = 16) }
                     }
                 }
                 Spacer(Modifier.height(14.dp))
                 OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                    OcTitle(R.drawable.ic_pin, if (hasDropoff) "حدّد الاستلام والتسليم على الخريطة" else "حدّد نقطة الاستلام على الخريطة")
+                    OcTitle(R.drawable.ic_pin, if (hasDropoff) tr("حدّد الاستلام والتسليم على الخريطة", "Set pickup & drop-off on the map") else tr("حدّد نقطة الاستلام على الخريطة", "Set the pickup point on the map"))
                     if (hasDropoff) {
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            PMode("نقطة الاستلام", R.drawable.ic_pin, target == "a", C.green, Modifier.weight(1f)) { target = "a" }
-                            PMode("نقطة التسليم", R.drawable.ic_flag, target == "b", C.terra, Modifier.weight(1f)) { target = "b" }
+                            PMode(tr("نقطة الاستلام", "Pickup point"), R.drawable.ic_pin, target == "a", C.green, Modifier.weight(1f)) { target = "a" }
+                            PMode(tr("نقطة التسليم", "Drop-off point"), R.drawable.ic_flag, target == "b", C.terra, Modifier.weight(1f)) { target = "b" }
                         }
                     }
                     SavedAddrStrip(if (!hasDropoff || target == "a") "pickup" else "receive") { a ->
@@ -113,47 +113,47 @@ fun OrderScreen(onBack: () -> Unit, onMenu: () -> Unit, onCreated: (Int) -> Unit
                         if (!mapFull) {
                             OrderPickMap(camera, granted, locA, locB, handleClick, Modifier.fillMaxSize())
                             Box(Modifier.align(Alignment.BottomStart).padding(10.dp).clip(RoundedCornerShape(50.dp)).background(Color(0xF2FFFFFF)).border(1.dp, C.line, RoundedCornerShape(50.dp)).padding(horizontal = 13.dp, vertical = 7.dp)) {
-                                T(if (!hasDropoff || target == "a") "اضغط لتحديد الاستلام" else "اضغط لتحديد التسليم", 10, FontWeight.ExtraBold, if (!hasDropoff || target == "a") C.greenD else C.terraText)
+                                T(if (!hasDropoff || target == "a") tr("اضغط لتحديد الاستلام", "Tap to set pickup") else tr("اضغط لتحديد التسليم", "Tap to set drop-off"), 10, FontWeight.ExtraBold, if (!hasDropoff || target == "a") C.greenD else C.terraText)
                             }
-                            Box(Modifier.align(Alignment.TopEnd).padding(10.dp).clip(RoundedCornerShape(50.dp)).background(Color(0xF2FFFFFF)).border(1.dp, C.line, RoundedCornerShape(50.dp)).clickable { mapFull = true }.padding(horizontal = 12.dp, vertical = 8.dp)) { T("🗺️ ملء الشاشة", 11, FontWeight.ExtraBold, C.greenD) }
+                            Box(Modifier.align(Alignment.TopEnd).padding(10.dp).clip(RoundedCornerShape(50.dp)).background(Color(0xF2FFFFFF)).border(1.dp, C.line, RoundedCornerShape(50.dp)).clickable { mapFull = true }.padding(horizontal = 12.dp, vertical = 8.dp)) { T(tr("🗺️ ملء الشاشة", "🗺️ Fullscreen"), 11, FontWeight.ExtraBold, C.greenD) }
                         } else {
-                            Box(Modifier.fillMaxSize().background(C.card2), contentAlignment = Alignment.Center) { T("الخريطة مفتوحة بملء الشاشة …", 12, FontWeight.ExtraBold, C.muted) }
+                            Box(Modifier.fillMaxSize().background(C.card2), contentAlignment = Alignment.Center) { T(tr("الخريطة مفتوحة بملء الشاشة …", "Map open in fullscreen …"), 12, FontWeight.ExtraBold, C.muted) }
                         }
                     }
                     Spacer(Modifier.height(11.dp))
-                    LocBox(R.drawable.ic_pin, C.green, "الاستلام", areaA)
-                    if (hasDropoff) { Spacer(Modifier.height(9.dp)); LocBox(R.drawable.ic_flag, C.terra, "التسليم", areaB) }
+                    LocBox(R.drawable.ic_pin, C.green, tr("الاستلام", "Pickup"), areaA)
+                    if (hasDropoff) { Spacer(Modifier.height(9.dp)); LocBox(R.drawable.ic_flag, C.terra, tr("التسليم", "Delivery"), areaB) }
                 }
                 Spacer(Modifier.height(14.dp))
                 OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                    OcTitle(R.drawable.ic_msg, "ملاحظات الطلب")
-                    FinField(note, { note = it }, "تفاصيل الحمولة أو ملاحظات للمندوب (النوع، الوزن، طابق، وقت مناسب…)", singleLine = false, minHeight = 84.dp)
+                    OcTitle(R.drawable.ic_msg, tr("ملاحظات الطلب", "Order notes"))
+                    FinField(note, { note = it }, tr("تفاصيل الحمولة أو ملاحظات للمندوب (النوع، الوزن، طابق، وقت مناسب…)", "Load details or notes for the courier (type, weight, floor, suitable time…)"), singleLine = false, minHeight = 84.dp)
                 }
                 Spacer(Modifier.height(4.dp))
                 Row(Modifier.padding(horizontal = 22.dp, vertical = 12.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.5.dp, Color(0xFFCFE0D4), RoundedCornerShape(22.dp)).padding(17.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        T("التكلفة التقديرية", 11, FontWeight.Normal, C.muted)
-                        if (hasDist) { T("﷼${base + distExtraMin} – ﷼${base + distExtraMax}", 20, FontWeight.Black, C.greenD); T("~${Math.round(distanceKm(locA!!, locB!!))} كم × سعر الكيلو", 10, FontWeight.Medium, C.muted) }
-                        else if (!hasDropoff) T(if (base > 0) "﷼$base" else "حسب عرض السائق", 18, FontWeight.Black, C.greenD)
-                        else T("حدّد النقطتين للتقدير", 15, FontWeight.Bold, C.muted)
+                        T(tr("التكلفة التقديرية", "Estimated cost"), 11, FontWeight.Normal, C.muted)
+                        if (hasDist) { T("﷼${base + distExtraMin} – ﷼${base + distExtraMax}", 20, FontWeight.Black, C.greenD); T(tr("~${Math.round(distanceKm(locA!!, locB!!))} كم × سعر الكيلو", "~${Math.round(distanceKm(locA!!, locB!!))} km × per-km price"), 10, FontWeight.Medium, C.muted) }
+                        else if (!hasDropoff) T(if (base > 0) "﷼$base" else tr("حسب عرض السائق", "Per the driver's offer"), 18, FontWeight.Black, C.greenD)
+                        else T(tr("حدّد النقطتين للتقدير", "Set both points to estimate"), 15, FontWeight.Bold, C.muted)
                     }
-                    T("تقديري — السعر النهائي\nحسب عرض السائق الفائز", 10, FontWeight.Normal, C.muted, lineHeight = 16)
+                    T(tr("تقديري — السعر النهائي\nحسب عرض السائق الفائز", "Estimated — final price\nper the winning driver's offer"), 10, FontWeight.Normal, C.muted, lineHeight = 16)
                 }
                 Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(RoundedCornerShape(17.dp)).background(Grad.green).clickable {
                     if (sending) return@clickable
-                    if (!Session.isLoggedIn()) { toast("سجّل الدخول أولاً"); return@clickable }
-                    if (locA == null) { toast("حدّد نقطة الاستلام على الخريطة"); return@clickable }
-                    if (hasDropoff && locB == null) { toast("حدّد نقطة التسليم على الخريطة"); return@clickable }
+                    if (!Session.isLoggedIn()) { toast(tr("سجّل الدخول أولاً", "Log in first")); return@clickable }
+                    if (locA == null) { toast(tr("حدّد نقطة الاستلام على الخريطة", "Set the pickup point on the map")); return@clickable }
+                    if (hasDropoff && locB == null) { toast(tr("حدّد نقطة التسليم على الخريطة", "Set the drop-off point on the map")); return@clickable }
                     sending = true
                     scope.launch {
                         val price = (if (distExtraMax > 0) base + distExtraMax else base).toDouble()
-                        val body = com.matnokh.customer.net.TransportBody(svc.key, svc.name, areaA ?: "موقع الاستلام", if (hasDropoff) (areaB ?: "موقع التسليم") else null, locA!!.latitude, locA!!.longitude, note.ifBlank { null }, "bid", price, "cash", if (hasDropoff) locB?.latitude else null, if (hasDropoff) locB?.longitude else null)
+                        val body = com.matnokh.customer.net.TransportBody(svc.key, svc.name, areaA ?: tr("موقع الاستلام", "Pickup location"), if (hasDropoff) (areaB ?: tr("موقع التسليم", "Drop-off location")) else null, locA!!.latitude, locA!!.longitude, note.ifBlank { null }, "bid", price, "cash", if (hasDropoff) locB?.latitude else null, if (hasDropoff) locB?.longitude else null)
                         val r = call({ com.matnokh.customer.net.Net.api.createTransport(body) }, toast)
                         sending = false
-                        if (r?.order_id != null) { Sel.svcName = svc.name; toast(r.message ?: "أُرسل طلبك للسائقين ✓"); onCreated(r.order_id!!) }
+                        if (r?.order_id != null) { Sel.svcName = svc.name; toast(r.message ?: tr("أُرسل طلبك للسائقين ✓", "Your request was sent to drivers ✓")); onCreated(r.order_id!!) }
                     }
                 }.padding(vertical = 16.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                    T(if (sending) "جارٍ الإرسال…" else "تأكيد الطلب واستقبال العروض", 14, FontWeight.ExtraBold, Color.White); Spacer(Modifier.width(8.dp)); Ic(R.drawable.ic_check, 16.dp, Color.White)
+                    T(if (sending) tr("جارٍ الإرسال…", "Sending…") else tr("تأكيد الطلب واستقبال العروض", "Confirm order & receive offers"), 14, FontWeight.ExtraBold, Color.White); Spacer(Modifier.width(8.dp)); Ic(R.drawable.ic_check, 16.dp, Color.White)
                 }
                 Spacer(Modifier.height(24.dp))
             }
@@ -162,10 +162,10 @@ fun OrderScreen(onBack: () -> Unit, onMenu: () -> Unit, onCreated: (Int) -> Unit
             Box(Modifier.fillMaxSize().background(C.bg)) {
                 OrderPickMap(camera, granted, locA, locB, handleClick, Modifier.fillMaxSize())
                 Box(Modifier.align(Alignment.TopStart).statusBarsPadding().padding(14.dp).size(46.dp).clip(RoundedCornerShape(16.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(16.dp)).clickable { mapFull = false }, contentAlignment = Alignment.Center) { Ic(R.drawable.ic_back, 20.dp, C.head) }
-                Box(Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(14.dp).clip(RoundedCornerShape(50.dp)).background(Color(0xF2FFFFFF)).border(1.dp, C.line, RoundedCornerShape(50.dp)).padding(horizontal = 16.dp, vertical = 10.dp)) { T(if (!hasDropoff || target == "a") "اضغط لتحديد الاستلام" else "اضغط لتحديد التسليم", 12, FontWeight.ExtraBold, if (!hasDropoff || target == "a") C.greenD else C.terraText) }
+                Box(Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(14.dp).clip(RoundedCornerShape(50.dp)).background(Color(0xF2FFFFFF)).border(1.dp, C.line, RoundedCornerShape(50.dp)).padding(horizontal = 16.dp, vertical = 10.dp)) { T(if (!hasDropoff || target == "a") tr("اضغط لتحديد الاستلام", "Tap to set pickup") else tr("اضغط لتحديد التسليم", "Tap to set drop-off"), 12, FontWeight.ExtraBold, if (!hasDropoff || target == "a") C.greenD else C.terraText) }
                 if (hasDropoff) Row(Modifier.align(Alignment.BottomCenter).fillMaxWidth().navigationBarsPadding().padding(16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    PMode("نقطة الاستلام", R.drawable.ic_pin, target == "a", C.green, Modifier.weight(1f)) { target = "a" }
-                    PMode("نقطة التسليم", R.drawable.ic_flag, target == "b", C.terra, Modifier.weight(1f)) { target = "b" }
+                    PMode(tr("نقطة الاستلام", "Pickup point"), R.drawable.ic_pin, target == "a", C.green, Modifier.weight(1f)) { target = "a" }
+                    PMode(tr("نقطة التسليم", "Drop-off point"), R.drawable.ic_flag, target == "b", C.terra, Modifier.weight(1f)) { target = "b" }
                 }
             }
         }
@@ -183,8 +183,8 @@ private fun OrderPickMap(camera: CameraPositionState, granted: Boolean, locA: La
         onMapClick = onClick,
     ) {
         OsmTiles()
-        locA?.let { Marker(state = MarkerState(it), title = "الاستلام", icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)) }
-        locB?.let { Marker(state = MarkerState(it), title = "التسليم", icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)) }
+        locA?.let { Marker(state = MarkerState(it), title = tr("الاستلام", "Pickup"), icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)) }
+        locB?.let { Marker(state = MarkerState(it), title = tr("التسليم", "Delivery"), icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)) }
     }
 }
 
@@ -207,7 +207,7 @@ private fun LocBox(icon: Int, color: Color, label: String, area: String?) {
     val set = area != null
     Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).then(if (set) Modifier.background(Color(0xFFF2F8F3)).border(1.dp, Color(0xFFCFE0D4), RoundedCornerShape(14.dp)) else Modifier.background(Color(0xFFFAF8F4)).border(1.dp, C.line, RoundedCornerShape(14.dp))).padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
         Ic(icon, 15.dp, color); Spacer(Modifier.width(9.dp))
-        if (set) T("$label: $area ✓", 12, FontWeight.Bold, C.head, maxLines = 1) else T("$label: اضغط على الخريطة لتحديدها", 11, FontWeight.Medium, C.muted, maxLines = 1)
+        if (set) T("$label: $area ✓", 12, FontWeight.Bold, C.head, maxLines = 1) else T(tr("$label: اضغط على الخريطة لتحديدها", "$label: tap the map to set it"), 11, FontWeight.Medium, C.muted, maxLines = 1)
     }
 }
 
@@ -239,29 +239,29 @@ fun OffersScreen(onBack: () -> Unit, onMenu: () -> Unit, onPick: (String, String
         CData.driverPool.forEachIndexed { i, d -> delay(if (i == 0) 900 else 1500); shown.add(d) }
     }
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("عروض السائقين", onBack, onMenu)
+        ScreenHeader(tr("عروض السائقين", "Drivers' offers"), onBack, onMenu)
         LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(bottom = 24.dp)) {
             item {
                 OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.size(9.dp).clip(CircleShape).background(C.green))
                         Spacer(Modifier.width(12.dp))
-                        Column(Modifier.weight(1f)) { T("تم بثّ طلبك ✓", 13, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T("أُرسل لسائقي «${svc.name}» الأقرب إليك — العروض تصلك أولاً بأول", 10, FontWeight.Normal, C.muted, lineHeight = 16) }
-                        Column(Modifier.clip(RoundedCornerShape(14.dp)).background(Color(0xFFEEF4EF)).padding(horizontal = 13.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) { T("${shown.size}", 17, FontWeight.Black, C.greenD); T("عروض", 9, FontWeight.Normal, C.muted) }
+                        Column(Modifier.weight(1f)) { T(tr("تم بثّ طلبك ✓", "Your order was broadcast ✓"), 13, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T(tr("أُرسل لسائقي «${svc.name}» الأقرب إليك — العروض تصلك أولاً بأول", "Sent to the nearest «${svc.name}» drivers — offers arrive in real time"), 10, FontWeight.Normal, C.muted, lineHeight = 16) }
+                        Column(Modifier.clip(RoundedCornerShape(14.dp)).background(Color(0xFFEEF4EF)).padding(horizontal = 13.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) { T("${shown.size}", 17, FontWeight.Black, C.greenD); T(tr("عروض", "Offers"), 9, FontWeight.Normal, C.muted) }
                     }
                 }
-                SecTitle("العروض المستلمة", "الأقل سعراً")
+                SecTitle(tr("العروض المستلمة", "Received offers"), tr("الأقل سعراً", "Lowest price"))
             }
-            if (shown.isEmpty()) item { OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), PaddingValues(26.dp)) { Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { T("بانتظار أول عرض…", 12, FontWeight.Normal, C.muted) } } }
+            if (shown.isEmpty()) item { OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), PaddingValues(26.dp)) { Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { T(tr("بانتظار أول عرض…", "Waiting for the first offer…"), 12, FontWeight.Normal, C.muted) } } }
             items(shown.size) { i ->
                 val d = shown[i]; val price = base + d.priceDelta
                 Row(Modifier.padding(start = 22.dp, end = 22.dp, bottom = 12.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp)).padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(Grad.sand), contentAlignment = Alignment.Center) { T(d.avatar, 14, FontWeight.ExtraBold, Color(0xFF6B5335)) }
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) { T(d.name, 13, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(2.dp)); Row(verticalAlignment = Alignment.CenterVertically) { Text("★", color = Color(0xFFD9A441), fontSize = 11.sp); Spacer(Modifier.width(4.dp)); T("${d.rating} · ${svc.vehicle} · ${d.eta}", 10, FontWeight.Normal, C.muted, maxLines = 1) } }
-                    Column(Modifier.clip(RoundedCornerShape(14.dp)).background(Color(0xFFEEF4EF)).padding(horizontal = 12.dp, vertical = 7.dp), horizontalAlignment = Alignment.CenterHorizontally) { T("﷼$price", 15, FontWeight.Black, C.greenD); T("عرض السائق", 9, FontWeight.Normal, C.muted) }
+                    Column(Modifier.clip(RoundedCornerShape(14.dp)).background(Color(0xFFEEF4EF)).padding(horizontal = 12.dp, vertical = 7.dp), horizontalAlignment = Alignment.CenterHorizontally) { T("﷼$price", 15, FontWeight.Black, C.greenD); T(tr("عرض السائق", "Driver's offer"), 9, FontWeight.Normal, C.muted) }
                     Spacer(Modifier.width(10.dp))
-                    Box(Modifier.clip(RoundedCornerShape(13.dp)).background(Grad.green).clickable { onPick(d.name, d.avatar, "${d.rating} · ${svc.vehicle}", price) }.padding(horizontal = 14.dp, vertical = 10.dp)) { T("اختيار", 11, FontWeight.ExtraBold, Color.White) }
+                    Box(Modifier.clip(RoundedCornerShape(13.dp)).background(Grad.green).clickable { onPick(d.name, d.avatar, "${d.rating} · ${svc.vehicle}", price) }.padding(horizontal = 14.dp, vertical = 10.dp)) { T(tr("اختيار", "Select"), 11, FontWeight.ExtraBold, Color.White) }
                 }
             }
         }
@@ -269,7 +269,7 @@ fun OffersScreen(onBack: () -> Unit, onMenu: () -> Unit, onPick: (String, String
 }
 
 /* ── التتبّع ── */
-private val steps = listOf("تم القبول" to R.drawable.ic_check, "تم التحميل" to R.drawable.ic_box, "في الطريق" to R.drawable.ic_van, "التسليم" to R.drawable.ic_flag)
+private val steps = listOf(tr("تم القبول", "Accepted") to R.drawable.ic_check, tr("تم التحميل", "Loaded") to R.drawable.ic_box, tr("في الطريق", "On the way") to R.drawable.ic_van, tr("التسليم", "Delivery") to R.drawable.ic_flag)
 
 @Composable
 fun TrackScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit, onChat: () -> Unit = {}) {
@@ -279,7 +279,7 @@ fun TrackScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit,
     var ord by remember { mutableStateOf<com.matnokh.customer.net.TOrder?>(null) }
     LaunchedEffect(Unit) { while (true) { val o = runCatching { com.matnokh.customer.net.Net.api.transportOrders().orders.firstOrNull { it.id == Sel.transportId } }.getOrNull(); ord = o; if (o != null) step = when (o.status) { "assigned" -> 1; "loaded" -> 2; "on_the_way" -> 3; "delivered" -> 4; else -> step }; delay(4000) } }
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("تتبّع الطلب", onBack, onMenu)
+        ScreenHeader(tr("تتبّع الطلب", "Track order"), onBack, onMenu)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             // خريطة حقيقية
             val trkCtx = LocalContext.current
@@ -289,23 +289,23 @@ fun TrackScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit,
             LaunchedEffect(ord?.driver?.lat, ord?.driver?.lng) { val dd = ord?.driver; if (dd?.lat != null && dd.lng != null) trkCam.position = CameraPosition.fromLatLngZoom(LatLng(dd.lat, dd.lng), 15f) }
             Box(Modifier.fillMaxWidth().height(300.dp)) {
                 GoogleMap(modifier = Modifier.fillMaxSize(), cameraPositionState = trkCam, uiSettings = MapUiSettings(zoomControlsEnabled = false, mapToolbarEnabled = false, compassEnabled = false)) {
-                    trkHere?.let { Marker(state = MarkerState(LatLng(it.first, it.second)), title = "موقعك", icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)) }
+                    trkHere?.let { Marker(state = MarkerState(LatLng(it.first, it.second)), title = tr("موقعك", "Your location"), icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)) }
                     val oo = ord
                     val dTo = if (oo?.to_lat != null && oo.to_lng != null) LatLng(oo.to_lat, oo.to_lng) else null
-                    dTo?.let { Marker(state = MarkerState(it), title = "الوجهة", icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)) }
+                    dTo?.let { Marker(state = MarkerState(it), title = tr("الوجهة", "Destination"), icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)) }
                     oo?.driver?.let { dd -> if (dd.lat != null && dd.lng != null) {
                         if (dTo != null) Polyline(points = listOf(LatLng(dd.lat, dd.lng), dTo), color = C.green, width = 9f)
-                        AnimatedCarMarker(LatLng(dd.lat, dd.lng), dd.name ?: "المندوب", trkCtx, dTo)
+                        AnimatedCarMarker(LatLng(dd.lat, dd.lng), dd.name ?: tr("المندوب", "Courier"), trkCtx, dTo)
                     } }
                 }
-                Box(Modifier.align(Alignment.TopStart).padding(14.dp).clip(RoundedCornerShape(15.dp)).background(Color.White.copy(alpha = .9f)).padding(horizontal = 15.dp, vertical = 9.dp)) { Row(verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_nav, 15.dp, C.green); Spacer(Modifier.width(7.dp)); T("مباشر", 12, FontWeight.ExtraBold, Color(0xFF4B5A51)) } }
+                Box(Modifier.align(Alignment.TopStart).padding(14.dp).clip(RoundedCornerShape(15.dp)).background(Color.White.copy(alpha = .9f)).padding(horizontal = 15.dp, vertical = 9.dp)) { Row(verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_nav, 15.dp, C.green); Spacer(Modifier.width(7.dp)); T(tr("مباشر", "Live"), 12, FontWeight.ExtraBold, Color(0xFF4B5A51)) } }
             }
             // الورقة السفلية
             Column(Modifier.offset(y = (-26).dp).fillMaxWidth().clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)).background(C.bg).padding(horizontal = 22.dp, vertical = 10.dp)) {
                 Box(Modifier.align(Alignment.CenterHorizontally).padding(top = 4.dp, bottom = 16.dp).width(44.dp).height(5.dp).clip(CircleShape).background(Color(0xFFDDD6C9)))
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) { T(if (step >= 4) "وصلت شحنتك بأمان ✓" else "سائقك في الطريق إليك", 17, FontWeight.Bold, C.head); T("طلب #" + (ord?.order_no ?: "") + " · " + (ord?.service_name ?: Sel.svcName), 12, FontWeight.Normal, C.muted); run { val oo = ord; val dd = oo?.driver; val tlat = oo?.to_lat; val tlng = oo?.to_lng; if (step < 4 && dd?.lat != null && dd.lng != null && tlat != null && tlng != null) { Spacer(Modifier.height(5.dp)); Row(verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_clock, 13.dp, C.green); Spacer(Modifier.width(5.dp)); T(etaText(haversineKm(LatLng(dd.lat, dd.lng), LatLng(tlat, tlng))), 12, FontWeight.ExtraBold, C.green) } } } }
-                    Column(Modifier.clip(RoundedCornerShape(16.dp)).background(C.pillLive).padding(horizontal = 16.dp, vertical = 9.dp), horizontalAlignment = Alignment.CenterHorizontally) { T("18 د", 20, FontWeight.Black, C.greenD); T("وقت الوصول", 10, FontWeight.Normal, C.muted) }
+                    Column(Modifier.weight(1f)) { T(if (step >= 4) tr("وصلت شحنتك بأمان ✓", "Your shipment arrived safely ✓") else tr("سائقك في الطريق إليك", "Your driver is on the way"), 17, FontWeight.Bold, C.head); T(tr("طلب #", "Order #") + (ord?.order_no ?: "") + " · " + (ord?.service_name ?: Sel.svcName), 12, FontWeight.Normal, C.muted); run { val oo = ord; val dd = oo?.driver; val tlat = oo?.to_lat; val tlng = oo?.to_lng; if (step < 4 && dd?.lat != null && dd.lng != null && tlat != null && tlng != null) { Spacer(Modifier.height(5.dp)); Row(verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_clock, 13.dp, C.green); Spacer(Modifier.width(5.dp)); T(etaText(haversineKm(LatLng(dd.lat, dd.lng), LatLng(tlat, tlng))), 12, FontWeight.ExtraBold, C.green) } } } }
+                    Column(Modifier.clip(RoundedCornerShape(16.dp)).background(C.pillLive).padding(horizontal = 16.dp, vertical = 9.dp), horizontalAlignment = Alignment.CenterHorizontally) { T(tr("18 د", "18 min"), 20, FontWeight.Black, C.greenD); T(tr("وقت الوصول", "Arrival time"), 10, FontWeight.Normal, C.muted) }
                 }
                 Spacer(Modifier.height(16.dp))
                 // المراحل
@@ -324,31 +324,31 @@ fun TrackScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit,
                 Spacer(Modifier.height(20.dp))
                 // السائق
                 Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp)).padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Box(Modifier.size(52.dp).clip(RoundedCornerShape(17.dp)).background(Grad.sand), contentAlignment = Alignment.Center) { T(ord?.driver?.name?.take(2) ?: "؟", 16, FontWeight.ExtraBold, Color(0xFF6B5335)) }
+                    Box(Modifier.size(52.dp).clip(RoundedCornerShape(17.dp)).background(Grad.sand), contentAlignment = Alignment.Center) { T(ord?.driver?.name?.take(2) ?: tr("؟", "?"), 16, FontWeight.ExtraBold, Color(0xFF6B5335)) }
                     Spacer(Modifier.width(13.dp))
-                    Column(Modifier.weight(1f)) { T(ord?.driver?.name ?: "بانتظار تعيين السائق", 14, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); Row(verticalAlignment = Alignment.CenterVertically) { Text("★", color = Color(0xFFD9A441), fontSize = 11.sp); Spacer(Modifier.width(4.dp)); T(ord?.driver?.let { String.format("%.1f", it.rating) + " · " + (it.vehicle_type ?: "") } ?: "—", 11, FontWeight.Normal, C.muted, maxLines = 1) } }
+                    Column(Modifier.weight(1f)) { T(ord?.driver?.name ?: tr("بانتظار تعيين السائق", "Awaiting driver assignment"), 14, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); Row(verticalAlignment = Alignment.CenterVertically) { Text("★", color = Color(0xFFD9A441), fontSize = 11.sp); Spacer(Modifier.width(4.dp)); T(ord?.driver?.let { String.format("%.1f", it.rating) + " · " + (it.vehicle_type ?: "") } ?: "—", 11, FontWeight.Normal, C.muted, maxLines = 1) } }
                     Box(Modifier.size(44.dp).clip(RoundedCornerShape(15.dp)).background(Color(0xFFF2EFE9)).border(1.dp, C.line, RoundedCornerShape(15.dp)).clickable { onChat() }, contentAlignment = Alignment.Center) { Ic(R.drawable.ic_msg, 17.dp, Color(0xFF5D6B62)) }
                     Spacer(Modifier.width(9.dp))
-                    Box(Modifier.size(44.dp).clip(RoundedCornerShape(15.dp)).background(Grad.green).clickable { toast("الاتصال بالسائق") }, contentAlignment = Alignment.Center) { Ic(R.drawable.ic_phone, 17.dp, Color.White) }
+                    Box(Modifier.size(44.dp).clip(RoundedCornerShape(15.dp)).background(Grad.green).clickable { toast(tr("الاتصال بالسائق", "Call the driver")) }, contentAlignment = Alignment.Center) { Ic(R.drawable.ic_phone, 17.dp, Color.White) }
                 }
                 Spacer(Modifier.height(12.dp))
                 // معلومات الحمولة
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    CargoBox("الحمولة", R.drawable.ic_box, ord?.service_name ?: Sel.svcName, Modifier.weight(1f)); CargoBox("الدفع", R.drawable.ic_card, "بطاقة · ﷼${Sel.payAmount}", Modifier.weight(1f))
+                    CargoBox(tr("الحمولة", "Load"), R.drawable.ic_box, ord?.service_name ?: Sel.svcName, Modifier.weight(1f)); CargoBox(tr("الدفع", "Payment"), R.drawable.ic_card, tr("بطاقة · ﷼${Sel.payAmount}", "Card · ﷼${Sel.payAmount}"), Modifier.weight(1f))
                 }
                 Spacer(Modifier.height(10.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    CargoBox("من", R.drawable.ic_pin, ord?.from ?: "نقطة الاستلام", Modifier.weight(1f)); CargoBox("إلى", R.drawable.ic_flag, ord?.to ?: "نقطة التسليم", Modifier.weight(1f))
+                    CargoBox(tr("من", "From"), R.drawable.ic_pin, ord?.from ?: tr("نقطة الاستلام", "Pickup point"), Modifier.weight(1f)); CargoBox(tr("إلى", "To"), R.drawable.ic_flag, ord?.to ?: tr("نقطة التسليم", "Drop-off point"), Modifier.weight(1f))
                 }
                 if (step >= 4) {
                     Spacer(Modifier.height(14.dp))
                     OCard(Modifier.fillMaxWidth()) {
-                        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { T("وصلت شحنتك 🎉 — قيّم تجربتك", 14, FontWeight.Bold, C.head) }
+                        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { T(tr("وصلت شحنتك 🎉 — قيّم تجربتك", "Your shipment arrived 🎉 — rate your experience"), 14, FontWeight.Bold, C.head) }
                         Spacer(Modifier.height(8.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                             (1..5).forEach { n -> Text("★", fontSize = 30.sp, color = if (rated >= n) Color(0xFFD9A441) else Color(0xFFDDD6C9), modifier = Modifier.padding(horizontal = 4.dp).clickable { rated = n }) }
                         }
-                        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { T(if (rated > 0) "شكراً لاستخدامك تطبيق مطنوخ 💚 نتمنى أن تكون تجربتك رائعة!" else "من 1 إلى 5 نجوم", 11, FontWeight.Normal, C.muted) }
+                        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { T(if (rated > 0) tr("شكراً لاستخدامك تطبيق مطنوخ 💚 نتمنى أن تكون تجربتك رائعة!", "Thanks for using Matnokh 💚 We hope you have a great experience!") else tr("من 1 إلى 5 نجوم", "From 1 to 5 stars"), 11, FontWeight.Normal, C.muted) }
                     }
                 }
                 Spacer(Modifier.height(24.dp))
@@ -379,30 +379,30 @@ fun TransportBidsScreen(onBack: () -> Unit, onMenu: () -> Unit, onTrack: () -> U
         kotlinx.coroutines.delay(4000); tick++
     }
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("عروض السائقين", onBack, onMenu)
+        ScreenHeader(tr("عروض السائقين", "Drivers' offers"), onBack, onMenu)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(top = 8.dp)) {
             val o = order
             when {
                 !loaded -> Box(Modifier.fillMaxWidth().padding(30.dp), contentAlignment = Alignment.Center) { androidx.compose.material3.CircularProgressIndicator(color = C.green) }
-                o == null -> CenterHint("لم يُعثر على الطلب — تحقّق من «العروض الجارية»")
+                o == null -> CenterHint(tr("لم يُعثر على الطلب — تحقّق من «العروض الجارية»", "Order not found — check «Active offers»"))
                 o.status != "broadcasting" -> {
-                    CenterHint("تم إسناد طلبك لسائق ✓ — جارٍ التنفيذ")
-                    Row(Modifier.padding(22.dp).fillMaxWidth().clip(RoundedCornerShape(17.dp)).background(Grad.green).clickable(onClick = onTrack).padding(vertical = 15.dp), horizontalArrangement = Arrangement.Center) { T("تتبّع الطلب", 14, FontWeight.ExtraBold, Color.White) }
+                    CenterHint(tr("تم إسناد طلبك لسائق ✓ — جارٍ التنفيذ", "Your order was assigned to a driver ✓ — in progress"))
+                    Row(Modifier.padding(22.dp).fillMaxWidth().clip(RoundedCornerShape(17.dp)).background(Grad.green).clickable(onClick = onTrack).padding(vertical = 15.dp), horizontalArrangement = Arrangement.Center) { T(tr("تتبّع الطلب", "Track order"), 14, FontWeight.ExtraBold, Color.White) }
                 }
                 o.bids.isEmpty() && System.currentTimeMillis() - startedAt > 180_000L -> {
-                    CenterHint("عذراً، لا يوجد مناديب متاحون الآن.\nيمكنك المحاولة بعد قليل.")
-                    Row(Modifier.padding(22.dp).fillMaxWidth().clip(RoundedCornerShape(17.dp)).background(Grad.green).clickable(onClick = onBack).padding(vertical = 15.dp), horizontalArrangement = Arrangement.Center) { T("العودة", 14, FontWeight.ExtraBold, Color.White) }
+                    CenterHint(tr("عذراً، لا يوجد مناديب متاحون الآن.\nيمكنك المحاولة بعد قليل.", "Sorry, no couriers are available now.\nPlease try again shortly."))
+                    Row(Modifier.padding(22.dp).fillMaxWidth().clip(RoundedCornerShape(17.dp)).background(Grad.green).clickable(onClick = onBack).padding(vertical = 15.dp), horizontalArrangement = Arrangement.Center) { T(tr("العودة", "Back"), 14, FontWeight.ExtraBold, Color.White) }
                 }
-                o.bids.isEmpty() -> CenterHint("بانتظار عروض السائقين القريبين…\nستظهر العروض هنا فور وصولها.")
+                o.bids.isEmpty() -> CenterHint(tr("بانتظار عروض السائقين القريبين…\nستظهر العروض هنا فور وصولها.", "Awaiting offers from nearby drivers…\nOffers appear here as they arrive."))
                 else -> {
-                    T("اختر عرضاً لبدء التنفيذ", 12, FontWeight.Medium, C.muted, Modifier.padding(start = 22.dp, bottom = 8.dp))
+                    T(tr("اختر عرضاً لبدء التنفيذ", "Choose an offer to start"), 12, FontWeight.Medium, C.muted, Modifier.padding(start = 22.dp, bottom = 8.dp))
                     o.bids.forEach { b ->
                         Row(Modifier.padding(start = 22.dp, end = 22.dp, bottom = 12.dp).fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(20.dp)).padding(15.dp), verticalAlignment = Alignment.CenterVertically) {
                             Box(Modifier.size(46.dp).clip(CircleShape).background(Grad.sand), contentAlignment = Alignment.Center) { T(b.driver.name.take(2), 15, FontWeight.ExtraBold, Color(0xFF6B5335)) }
                             Spacer(Modifier.width(12.dp))
                             Column(Modifier.weight(1f)) { T(b.driver.name, 13, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T("★ " + String.format("%.1f", b.driver.rating), 11, FontWeight.Normal, C.muted) }
                             T("﷼" + money(b.amount), 16, FontWeight.Black, C.greenD); Spacer(Modifier.width(10.dp))
-                            Box(Modifier.clip(RoundedCornerShape(13.dp)).background(Grad.green).clickable { scope.launch { val r = call({ com.matnokh.customer.net.Net.api.pickTransport(o.id, com.matnokh.customer.net.PickBidBody(b.id)) }, toast); if (r != null) { toast(r.message ?: "تم الاختيار ✓"); onTrack() } } }.padding(horizontal = 15.dp, vertical = 9.dp)) { T("قبول", 12, FontWeight.ExtraBold, Color.White) }
+                            Box(Modifier.clip(RoundedCornerShape(13.dp)).background(Grad.green).clickable { scope.launch { val r = call({ com.matnokh.customer.net.Net.api.pickTransport(o.id, com.matnokh.customer.net.PickBidBody(b.id)) }, toast); if (r != null) { toast(r.message ?: tr("تم الاختيار ✓", "Selected ✓")); onTrack() } } }.padding(horizontal = 15.dp, vertical = 9.dp)) { T(tr("قبول", "Accept"), 12, FontWeight.ExtraBold, Color.White) }
                         }
                     }
                 }

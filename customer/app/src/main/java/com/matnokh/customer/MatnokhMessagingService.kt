@@ -1,4 +1,5 @@
 package com.matnokh.customer
+import com.matnokh.customer.ui.tr
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -24,10 +25,10 @@ class MatnokhMessagingService : FirebaseMessagingService() {
             val k = (message.data["kind"] ?: "") + ":" + (message.data["order_id"] ?: "") + ":" + (message.data["chat_type"] ?: "")
             if (com.matnokh.customer.ui.ChatOpen.key == k) return
         }
-        val title = message.notification?.title ?: message.data["title"] ?: "مطنوخ"
+        val title = message.notification?.title ?: message.data["title"] ?: tr("مطنوخ", "Matnokh")
         val body = message.notification?.body ?: message.data["body"] ?: ""
         val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) nm.createNotificationChannel(NotificationChannel("matnokh_default", "إشعارات مطنوخ", NotificationManager.IMPORTANCE_HIGH))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) nm.createNotificationChannel(NotificationChannel("matnokh_default", tr("إشعارات مطنوخ", "Matnokh notifications"), NotificationManager.IMPORTANCE_HIGH))
         val intent = packageManager.getLaunchIntentForPackage(packageName)?.apply { flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP; putExtra("open", message.data["open"] ?: "orders"); putExtra("order_id", message.data["order_id"]); putExtra("kind", message.data["kind"]); putExtra("chat_type", message.data["chat_type"]) }
         val pi = PendingIntent.getActivity(this, 0, intent ?: Intent(), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         nm.notify(System.currentTimeMillis().toInt(), NotificationCompat.Builder(this, "matnokh_default")

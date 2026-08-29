@@ -71,7 +71,7 @@ fun NearbyScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, onE
 
     val shown = if (query.isBlank()) Repo.places else Repo.places.filter { it.name.contains(query.trim(), true) || it.address.contains(query.trim(), true) }
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        CustBackHeader("متاجر قريبة", onBack, onCart, onMenu)
+        CustBackHeader(tr("متاجر قريبة", "Nearby stores"), onBack, onCart, onMenu)
         Box(Modifier.fillMaxWidth().height(300.dp)) {
             GoogleMap(
                 modifier = Modifier.fillMaxSize(), cameraPositionState = camera,
@@ -84,7 +84,7 @@ fun NearbyScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, onE
                         icon = BitmapDescriptorFactory.defaultMarker(PLACE_CATS[catIdx].hue), onClick = { onPlace(p); true })
                 }
             }
-            Box(Modifier.align(Alignment.TopEnd).padding(12.dp).clip(RoundedCornerShape(50.dp)).background(Color(0xF2FFFFFF)).border(1.dp, C.line, RoundedCornerShape(50.dp)).clickable(onClick = onExpand).padding(horizontal = 12.dp, vertical = 8.dp)) { T("🗺️ ملء الشاشة", 11, FontWeight.ExtraBold, C.greenD) }
+            Box(Modifier.align(Alignment.TopEnd).padding(12.dp).clip(RoundedCornerShape(50.dp)).background(Color(0xF2FFFFFF)).border(1.dp, C.line, RoundedCornerShape(50.dp)).clickable(onClick = onExpand).padding(horizontal = 12.dp, vertical = 8.dp)) { T(tr("🗺️ ملء الشاشة", "🗺️ Fullscreen"), 11, FontWeight.ExtraBold, C.greenD) }
         }
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             PLACE_CATS.forEachIndexed { i, c ->
@@ -92,15 +92,15 @@ fun NearbyScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, onE
                 Box(Modifier.clip(CircleShape).then(if (on) Modifier.background(Grad.green) else Modifier.background(C.card)).border(1.dp, if (on) Color.Transparent else C.line, CircleShape).clickable { catIdx = i }.padding(horizontal = 14.dp, vertical = 9.dp)) { T("${c.emoji} ${c.label}", 11, FontWeight.ExtraBold, if (on) Color.White else Color(0xFF4B5A51)) }
             }
         }
-        FinField(query, { query = it }, placeholder = "ابحث باسم المكان أو العنوان…", modifier = Modifier.padding(start = 22.dp, end = 22.dp, bottom = 6.dp))
+        FinField(query, { query = it }, placeholder = tr("ابحث باسم المكان أو العنوان…", "Search by place or address…"), modifier = Modifier.padding(start = 22.dp, end = 22.dp, bottom = 6.dp))
         Row(Modifier.fillMaxWidth().padding(start = 22.dp, end = 22.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            T("${PLACE_CATS[catIdx].label} قريبة منك", 15, FontWeight.ExtraBold, C.head, Modifier.weight(1f))
+            T(tr("${PLACE_CATS[catIdx].label} قريبة منك", "${PLACE_CATS[catIdx].label} near you"), 15, FontWeight.ExtraBold, C.head, Modifier.weight(1f))
             StorePill("${shown.size}", C.pillLive, C.greenD)
         }
         if (loading) Box(Modifier.fillMaxWidth().padding(30.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = C.green) }
         else LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(bottom = 24.dp)) {
             items(shown) { p -> PlaceRow(p, PLACE_CATS[catIdx].emoji) { onPlace(p) } }
-            if (shown.isEmpty()) item { CenterHint(if (query.isNotBlank()) "لا نتائج مطابقة للبحث" else "لا توجد أماكن قريبة في هذا النوع") }
+            if (shown.isEmpty()) item { CenterHint(if (query.isNotBlank()) tr("لا نتائج مطابقة للبحث", "No results match your search") else tr("لا توجد أماكن قريبة في هذا النوع", "No nearby places of this type")) }
         }
     }
 }
@@ -112,10 +112,10 @@ private fun PlaceRow(p: UiPlace, emoji: String, onClick: () -> Unit) {
         Spacer(Modifier.width(13.dp))
         Column(Modifier.weight(1f)) {
             T(p.name, 13, FontWeight.Bold, C.head, maxLines = 1)
-            Spacer(Modifier.height(3.dp)); T(p.address.ifBlank { "مكان قريب" }, 10, FontWeight.Normal, C.muted, maxLines = 2, lineHeight = 15)
+            Spacer(Modifier.height(3.dp)); T(p.address.ifBlank { tr("مكان قريب", "Nearby place") }, 10, FontWeight.Normal, C.muted, maxLines = 2, lineHeight = 15)
         }
         Spacer(Modifier.width(8.dp))
-        Box(Modifier.clip(CircleShape).background(C.pillLive).padding(horizontal = 10.dp, vertical = 5.dp)) { T("اطلب عبر مندوب", 9, FontWeight.ExtraBold, C.greenD) }
+        Box(Modifier.clip(CircleShape).background(C.pillLive).padding(horizontal = 10.dp, vertical = 5.dp)) { T(tr("اطلب عبر مندوب", "Order via courier"), 9, FontWeight.ExtraBold, C.greenD) }
     }
 }
 
@@ -126,39 +126,39 @@ fun PlaceErrandScreen(place: UiPlace, onBack: () -> Unit, onMenu: () -> Unit, on
     var msg by remember { mutableStateOf("") }
     var sending by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("طلب من ${place.name}", onBack, onMenu)
+        ScreenHeader(tr("طلب من ${place.name}", "Order from ${place.name}"), onBack, onMenu)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             OCard(Modifier.padding(horizontal = 22.dp).padding(top = 6.dp).fillMaxWidth(), PaddingValues(14.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(50.dp).clip(RoundedCornerShape(16.dp)).background(C.pillLive), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_pin, 24.dp, C.greenD) }
                     Spacer(Modifier.width(13.dp))
-                    Column(Modifier.weight(1f)) { T(place.name, 14, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(2.dp)); T(place.address.ifBlank { "مكان قريب" }, 10, FontWeight.Normal, C.muted, maxLines = 2, lineHeight = 15) }
+                    Column(Modifier.weight(1f)) { T(place.name, 14, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(2.dp)); T(place.address.ifBlank { tr("مكان قريب", "Nearby place") }, 10, FontWeight.Normal, C.muted, maxLines = 2, lineHeight = 15) }
                 }
             }
             Spacer(Modifier.height(12.dp))
             OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                OcTitle(R.drawable.ic_msg, "اكتب ما تريد شراءه من هذا المكان")
-                FinField(msg, { msg = it }, "مثال: وجبة برجر · عصير · دواء بنادول…", singleLine = false, minHeight = 110.dp)
+                OcTitle(R.drawable.ic_msg, tr("اكتب ما تريد شراءه من هذا المكان", "Write what you want to buy from this place"))
+                FinField(msg, { msg = it }, tr("مثال: وجبة برجر · عصير · دواء بنادول…", "e.g. a burger meal · juice · Panadol…"), singleLine = false, minHeight = 110.dp)
                 Spacer(Modifier.height(6.dp))
-                T("يشتري المندوب طلبك من هذا المكان ويوصّله إليك.", 10, FontWeight.Medium, C.muted, lineHeight = 16)
+                T(tr("يشتري المندوب طلبك من هذا المكان ويوصّله إليك.", "The courier buys your order from this place and delivers it to you."), 10, FontWeight.Medium, C.muted, lineHeight = 16)
             }
             Spacer(Modifier.height(12.dp))
             DestRow(onDest)
             Spacer(Modifier.height(12.dp))
             Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(Color(0xFFEEF4EF)).border(1.dp, Color(0xFFCFE0D4), RoundedCornerShape(18.dp)).padding(horizontal = 15.dp, vertical = 13.dp), verticalAlignment = Alignment.Top) {
                 Ic(R.drawable.ic_card, 17.dp, C.greenD, Modifier.padding(top = 1.dp)); Spacer(Modifier.width(9.dp))
-                T("الدفع نقداً للمندوب عند الاستلام — قيمة المشتريات + أجرة التوصيل التي تتفق عليها معه.", 11, FontWeight.Medium, C.greenD, lineHeight = 19)
+                T(tr("الدفع نقداً للمندوب عند الاستلام — قيمة المشتريات + أجرة التوصيل التي تتفق عليها معه.", "Pay the courier in cash on delivery — items value + the delivery fee you agree on with them."), 11, FontWeight.Medium, C.greenD, lineHeight = 19)
             }
             Spacer(Modifier.height(16.dp))
-            WideButton(if (sending) "جارٍ الإرسال…" else "أرسل الطلب لأقرب مندوب", R.drawable.ic_nav, modifier = Modifier.padding(horizontal = 22.dp)) {
+            WideButton(if (sending) tr("جارٍ الإرسال…", "Sending…") else tr("أرسل الطلب لأقرب مندوب", "Send order to nearest courier"), R.drawable.ic_nav, modifier = Modifier.padding(horizontal = 22.dp)) {
                 if (sending) return@WideButton
-                if (msg.isBlank()) { toast("اكتب ما تريد شراءه أولاً"); return@WideButton }
+                if (msg.isBlank()) { toast(tr("اكتب ما تريد شراءه أولاً", "Write what you want to buy first")); return@WideButton }
                 sending = true
                 scope.launch {
-                    val body = TransportBody("errand", "طلب من ${place.name}", place.address.ifBlank { place.name }, Sel.destAddr ?: Sel.destLabel, place.lat, place.lng, msg.trim(), "bid", 20.0, "cash", Sel.destLat, Sel.destLng)
+                    val body = TransportBody("errand", tr("طلب من ${place.name}", "Order from ${place.name}"), place.address.ifBlank { place.name }, Sel.destAddr ?: Sel.destLabel, place.lat, place.lng, msg.trim(), "bid", 20.0, "cash", Sel.destLat, Sel.destLng)
                     val r = call({ Net.api.createTransport(body) }, toast)
                     sending = false
-                    if (r?.order_id != null) { toast(r.message ?: "أُرسل طلبك للمناديب القريبين ✓"); onSent(r.order_id!!) }
+                    if (r?.order_id != null) { toast(r.message ?: tr("أُرسل طلبك للمناديب القريبين ✓", "Your request was sent to nearby couriers ✓")); onSent(r.order_id!!) }
                 }
             }
             Spacer(Modifier.height(24.dp))
@@ -193,7 +193,7 @@ fun PlacesMapFull(onBack: () -> Unit, onPlace: (UiPlace) -> Unit) {
             Repo.places.forEach { p -> Marker(state = MarkerState(LatLng(p.lat, p.lng)), title = p.name, snippet = p.address, icon = BitmapDescriptorFactory.defaultMarker(PLACE_CATS[catIdx].hue), onClick = { onPlace(p); true }) }
         }
         Box(Modifier.align(Alignment.TopStart).statusBarsPadding().padding(14.dp).size(46.dp).clip(RoundedCornerShape(16.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(16.dp)).clickable(onClick = onBack), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_back, 20.dp, C.head) }
-        Box(Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(14.dp).clip(RoundedCornerShape(50.dp)).background(Color(0xF2FFFFFF)).border(1.dp, C.line, RoundedCornerShape(50.dp)).padding(horizontal = 16.dp, vertical = 10.dp)) { T("${Repo.places.size} ${PLACE_CATS[catIdx].label} قريبة", 13, FontWeight.ExtraBold, C.head) }
+        Box(Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(14.dp).clip(RoundedCornerShape(50.dp)).background(Color(0xF2FFFFFF)).border(1.dp, C.line, RoundedCornerShape(50.dp)).padding(horizontal = 16.dp, vertical = 10.dp)) { T(tr("${Repo.places.size} ${PLACE_CATS[catIdx].label} قريبة", "${Repo.places.size} ${PLACE_CATS[catIdx].label} nearby"), 13, FontWeight.ExtraBold, C.head) }
         Row(Modifier.align(Alignment.BottomStart).fillMaxWidth().horizontalScroll(rememberScrollState()).padding(14.dp).navigationBarsPadding(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             PLACE_CATS.forEachIndexed { i, c ->
                 val on = catIdx == i

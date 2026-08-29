@@ -23,10 +23,10 @@ import com.matnokh.customer.R
 @Composable
 fun AccountScreen(kind: String, onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit) {
     val (title, icon, empty, cta) = when (kind) {
-        "addresses" -> Quad("عناويني", R.drawable.ic_pin, "لا توجد عناوين محفوظة بعد", "إضافة عنوان جديد")
-        "paymethods" -> Quad("وسائل الدفع", R.drawable.ic_card, "أضف وسيلة دفع لتسريع الطلبات", "إضافة وسيلة دفع")
-        "favorites" -> Quad("المفضّلة", R.drawable.ic_heart, "لم تُضِف أي متجر أو منتج للمفضّلة بعد", "تصفّح المتاجر")
-        else -> Quad("مركز المساعدة", R.drawable.ic_msg, "فريق الدعم متاح على مدار الساعة", "تواصل مع الدعم")
+        "addresses" -> Quad(tr("عناويني", "My addresses"), R.drawable.ic_pin, tr("لا توجد عناوين محفوظة بعد", "No saved addresses yet"), tr("إضافة عنوان جديد", "Add new address"))
+        "paymethods" -> Quad(tr("وسائل الدفع", "Payment methods"), R.drawable.ic_card, tr("أضف وسيلة دفع لتسريع الطلبات", "Add a payment method to speed up orders"), tr("إضافة وسيلة دفع", "Add payment method"))
+        "favorites" -> Quad(tr("المفضّلة", "Favorites"), R.drawable.ic_heart, tr("لم تُضِف أي متجر أو منتج للمفضّلة بعد", "You haven't added any store or product to favorites yet"), tr("تصفّح المتاجر", "Browse stores"))
+        else -> Quad(tr("مركز المساعدة", "Help center"), R.drawable.ic_msg, tr("فريق الدعم متاح على مدار الساعة", "Support team available around the clock"), tr("تواصل مع الدعم", "Contact support"))
     }
     Column(Modifier.fillMaxSize().background(C.bg)) {
         ScreenHeader(title, onBack, onMenu)
@@ -38,7 +38,7 @@ fun AccountScreen(kind: String, onBack: () -> Unit, onMenu: () -> Unit, toast: (
             Spacer(Modifier.height(8.dp))
             androidx.compose.material3.Text(empty, fontFamily = Cairo, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = C.muted, textAlign = TextAlign.Center, lineHeight = 22.sp, modifier = Modifier.widthIn(max = 260.dp))
             Spacer(Modifier.height(24.dp))
-            Row(Modifier.clip(RoundedCornerShape(15.dp)).background(Grad.green).clickable { toast("$cta — قريباً") }.padding(horizontal = 20.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.clip(RoundedCornerShape(15.dp)).background(Grad.green).clickable { toast(tr("$cta — قريباً", "$cta — soon")) }.padding(horizontal = 20.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
                 Ic(R.drawable.ic_plus, 16.dp, Color.White); Spacer(Modifier.width(8.dp)); T(cta, 13, FontWeight.ExtraBold, Color.White)
             }
         }
