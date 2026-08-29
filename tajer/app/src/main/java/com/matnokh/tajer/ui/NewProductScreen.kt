@@ -47,8 +47,10 @@ fun NewProductScreen(productId: Int?, onBack: () -> Unit, onMenu: () -> Unit, on
     var branches by remember { mutableStateOf<List<BranchDto>>(emptyList()) }
     val images = remember { mutableStateListOf<String>() }
     var name by remember { mutableStateOf("") }
+    var nameEn by remember { mutableStateOf("") }
     var secId by remember { mutableStateOf<Int?>(null) }
     var desc by remember { mutableStateOf("") }
+    var descEn by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
     var offer by remember { mutableStateOf(false) }
     var oldPrice by remember { mutableStateOf("") }
@@ -65,7 +67,7 @@ fun NewProductScreen(productId: Int?, onBack: () -> Unit, onMenu: () -> Unit, on
         call({ Net.api.branches() }, toast)?.let { branches = it.branches; it.branches.forEach { b -> if (stock[b.id] == null) stock[b.id] = "0" } }
         if (editing) call({ Net.api.product(productId!!) }, toast)?.let { r ->
             val p = r.product
-            name = p.name; desc = p.description ?: ""; secId = p.section_id; price = money(p.price)
+            name = p.name; desc = p.description ?: ""; nameEn = p.name_en ?: ""; descEn = p.description_en ?: ""; secId = p.section_id; price = money(p.price)
             if (p.price_before > 0) { offer = true; oldPrice = money(p.price_before) }
             status = p.status; images.clear(); images.addAll(p.images)
             if (p.addons.isNotEmpty()) { addonsOn = true; addons.clear(); addons.addAll(p.addons) }
@@ -110,12 +112,14 @@ fun NewProductScreen(productId: Int?, onBack: () -> Unit, onMenu: () -> Unit, on
                 OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
                     OcTitle(R.drawable.ic_box, "بيانات المنتج")
                     FieldLabel("اسم المنتج", required = true); FinField(name, { name = it }, "مثال: كبسة لحم — طبق كبير")
+                    Spacer(Modifier.height(10.dp)); FieldLabel("الاسم بالإنجليزية (English)"); FinField(nameEn, { nameEn = it }, "e.g. Meat Kabsa — large", align = androidx.compose.ui.text.style.TextAlign.Left)
                     FieldLabel("القسم داخل المتجر", required = true)
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         sections.forEach { s -> Chip("${s.icon ?: ""} ${s.name}", secId == s.id) { secId = s.id } }
                         Chip("+ قسم جديد", false, onClick = onNewSection)
                     }
                     FieldLabel("الوصف"); FinField(desc, { desc = it }, "وصف مختصر يظهر للزبون", singleLine = false, minHeight = 64.dp)
+                    Spacer(Modifier.height(10.dp)); FieldLabel("الوصف بالإنجليزية (English)"); FinField(descEn, { descEn = it }, "Short description shown to the customer", singleLine = false, minHeight = 64.dp, align = androidx.compose.ui.text.style.TextAlign.Left)
                 }
             }
             item {
@@ -185,7 +189,7 @@ fun NewProductScreen(productId: Int?, onBack: () -> Unit, onMenu: () -> Unit, on
                         if (pr <= 0.0) { toast("أدخل سعر المنتج"); return@WideButton }
                         val o = if (offer) (oldPrice.toDoubleOrNull() ?: 0.0) else 0.0
                         val body = ProductBody(nm, desc.ifBlank { null }, secId, pr, if (o > pr) o else null, status,
-                            images.toList(), addons.filter { it.name.isNotBlank() }, stock.mapKeys { it.key.toString() }.mapValues { it.value.toIntOrNull() ?: 0 })
+                            images.toList(), addons.filter { it.name.isNotBlank() }, stock.mapKeys { it.key.toString() }.mapValues { it.value.toIntOrNull() ?: 0 }, nameEn.ifBlank { null }, descEn.ifBlank { null })
                         scope.launch {
                             saving = true
                             val r = call({ if (editing) Net.api.updateProduct(productId!!, body) else Net.api.createProduct(body) }, toast)

@@ -29,6 +29,7 @@ fun SectionsScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Un
     val scope = rememberCoroutineScope()
     var sections by remember { mutableStateOf<List<SectionDto>?>(null) }
     var name by remember { mutableStateOf("") }
+    var nameEn by remember { mutableStateOf("") }
     var emoIdx by remember { mutableStateOf(0) }
     var icons by remember { mutableStateOf<List<String>>(emptyList()) }
 
@@ -43,6 +44,8 @@ fun SectionsScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Un
                     OcTitle(R.drawable.ic_plus, "إضافة قسم جديد")
                     FieldLabel("اسم القسم", required = true)
                     FinField(name, { name = it }, "مثال: ألبان وأجبان")
+                    Spacer(Modifier.height(10.dp)); FieldLabel("الاسم بالإنجليزية (English)")
+                    FinField(nameEn, { nameEn = it }, "e.g. Dairy & Cheese", align = androidx.compose.ui.text.style.TextAlign.Left)
                     FieldLabel("أيقونة القسم")
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(9.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
                         if (icons.isEmpty()) T("جارٍ تحميل أيقونات التصنيف…", 11, androidx.compose.ui.text.font.FontWeight.Medium, C.muted)
@@ -54,8 +57,8 @@ fun SectionsScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Un
                         val n = name.trim()
                         if (n.isEmpty()) { toast("اكتب اسم القسم"); return@WideButton }
                         scope.launch {
-                            call({ Net.api.addSection(SectionBody(n, icons.getOrElse(emoIdx) { "🏷️" })) }, toast)?.let {
-                                name = ""; toast(it.message ?: "أُضيف القسم ✓"); load()
+                            call({ Net.api.addSection(SectionBody(n, icons.getOrElse(emoIdx) { "🏷️" }, nameEn.ifBlank { null })) }, toast)?.let {
+                                name = ""; nameEn = ""; toast(it.message ?: "أُضيف القسم ✓"); load()
                             }
                         }
                     }
