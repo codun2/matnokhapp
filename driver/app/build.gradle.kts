@@ -12,7 +12,7 @@ android {
         applicationId = "com.matnokh.driver"
         minSdk = 26
         targetSdk = 34
-        versionCode = 25
+        versionCode = 26
         versionName = "3.3"
     }
 
