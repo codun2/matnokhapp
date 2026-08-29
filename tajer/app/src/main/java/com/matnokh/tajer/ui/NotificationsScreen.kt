@@ -25,14 +25,14 @@ fun NotificationsScreen(onBack: () -> Unit, onMenu: () -> Unit, onOpen: (String?
     LaunchedEffect(Unit) { call({ Net.api.notifications() }, toast)?.let { items = it.notifications } }
 
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("الإشعارات", onBack, onMenu)
+        ScreenHeader(tr("الإشعارات", "Notifications"), onBack, onMenu)
         val list = items
         when {
             list == null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = C.green) }
             list.isEmpty() -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Ic(R.drawable.ic_bell, 40.dp, C.sage)
-                    Spacer(Modifier.height(10.dp)); T("لا توجد إشعارات بعد", 13, FontWeight.Bold, C.muted)
+                    Spacer(Modifier.height(10.dp)); T(tr("لا توجد إشعارات بعد", "No notifications yet"), 13, FontWeight.Bold, C.muted)
                 }
             }
             else -> LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(top = 4.dp, bottom = 24.dp)) {

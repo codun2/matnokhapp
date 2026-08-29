@@ -98,14 +98,14 @@ fun StoreDataScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> U
                 try {
                     val bytes = ctx.contentResolver.openInputStream(uri)!!.use { it.readBytes() }
                     val part = MultipartBody.Part.createFormData("file", "logo.jpg", bytes.toRequestBody("image/*".toMediaTypeOrNull()))
-                    call({ Net.api.upload(part) }, toast)?.let { logo = it.url; StoreInfo.logo.value = it.url; toast("تم رفع الشعار ✓") }
+                    call({ Net.api.upload(part) }, toast)?.let { logo = it.url; StoreInfo.logo.value = it.url; toast(tr("تم رفع الشعار ✓", "Logo uploaded ✓")) }
                 } finally { uploading = false }
             }
         }
     }
 
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("بيانات المتجر", onBack, onMenu)
+        ScreenHeader(tr("بيانات المتجر", "Store details"), onBack, onMenu)
         val s = store
         if (s == null) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = C.green) }
@@ -115,20 +115,20 @@ fun StoreDataScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> U
 
             // الشعار
             OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                OcTitle(R.drawable.ic_img, "شعار المتجر")
+                OcTitle(R.drawable.ic_img, tr("شعار المتجر", "Store logo"))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(64.dp).clip(RoundedCornerShape(18.dp)).background(C.card2), contentAlignment = Alignment.Center) {
                         if (logo.isNullOrBlank()) Text("🛒", fontSize = 26.sp) else AsyncImage(model = logo, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
                     }
                     Spacer(Modifier.width(14.dp))
                     Column(Modifier.weight(1f)) {
-                        T(if (logo.isNullOrBlank()) "لا يوجد شعار" else "تم رفع الشعار ✓", 12, FontWeight.Bold, C.head)
+                        T(if (logo.isNullOrBlank()) tr("لا يوجد شعار", "No logo") else tr("تم رفع الشعار ✓", "Logo uploaded ✓"), 12, FontWeight.Bold, C.head)
                         Spacer(Modifier.height(6.dp))
                         Box(
                             Modifier.clip(RoundedCornerShape(12.dp)).background(Color(0xFFEEF4EF))
                                 .clickable(enabled = !uploading) { picker.launch("image/*") }
                                 .padding(horizontal = 14.dp, vertical = 9.dp)
-                        ) { T(if (uploading) "جارٍ الرفع…" else (if (logo.isNullOrBlank()) "رفع شعار" else "تغيير الشعار"), 11, FontWeight.ExtraBold, C.greenD) }
+                        ) { T(if (uploading) tr("جارٍ الرفع…", "Uploading…") else (if (logo.isNullOrBlank()) tr("رفع شعار", "Upload logo") else tr("تغيير الشعار", "Change logo")), 11, FontWeight.ExtraBold, C.greenD) }
                     }
                 }
             }
@@ -136,14 +136,14 @@ fun StoreDataScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> U
 
             // البيانات
             OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                OcTitle(R.drawable.ic_shop, "بيانات المتجر")
-                FieldLabel("اسم المتجر", required = true)
-                FinField(name, { name = it }, "اسم المتجر")
-                FieldLabel("اسم صاحب المتجر")
-                FinField(owner, { owner = it }, "الاسم الكامل")
-                FieldLabel("العنوان")
-                FinField(address, { address = it }, "الحي · الشارع · المدينة", singleLine = false, minHeight = 60.dp)
-                FieldLabel("المدينة")
+                OcTitle(R.drawable.ic_shop, tr("بيانات المتجر", "Store details"))
+                FieldLabel(tr("اسم المتجر", "Store name"), required = true)
+                FinField(name, { name = it }, tr("اسم المتجر", "Store name"))
+                FieldLabel(tr("اسم صاحب المتجر", "Store owner name"))
+                FinField(owner, { owner = it }, tr("الاسم الكامل", "Full name"))
+                FieldLabel(tr("العنوان", "Address"))
+                FinField(address, { address = it }, tr("الحي · الشارع · المدينة", "District · street · city"), singleLine = false, minHeight = 60.dp)
+                FieldLabel(tr("المدينة", "City"))
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     cities.forEach { c -> Chip(c.name, cityId == c.id) { cityId = c.id } }
                 }
@@ -151,15 +151,15 @@ fun StoreDataScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> U
             Spacer(Modifier.height(12.dp))
 
             OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                OcTitle(R.drawable.ic_shop, "الحساب البنكي (للتحويل)")
-                FieldLabel("رقم الآيبان (IBAN)")
+                OcTitle(R.drawable.ic_shop, tr("الحساب البنكي (للتحويل)", "Bank account (for transfer)"))
+                FieldLabel(tr("رقم الآيبان (IBAN)", "IBAN number"))
                 FinField(iban, { iban = it }, "SA00 0000 0000 0000 0000 0000")
-                FieldLabel("اسم البنك")
-                FinField(bankName, { bankName = it }, "مثال: مصرف الراجحي")
-                FieldLabel("اسم المستفيد")
-                FinField(accountName, { accountName = it }, "اسم صاحب الحساب")
+                FieldLabel(tr("اسم البنك", "Bank name"))
+                FinField(bankName, { bankName = it }, tr("مثال: مصرف الراجحي", "e.g. Al-Rajhi Bank"))
+                FieldLabel(tr("اسم المستفيد", "Beneficiary name"))
+                FinField(accountName, { accountName = it }, tr("اسم صاحب الحساب", "Account holder name"))
                 Spacer(Modifier.height(6.dp))
-                T("يظهر هذا الحساب للزبون عند اختيار الدفع بتحويل بنكي. اتركه فارغاً لتعطيل التحويل.", 10, FontWeight.Normal, C.muted, lineHeight = 15)
+                T(tr("يظهر هذا الحساب للزبون عند اختيار الدفع بتحويل بنكي. اتركه فارغاً لتعطيل التحويل.", "This account is shown to the customer when they choose bank-transfer payment. Leave it empty to disable transfers."), 10, FontWeight.Normal, C.muted, lineHeight = 15)
             }
             Spacer(Modifier.height(12.dp))
 
@@ -169,22 +169,22 @@ fun StoreDataScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> U
 
             // حقول للقراءة فقط
             OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                ReadRow("رقم الهاتف (للدخول)", s.phone ?: "—")
+                ReadRow(tr("رقم الهاتف (للدخول)", "Phone number (for login)"), s.phone ?: "—")
                 Divider2()
-                ReadRow("البريد الإلكتروني", s.email ?: "—")
+                ReadRow(tr("البريد الإلكتروني", "Email"), s.email ?: "—")
                 Divider2()
-                ReadRow("حالة المتجر", when (s.status) { "approved" -> "معتمد"; "pending" -> "قيد المراجعة"; "rejected" -> "مرفوض"; else -> "موقوف" })
+                ReadRow(tr("حالة المتجر", "Store status"), when (s.status) { "approved" -> tr("معتمد", "Approved"); "pending" -> tr("قيد المراجعة", "Under review"); "rejected" -> tr("مرفوض", "Rejected"); else -> tr("موقوف", "Suspended") })
             }
             Spacer(Modifier.height(16.dp))
 
             Box(Modifier.padding(horizontal = 22.dp)) {
-                WideButton(if (saving) "…" else "حفظ التعديلات", if (saving) null else R.drawable.ic_check) {
+                WideButton(if (saving) "…" else tr("حفظ التعديلات", "Save changes"), if (saving) null else R.drawable.ic_check) {
                     if (saving) return@WideButton
-                    if (name.isBlank()) { toast("اسم المتجر مطلوب"); return@WideButton }
+                    if (name.isBlank()) { toast(tr("اسم المتجر مطلوب", "Store name is required")); return@WideButton }
                     scope.launch {
                         saving = true
                         call({ Net.api.updateStore(StoreUpdate(store_name = name.trim(), owner_name = owner.trim(), address = address.trim(), city_id = cityId, lat = lat, lng = lng, logo = logo, iban = iban.trim(), bank_name = bankName.trim(), account_name = accountName.trim())) }, toast)?.let {
-                            store = it.store; com.matnokh.tajer.net.Session.logo = logo; StoreInfo.logo.value = logo; toast("تم حفظ بيانات المتجر ✓"); onBack()
+                            store = it.store; com.matnokh.tajer.net.Session.logo = logo; StoreInfo.logo.value = logo; toast(tr("تم حفظ بيانات المتجر ✓", "Store details saved ✓")); onBack()
                         }
                         saving = false
                     }
@@ -220,8 +220,8 @@ fun StoreLocationCard(lat: Double?, lng: Double?, autoLocate: Boolean = false, o
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { g -> granted = g; if (g) useHere() }
     LaunchedEffect(Unit) { if (autoLocate && lat == null && granted) useHere() }
     OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-        OcTitle(R.drawable.ic_pin, "موقع المتجر")
-        T("يُستخدم لإسناد أقرب مندوب إليك تلقائياً عند تجهيز الطلب. اضغط على الخريطة لتحديد الموقع، أو استخدم موقعك الحالي.", 11, FontWeight.Medium, C.muted, lineHeight = 17)
+        OcTitle(R.drawable.ic_pin, tr("موقع المتجر", "Store location"))
+        T(tr("يُستخدم لإسناد أقرب مندوب إليك تلقائياً عند تجهيز الطلب. اضغط على الخريطة لتحديد الموقع، أو استخدم موقعك الحالي.", "Used to automatically assign the nearest courier to you when an order is prepared. Tap the map to set the location, or use your current location."), 11, FontWeight.Medium, C.muted, lineHeight = 17)
         Spacer(Modifier.height(10.dp))
         Box(Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(16.dp))) {
             GoogleMap(
@@ -231,7 +231,7 @@ fun StoreLocationCard(lat: Double?, lng: Double?, autoLocate: Boolean = false, o
                 uiSettings = MapUiSettings(myLocationButtonEnabled = false, zoomControlsEnabled = false, mapToolbarEnabled = false),
                 onMapClick = { ll -> onPick(ll.latitude, ll.longitude) },
             ) {
-                if (lat != null && lng != null) Marker(state = MarkerState(LatLng(lat, lng)), title = "موقع المتجر")
+                if (lat != null && lng != null) Marker(state = MarkerState(LatLng(lat, lng)), title = tr("موقع المتجر", "Store location"))
             }
         }
         Spacer(Modifier.height(10.dp))
@@ -240,10 +240,10 @@ fun StoreLocationCard(lat: Double?, lng: Double?, autoLocate: Boolean = false, o
                 Modifier.clip(RoundedCornerShape(12.dp)).background(Color(0xFFEEF4EF))
                     .clickable { if (granted) useHere() else launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION) }
                     .padding(horizontal = 14.dp, vertical = 9.dp),
-            ) { T("📍 استخدام موقعي الحالي", 11, FontWeight.ExtraBold, C.greenD) }
+            ) { T(tr("📍 استخدام موقعي الحالي", "📍 Use my current location"), 11, FontWeight.ExtraBold, C.greenD) }
             Spacer(Modifier.width(10.dp))
             if (lat != null && lng != null) T("✓ " + "%.4f".format(lat) + ", " + "%.4f".format(lng), 10, FontWeight.Bold, C.head)
-            else T("لم يُحدَّد بعد", 10, FontWeight.Bold, C.muted)
+            else T(tr("لم يُحدَّد بعد", "Not set yet"), 10, FontWeight.Bold, C.muted)
         }
     }
 }
@@ -251,24 +251,24 @@ fun StoreLocationCard(lat: Double?, lng: Double?, autoLocate: Boolean = false, o
 @Composable
 private fun StoreDeliveryCard(mode: String, fixed: String, perKm: String, onMode: (String) -> Unit, onFixed: (String) -> Unit, onPerKm: (String) -> Unit) {
     OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-        OcTitle(R.drawable.ic_van, "تسعير التوصيل")
-        T("اختر كيف تُحتسب أجرة التوصيل التي يدفعها الزبون لطلبات متجرك.", 11, FontWeight.Medium, C.muted, lineHeight = 17)
+        OcTitle(R.drawable.ic_van, tr("تسعير التوصيل", "Delivery pricing"))
+        T(tr("اختر كيف تُحتسب أجرة التوصيل التي يدفعها الزبون لطلبات متجرك.", "Choose how the delivery fee the customer pays for your store's orders is calculated."), 11, FontWeight.Medium, C.muted, lineHeight = 17)
         Spacer(Modifier.height(10.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            DModeChip("سعر ثابت", mode == "fixed", Modifier.weight(1f)) { onMode("fixed") }
-            DModeChip("حسب الكيلومتر", mode == "per_km", Modifier.weight(1f)) { onMode("per_km") }
+            DModeChip(tr("سعر ثابت", "Fixed price"), mode == "fixed", Modifier.weight(1f)) { onMode("fixed") }
+            DModeChip(tr("حسب الكيلومتر", "Per kilometer"), mode == "per_km", Modifier.weight(1f)) { onMode("per_km") }
         }
         Spacer(Modifier.height(12.dp))
         if (mode == "per_km") {
-            FieldLabel("سعر الكيلومتر الواحد (﷼)")
-            FinField(perKm, onPerKm, "مثال: 2", keyboard = androidx.compose.ui.text.input.KeyboardType.Decimal)
+            FieldLabel(tr("سعر الكيلومتر الواحد (﷼)", "Price per kilometer (﷼)"))
+            FinField(perKm, onPerKm, tr("مثال: 2", "e.g. 2"), keyboard = androidx.compose.ui.text.input.KeyboardType.Decimal)
             Spacer(Modifier.height(5.dp))
-            T("الأجرة = سعر الكيلو × المسافة من متجرك إلى الزبون.", 10, FontWeight.Medium, C.muted, lineHeight = 16)
+            T(tr("الأجرة = سعر الكيلو × المسافة من متجرك إلى الزبون.", "Fee = per-km price × distance from your store to the customer."), 10, FontWeight.Medium, C.muted, lineHeight = 16)
         } else {
-            FieldLabel("أجرة التوصيل الثابتة (﷼)")
-            FinField(fixed, onFixed, "مثال: 15", keyboard = androidx.compose.ui.text.input.KeyboardType.Decimal)
+            FieldLabel(tr("أجرة التوصيل الثابتة (﷼)", "Fixed delivery fee (﷼)"))
+            FinField(fixed, onFixed, tr("مثال: 15", "e.g. 15"), keyboard = androidx.compose.ui.text.input.KeyboardType.Decimal)
             Spacer(Modifier.height(5.dp))
-            T("أجرة ثابتة لكل طلب داخل نطاق خدمتك.", 10, FontWeight.Medium, C.muted, lineHeight = 16)
+            T(tr("أجرة ثابتة لكل طلب داخل نطاق خدمتك.", "A fixed fee per order within your service area."), 10, FontWeight.Medium, C.muted, lineHeight = 16)
         }
     }
 }

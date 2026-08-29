@@ -36,7 +36,7 @@ fun FieldLabel(text: String, required: Boolean = false, iconId: Int? = null) {
         if (required) {
             Spacer(Modifier.width(6.dp))
             Box(Modifier.clip(CircleShape).background(C.redBg).padding(horizontal = 7.dp, vertical = 2.dp)) {
-                T("مطلوب", 9, FontWeight.ExtraBold, C.redText)
+                T(tr("مطلوب", "Required"), 9, FontWeight.ExtraBold, C.redText)
             }
         }
     }
@@ -112,7 +112,7 @@ fun OcTitle(iconId: Int, title: String, required: Boolean = false) {
         if (required) {
             Spacer(Modifier.width(6.dp))
             Box(Modifier.clip(CircleShape).background(C.redBg).padding(horizontal = 7.dp, vertical = 2.dp)) {
-                T("مطلوب", 9, FontWeight.ExtraBold, C.redText)
+                T(tr("مطلوب", "Required"), 9, FontWeight.ExtraBold, C.redText)
             }
         }
     }

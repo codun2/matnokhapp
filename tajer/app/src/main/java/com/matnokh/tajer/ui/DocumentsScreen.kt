@@ -40,12 +40,12 @@ fun DocumentsScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> U
 
     fun submit(typeId: Int, value: String) = scope.launch {
         call({ Net.api.submitDocument(mapOf("document_type_id" to typeId.toString(), "value" to value)) }, toast)?.let {
-            toast(it.message ?: "تم الحفظ"); load()
+            toast(it.message ?: tr("تم الحفظ", "Saved")); load()
         }
     }
 
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("الوثائق", onBack, onMenu)
+        ScreenHeader(tr("الوثائق", "Documents"), onBack, onMenu)
         val list = docs
         if (list == null) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = C.green) }; return@Column }
 
@@ -54,7 +54,7 @@ fun DocumentsScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> U
                 Box(Modifier.padding(start = 22.dp, end = 22.dp, top = 4.dp, bottom = 12.dp).fillMaxWidth().clip(RoundedCornerShape(16.dp))
                     .background(if (complete) Color(0xFFEEF4EF) else Color(0xFFFDF6EC))
                     .padding(horizontal = 14.dp, vertical = 12.dp)) {
-                    T(if (complete) "✓ اكتملت الوثائق المطلوبة" else "أكمل رفع الوثائق المطلوبة لاعتماد متجرك",
+                    T(if (complete) tr("✓ اكتملت الوثائق المطلوبة", "✓ Required documents complete") else tr("أكمل رفع الوثائق المطلوبة لاعتماد متجرك", "Complete uploading the required documents to get your store approved"),
                         11, FontWeight.Bold, if (complete) C.greenD else Color(0xFF8A6A3F))
                 }
             }
@@ -82,8 +82,8 @@ private fun DocCard(
                 val part = MultipartBody.Part.createFormData("file", "doc_${d.key}.jpg", bytes.toRequestBody("*/*".toMediaTypeOrNull()))
                 val r = Net.api.upload(part)
                 onUploaded(r.url)
-            } catch (e: retrofit2.HttpException) { toast(com.matnokh.tajer.net.errorMessage(e) ?: "تعذّر الرفع"); onBusyEnd() }
-            catch (e: Exception) { toast("تعذّر رفع الملف"); onBusyEnd() }
+            } catch (e: retrofit2.HttpException) { toast(com.matnokh.tajer.net.errorMessage(e) ?: tr("تعذّر الرفع", "Upload failed")); onBusyEnd() }
+            catch (e: Exception) { toast(tr("تعذّر رفع الملف", "Couldn't upload the file")); onBusyEnd() }
         }
     }
 
@@ -96,7 +96,7 @@ private fun DocCard(
             Column(Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     T(d.name, 13, FontWeight.Bold, C.head, Modifier.weight(1f, fill = false), maxLines = 1)
-                    if (d.required) { Spacer(Modifier.width(6.dp)); Box(Modifier.clip(RoundedCornerShape(50.dp)).background(C.redBg).padding(horizontal = 7.dp, vertical = 2.dp)) { T("مطلوب", 9, FontWeight.ExtraBold, C.redText, maxLines = 1) } }
+                    if (d.required) { Spacer(Modifier.width(6.dp)); Box(Modifier.clip(RoundedCornerShape(50.dp)).background(C.redBg).padding(horizontal = 7.dp, vertical = 2.dp)) { T(tr("مطلوب", "Required"), 9, FontWeight.ExtraBold, C.redText, maxLines = 1) } }
                 }
                 if (d.description != null) { Spacer(Modifier.height(2.dp)); T(d.description, 10, FontWeight.Normal, C.muted, lineHeight = 16) }
             }
@@ -104,11 +104,11 @@ private fun DocCard(
         }
         Spacer(Modifier.height(10.dp))
         if (d.field == "text") {
-            FinField(text, { text = it }, "أدخل القيمة (مثال: SA00 0000 …)")
+            FinField(text, { text = it }, tr("أدخل القيمة (مثال: SA00 0000 …)", "Enter the value (e.g. SA00 0000 …)"))
             Spacer(Modifier.height(8.dp))
-            WideButton("حفظ", R.drawable.ic_check) { if (text.isNotBlank()) onText(text) }
+            WideButton(tr("حفظ", "Save"), R.drawable.ic_check) { if (text.isNotBlank()) onText(text) }
         } else {
-            WideButton(if (busy) "جارٍ الرفع…" else if (d.value != null) "تغيير الملف" else "رفع الملف", R.drawable.ic_img, ghost = d.value != null) {
+            WideButton(if (busy) tr("جارٍ الرفع…", "Uploading…") else if (d.value != null) tr("تغيير الملف", "Change file") else tr("رفع الملف", "Upload file"), R.drawable.ic_img, ghost = d.value != null) {
                 if (!busy) { onPickFile(); picker.launch("*/*") }
             }
         }
@@ -118,10 +118,10 @@ private fun DocCard(
 @Composable
 private fun DocStatus(status: String) {
     val (label, kind) = when (status) {
-        "approved" -> "معتمد" to PillKind.Live
-        "pending" -> "قيد المراجعة" to PillKind.Wait
-        "rejected" -> "مرفوض" to PillKind.Rj
-        else -> "لم تُرفع" to PillKind.Off
+        "approved" -> tr("معتمد", "Approved") to PillKind.Live
+        "pending" -> tr("قيد المراجعة", "Under review") to PillKind.Wait
+        "rejected" -> tr("مرفوض", "Rejected") to PillKind.Rj
+        else -> tr("لم تُرفع", "Not uploaded") to PillKind.Off
     }
     StatusPill(label, kind)
 }

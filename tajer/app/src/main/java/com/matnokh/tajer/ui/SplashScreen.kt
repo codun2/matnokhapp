@@ -62,12 +62,12 @@ fun SplashScreen(onEnter: () -> Unit) {
                 ) { Ic(R.drawable.ic_shop, 56.dp, Color.White) }
 
                 Spacer(Modifier.height(28.dp))
-                T("مطنوخ تاجر", 38, FontWeight.Black, Color(0xFF33463C))
+                T(tr("مطنوخ تاجر", "Matnokh Merchant"), 38, FontWeight.Black, Color(0xFF33463C))
                 Spacer(Modifier.height(6.dp))
-                T("متجرك يوصل لكل بيت.", 15, FontWeight.Bold, C.green)
+                T(tr("متجرك يوصل لكل بيت.", "Your store reaches every home."), 15, FontWeight.Bold, C.green)
                 Spacer(Modifier.height(14.dp))
                 Text(
-                    "اعرض منتجاتك على آلاف الزبائن، استقبل الطلبات، وخلّي التوصيل علينا — أسطول مطنوخ جاهز.",
+                    tr("اعرض منتجاتك على آلاف الزبائن، استقبل الطلبات، وخلّي التوصيل علينا — أسطول مطنوخ جاهز.", "Show your products to thousands of customers, receive orders, and leave delivery to us — Matnokh's fleet is ready."),
                     fontFamily = Cairo, fontSize = 14.sp, color = C.muted, textAlign = TextAlign.Center,
                     lineHeight = 28.sp, modifier = Modifier.widthIn(max = 290.dp),
                 )
@@ -79,9 +79,9 @@ fun SplashScreen(onEnter: () -> Unit) {
                     horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    Feat(R.drawable.ic_shop, "متجر رقمي")
-                    Feat(R.drawable.ic_van, "توصيل جاهز")
-                    Feat(R.drawable.ic_cash, "محفظة وسحب")
+                    Feat(R.drawable.ic_shop, tr("متجر رقمي", "Digital store"))
+                    Feat(R.drawable.ic_van, tr("توصيل جاهز", "Ready for delivery"))
+                    Feat(R.drawable.ic_cash, tr("محفظة وسحب", "Wallet & withdrawal"))
                 }
 
                 Spacer(Modifier.height(34.dp))
@@ -91,12 +91,12 @@ fun SplashScreen(onEnter: () -> Unit) {
                         .background(Grad.green).clickable(onClick = onEnter).padding(vertical = 17.dp),
                     horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    T("ادخل لمتجرك", 16, FontWeight.ExtraBold, Color.White)
+                    T(tr("ادخل لمتجرك", "Log in to your store"), 16, FontWeight.ExtraBold, Color.White)
                     Spacer(Modifier.width(9.dp))
                     Ic(R.drawable.ic_back, 17.dp, Color.White)
                 }
                 Spacer(Modifier.height(12.dp))
-                T("تسجيل متجر جديد — يُعتمد من الإدارة", 13, FontWeight.Bold, C.muted, maxLines = 1)
+                T(tr("تسجيل متجر جديد — يُعتمد من الإدارة", "Register a new store — approved by admin"), 13, FontWeight.Bold, C.muted, maxLines = 1)
             }
         }
     }

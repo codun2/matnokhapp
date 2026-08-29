@@ -1,4 +1,5 @@
 package com.matnokh.tajer
+import com.matnokh.tajer.ui.tr
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -33,7 +34,7 @@ class MatnokhMessagingService : FirebaseMessagingService() {
             val k = (message.data["kind"] ?: "") + ":" + (message.data["order_id"] ?: "") + ":" + (message.data["chat_type"] ?: "")
             if (com.matnokh.tajer.ui.ChatOpen.key == k) return
         }
-        val title = message.notification?.title ?: message.data["title"] ?: "مطنوخ"
+        val title = message.notification?.title ?: message.data["title"] ?: tr("مطنوخ", "Matnokh")
         val body = message.notification?.body ?: message.data["body"] ?: ""
         val type = message.data["type"]
         val orderId = message.data["order_id"]?.toIntOrNull()
@@ -46,7 +47,7 @@ class MatnokhMessagingService : FirebaseMessagingService() {
         val channelId = "matnokh_default"
         val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            nm.createNotificationChannel(NotificationChannel(channelId, "إشعارات مطنوخ", NotificationManager.IMPORTANCE_HIGH))
+            nm.createNotificationChannel(NotificationChannel(channelId, tr("إشعارات مطنوخ", "Matnokh notifications"), NotificationManager.IMPORTANCE_HIGH))
         }
         val intent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP

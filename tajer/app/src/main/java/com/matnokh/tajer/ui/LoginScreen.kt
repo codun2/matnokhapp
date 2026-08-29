@@ -26,9 +26,9 @@ import com.matnokh.tajer.net.errorMessage
 import kotlinx.coroutines.launch
 
 private val METHOD_LABELS = mapOf(
-    "phone_password" to "هاتف",
-    "email_password" to "بريد",
-    "phone_otp" to "رمز SMS",
+    "phone_password" to tr("هاتف", "Phone"),
+    "email_password" to tr("بريد", "Email"),
+    "phone_otp" to tr("رمز SMS", "SMS code"),
 )
 
 @Composable
@@ -60,9 +60,9 @@ fun LoginScreen(onLoggedIn: () -> Unit, onRegister: () -> Unit, toast: (String) 
             Ic(R.drawable.ic_shop, 44.dp, Color.White)
         }
         Spacer(Modifier.height(18.dp))
-        T("تسجيل الدخول", 26, FontWeight.Black, C.head)
+        T(tr("تسجيل الدخول", "Log in"), 26, FontWeight.Black, C.head)
         Spacer(Modifier.height(4.dp))
-        T("ادخل إلى متجرك على مطنوخ", 13, FontWeight.Medium, C.muted)
+        T(tr("ادخل إلى متجرك على مطنوخ", "Log in to your store on Matnokh"), 13, FontWeight.Medium, C.muted)
         Spacer(Modifier.height(24.dp))
 
         // اختيار الطريقة (إن كانت أكثر من واحدة)
@@ -86,23 +86,23 @@ fun LoginScreen(onLoggedIn: () -> Unit, onRegister: () -> Unit, toast: (String) 
         OCard(Modifier.fillMaxWidth()) {
             when (method) {
                 "email_password" -> {
-                    FieldLabel("البريد الإلكتروني")
+                    FieldLabel(tr("البريد الإلكتروني", "Email"))
                     FinField(email, { email = it }, "you@example.com", keyboard = KeyboardType.Email)
-                    FieldLabel("كلمة المرور")
+                    FieldLabel(tr("كلمة المرور", "Password"))
                     FinField(password, { password = it }, "••••••", keyboard = KeyboardType.Password)
                 }
                 "phone_otp" -> {
-                    FieldLabel("رقم الهاتف")
+                    FieldLabel(tr("رقم الهاتف", "Phone number"))
                     FinField(phone, { phone = it }, "05xxxxxxxx", keyboard = KeyboardType.Phone)
                     if (otpSent) {
-                        FieldLabel("رمز التحقق")
+                        FieldLabel(tr("رمز التحقق", "Verification code"))
                         FinField(code, { code = it }, "____", keyboard = KeyboardType.Number)
                     }
                 }
                 else -> {
-                    FieldLabel("رقم الهاتف")
+                    FieldLabel(tr("رقم الهاتف", "Phone number"))
                     FinField(phone, { phone = it }, "05xxxxxxxx", keyboard = KeyboardType.Phone)
-                    FieldLabel("كلمة المرور")
+                    FieldLabel(tr("كلمة المرور", "Password"))
                     FinField(password, { password = it }, "••••••", keyboard = KeyboardType.Password)
                 }
             }
@@ -110,7 +110,7 @@ fun LoginScreen(onLoggedIn: () -> Unit, onRegister: () -> Unit, toast: (String) 
 
         Spacer(Modifier.height(16.dp))
 
-        val primaryLabel = if (method == "phone_otp" && !otpSent) "إرسال الرمز" else "دخول"
+        val primaryLabel = if (method == "phone_otp" && !otpSent) tr("إرسال الرمز", "Send code") else tr("دخول", "Log in")
         Box(Modifier.fillMaxWidth()) {
             WideButton(if (loading) "…" else primaryLabel, if (loading) null else R.drawable.ic_back) {
                 if (loading) return@WideButton
@@ -120,7 +120,7 @@ fun LoginScreen(onLoggedIn: () -> Unit, onRegister: () -> Unit, toast: (String) 
                         if (method == "phone_otp" && !otpSent) {
                             val r = Net.api.requestOtp(mapOf("phone" to phone))
                             otpSent = true
-                            toast(r.dev_code?.let { "رمز التطوير: $it" } ?: (r.message ?: "أُرسل الرمز"))
+                            toast(r.dev_code?.let { tr("رمز التطوير: $it", "Dev code: $it") } ?: (r.message ?: tr("أُرسل الرمز", "Code sent")))
                         } else {
                             val body = when (method) {
                                 "email_password" -> LoginBody("email_password", email = email, password = password)
@@ -129,12 +129,12 @@ fun LoginScreen(onLoggedIn: () -> Unit, onRegister: () -> Unit, toast: (String) 
                             }
                             val r = Net.api.login(body)
                             if (r.token != null) { Session.save(r); onLoggedIn() }
-                            else toast(r.message ?: "تعذّر الدخول")
+                            else toast(r.message ?: tr("تعذّر الدخول", "Login failed"))
                         }
                     } catch (e: retrofit2.HttpException) {
-                        toast(errorMessage(e) ?: "بيانات غير صحيحة")
+                        toast(errorMessage(e) ?: tr("بيانات غير صحيحة", "Invalid details"))
                     } catch (e: Exception) {
-                        toast("تعذّر الاتصال بالخادم")
+                        toast(tr("تعذّر الاتصال بالخادم", "Couldn't reach the server"))
                     } finally { loading = false }
                 }
             }
@@ -143,8 +143,8 @@ fun LoginScreen(onLoggedIn: () -> Unit, onRegister: () -> Unit, toast: (String) 
 
         Spacer(Modifier.height(16.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            T("ليس لديك متجر؟ ", 12, FontWeight.Medium, C.muted)
-            T("سجّل متجرك", 12, FontWeight.ExtraBold, C.greenD, Modifier.clickable(onClick = onRegister))
+            T(tr("ليس لديك متجر؟ ", "Don't have a store? "), 12, FontWeight.Medium, C.muted)
+            T(tr("سجّل متجرك", "Register your store"), 12, FontWeight.ExtraBold, C.greenD, Modifier.clickable(onClick = onRegister))
         }
         Spacer(Modifier.height(24.dp))
     }

@@ -26,23 +26,23 @@ fun OffersScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit
     val offers = d?.products?.filter { it.price_before > 0.0 && it.price_before > it.price } ?: emptyList()
 
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("العروض والخصومات", onBack, onMenu)
+        ScreenHeader(tr("العروض والخصومات", "Offers & discounts"), onBack, onMenu)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             Spacer(Modifier.height(16.dp))
             if (d != null && offers.isEmpty()) {
                 OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), PaddingValues(22.dp)) {
                     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            T("لا توجد عروض حالياً", 13, FontWeight.Bold, C.head)
+                            T(tr("لا توجد عروض حالياً", "No offers currently"), 13, FontWeight.Bold, C.head)
                             Spacer(Modifier.height(6.dp))
-                            T("لإضافة عرض: عدّل منتجاً وحدّد «السعر قبل الخصم» أعلى من السعر الحالي — يظهر هنا وللزبائن تلقائياً.",
+                            T(tr("لإضافة عرض: عدّل منتجاً وحدّد «السعر قبل الخصم» أعلى من السعر الحالي — يظهر هنا وللزبائن تلقائياً.", "To add an offer: edit a product and set «Price before discount» higher than the current price — it appears here and to customers automatically."),
                                 11, FontWeight.Normal, C.muted, lineHeight = 18)
                         }
                     }
                 }
             } else {
                 Box(Modifier.padding(start = 22.dp, end = 22.dp, bottom = 12.dp)) {
-                    T("منتجاتك التي عليها خصم حالياً (${offers.size})", 11, FontWeight.Medium, C.muted)
+                    T(tr("منتجاتك التي عليها خصم حالياً (${offers.size})", "Your products currently on discount (${offers.size})"), 11, FontWeight.Medium, C.muted)
                 }
                 offers.forEach { p -> OfferRow(p) }
             }
@@ -63,11 +63,11 @@ private fun OfferRow(p: ProductDto) {
             Column(Modifier.weight(1f)) {
                 T(p.name, 13, FontWeight.Bold, C.text, maxLines = 1)
                 Spacer(Modifier.height(2.dp))
-                T("﷼" + money(p.price) + " · قبل ﷼" + money(p.price_before) + (p.section?.let { " · $it" } ?: ""), 11, FontWeight.Normal, C.muted, maxLines = 1)
+                T("﷼" + money(p.price) + tr(" · قبل ﷼", " · before ﷼") + money(p.price_before) + (p.section?.let { " · $it" } ?: ""), 11, FontWeight.Normal, C.muted, maxLines = 1)
             }
             Spacer(Modifier.width(8.dp))
             Box(Modifier.clip(RoundedCornerShape(50)).background(Grad.terra).padding(horizontal = 10.dp, vertical = 4.dp)) {
-                T("−$pct٪", 11, FontWeight.Black, Color.White)
+                T(tr("−$pct٪", "−$pct%"), 11, FontWeight.Black, Color.White)
             }
         }
     }

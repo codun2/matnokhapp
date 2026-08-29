@@ -57,26 +57,26 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit
         pendingChat?.let { id ->
             com.matnokh.tajer.net.NotificationBus.pendingChatOrderId = null
             val d = call({ Net.api.orderDetail(id) }, toast)
-            chatFor = id to (d?.order?.customer ?: "الزبون")
+            chatFor = id to (d?.order?.customer ?: tr("الزبون", "Customer"))
         }
     }
 
     fun act(block: suspend () -> Unit) = scope.launch { block(); load() }
 
     val chatCo = chatFor
-    if (chatCo != null) { ChatScreen(chatCo.first, "محادثة ${chatCo.second}", { chatFor = null }, onMenu, toast); return }
+    if (chatCo != null) { ChatScreen(chatCo.first, tr("محادثة ${chatCo.second}", "${chatCo.second} chat"), { chatFor = null }, onMenu, toast); return }
 
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("طلبات المتجر", onBack, onMenu)
+        ScreenHeader(tr("طلبات المتجر", "Store orders"), onBack, onMenu)
 
         Box(Modifier.padding(horizontal = 22.dp)) {
-            if (needsPrep) ModeBar(R.drawable.ic_clock, true, "وضع التجهيز مفعّل", "— تقبل الطلب وتجهّزه ثم يُبثّ للمناديب")
-            else ModeBar(R.drawable.ic_zap, false, "قبول تلقائي", "— الطلبات جاهزة فوراً وتُبثّ للمناديب مباشرة")
+            if (needsPrep) ModeBar(R.drawable.ic_clock, true, tr("وضع التجهيز مفعّل", "Preparation mode enabled"), tr("— تقبل الطلب وتجهّزه ثم يُبثّ للمناديب", "— you accept and prepare the order, then it's broadcast to couriers"))
+            else ModeBar(R.drawable.ic_zap, false, tr("قبول تلقائي", "Auto-accept"), tr("— الطلبات جاهزة فوراً وتُبثّ للمناديب مباشرة", "— orders are ready instantly and broadcast to couriers directly"))
         }
 
         Row(Modifier.padding(start = 22.dp, end = 22.dp, top = 14.dp).fillMaxWidth().clip(CircleShape).background(C.card)
             .border(1.dp, C.line, CircleShape).padding(5.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            listOf("open" to "الجارية", "done" to "المكتملة").forEach { (k, lbl) ->
+            listOf("open" to tr("الجارية", "Active"), "done" to tr("المكتملة", "Completed")).forEach { (k, lbl) ->
                 val on = tab == k
                 Box(Modifier.weight(1f).clip(CircleShape).then(if (on) Modifier.background(Grad.green) else Modifier)
                     .clickable { tab = k }.padding(vertical = 9.dp), contentAlignment = Alignment.Center) {
@@ -93,7 +93,7 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit
             if (list.isEmpty()) item {
                 Box(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card)
                     .border(1.dp, C.line, RoundedCornerShape(22.dp)).padding(28.dp), contentAlignment = Alignment.Center) {
-                    T("لا توجد طلبات في هذا التبويب", 12, FontWeight.Normal, C.muted)
+                    T(tr("لا توجد طلبات في هذا التبويب", "No orders in this tab"), 12, FontWeight.Normal, C.muted)
                 }
             }
             items(list) { o ->
@@ -104,14 +104,14 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit
                     onReady = { act { call({ Net.api.readyOrder(o.id) }, toast)?.let { toast(it.message ?: "") } } },
                     onConfirmPay = { act { call({ Net.api.confirmPayment(o.id) }, toast)?.let { toast(it.message ?: "") } } },
                     onRejectPay = { act { call({ Net.api.rejectPayment(o.id) }, toast)?.let { toast(it.message ?: "") } } },
-                    onViewProof = { o.payment_proof?.let { proofImg = it } ?: toast("لا يوجد إيصال مرفوع") })
+                    onViewProof = { o.payment_proof?.let { proofImg = it } ?: toast(tr("لا يوجد إيصال مرفوع", "No receipt uploaded")) })
             }
             item {
                 Column(Modifier.padding(start = 22.dp, end = 22.dp, top = 2.dp).fillMaxWidth().clip(RoundedCornerShape(18.dp))
                     .background(Color(0xFFFDF6EC)).border(1.dp, Color(0xFFECDCC3), RoundedCornerShape(18.dp)).padding(horizontal = 16.dp, vertical = 13.dp)) {
-                    T("التفاوض على السعر لا يشملك", 12, FontWeight.ExtraBold, Color(0xFF75552E))
+                    T(tr("التفاوض على السعر لا يشملك", "Price negotiation doesn't apply to you"), 12, FontWeight.ExtraBold, Color(0xFF75552E))
                     Spacer(Modifier.height(3.dp))
-                    T("سعر المنتجات ثابت من متجرك. بعد تجهيز الطلب يُبثّ للمناديب القريبين، ويتفاوضون مع الزبون على أجرة التوصيل فقط — والزبون يختار العرض المناسب. عند استلام المندوب الطلب تُموَّل محفظتك بقيمة المنتجات.",
+                    T(tr("سعر المنتجات ثابت من متجرك. بعد تجهيز الطلب يُبثّ للمناديب القريبين، ويتفاوضون مع الزبون على أجرة التوصيل فقط — والزبون يختار العرض المناسب. عند استلام المندوب الطلب تُموَّل محفظتك بقيمة المنتجات.", "Product prices are fixed by your store. After an order is prepared it's broadcast to nearby couriers, who negotiate only the delivery fee with the customer — and the customer picks the suitable offer. When the courier picks up the order, your wallet is funded with the items value."),
                         11, FontWeight.Medium, Color(0xFF8A6A3F), lineHeight = 20)
                 }
             }
@@ -152,9 +152,9 @@ private fun OrderCard(o: OrderRow, onOpen: () -> Unit, onAccept: () -> Unit, onR
             Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(bg), contentAlignment = Alignment.Center) { Ic(iconId, 22.dp, col) }
             Spacer(Modifier.width(13.dp))
             Column(Modifier.weight(1f)) {
-                T("طلب ${o.customer}", 13, FontWeight.Bold, C.text, maxLines = 1)
+                T(tr("طلب ${o.customer}", "${o.customer}'s order"), 13, FontWeight.Bold, C.text, maxLines = 1)
                 Spacer(Modifier.height(2.dp))
-                T("#${(o.order_no ?: o.id.toString()).substringAfterLast("-")} · ${o.items_count} أصناف · ﷼${o.total.toInt()} · ${payLabel(o.payment_method)}", 11, FontWeight.Normal, C.muted, maxLines = 1)
+                T(tr("#${(o.order_no ?: o.id.toString()).substringAfterLast("-")} · ${o.items_count} أصناف · ﷼${o.total.toInt()} · ${payLabel(o.payment_method)}", "#${(o.order_no ?: o.id.toString()).substringAfterLast("-")} · ${o.items_count} items · ﷼${o.total.toInt()} · ${payLabel(o.payment_method)}"), 11, FontWeight.Normal, C.muted, maxLines = 1)
                 T(listOfNotNull(o.branch, o.dt, o.driver).joinToString(" · "), 11, FontWeight.Normal, C.muted, maxLines = 1)
             }
             Spacer(Modifier.width(8.dp))
@@ -162,31 +162,31 @@ private fun OrderCard(o: OrderRow, onOpen: () -> Unit, onAccept: () -> Unit, onR
         }
         when (st) {
             "await_pay" -> ActionRow {
-                ActBtn("الإيصال", R.drawable.ic_img, ActKind.Ghost, Modifier.weight(1f), onViewProof)
-                ActBtn("تأكيد", R.drawable.ic_check, ActKind.Ok, Modifier.weight(1f), onConfirmPay)
-                ActBtn("رفض", R.drawable.ic_x, ActKind.Rj, Modifier.weight(1f), onRejectPay)
+                ActBtn(tr("الإيصال", "Receipt"), R.drawable.ic_img, ActKind.Ghost, Modifier.weight(1f), onViewProof)
+                ActBtn(tr("تأكيد", "Confirm"), R.drawable.ic_check, ActKind.Ok, Modifier.weight(1f), onConfirmPay)
+                ActBtn(tr("رفض", "Reject"), R.drawable.ic_x, ActKind.Rj, Modifier.weight(1f), onRejectPay)
             }
             "new" -> ActionRow {
-                ActBtn("قبول وتجهيز", R.drawable.ic_check, ActKind.Ok, Modifier.weight(1f), onAccept)
-                ActBtn("رفض", R.drawable.ic_x, ActKind.Rj, Modifier.weight(1f), onReject)
+                ActBtn(tr("قبول وتجهيز", "Accept & prepare"), R.drawable.ic_check, ActKind.Ok, Modifier.weight(1f), onAccept)
+                ActBtn(tr("رفض", "Reject"), R.drawable.ic_x, ActKind.Rj, Modifier.weight(1f), onReject)
             }
-            "prep" -> ActionRow { ActBtn("جاهز — أبلغ المناديب", R.drawable.ic_check, ActKind.Ok, Modifier.weight(1f), onReady) }
-            "ready" -> ActionRow { ActBtn("بُثّ للمناديب — بانتظار من يستلمه", R.drawable.ic_clock, ActKind.Ghost, Modifier.weight(1f)) {} }
+            "prep" -> ActionRow { ActBtn(tr("جاهز — أبلغ المناديب", "Ready — notify couriers"), R.drawable.ic_check, ActKind.Ok, Modifier.weight(1f), onReady) }
+            "ready" -> ActionRow { ActBtn(tr("بُثّ للمناديب — بانتظار من يستلمه", "Broadcast to couriers — awaiting acceptance"), R.drawable.ic_clock, ActKind.Ghost, Modifier.weight(1f)) {} }
         }
     }
 }
 
-private fun payLabel(m: String?): String = when (m) { "card", "tap" -> "بطاقة ✓"; "cash" -> "نقداً"; "bank_transfer" -> "تحويل بنكي"; else -> m ?: "—" }
+private fun payLabel(m: String?): String = when (m) { "card", "tap" -> tr("بطاقة ✓", "Card ✓"); "cash" -> tr("نقداً", "Cash"); "bank_transfer" -> tr("تحويل بنكي", "Bank transfer"); else -> m ?: "—" }
 
 @Composable
 private fun ProofDialog(url: String, onClose: () -> Unit) {
     androidx.compose.ui.window.Dialog(onDismissRequest = onClose) {
         Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(C.card).padding(14.dp)) {
-            T("إيصال التحويل البنكي", 14, FontWeight.ExtraBold, C.head)
+            T(tr("إيصال التحويل البنكي", "Bank transfer receipt"), 14, FontWeight.ExtraBold, C.head)
             Spacer(Modifier.height(10.dp))
             coil.compose.AsyncImage(model = url, contentDescription = null, contentScale = androidx.compose.ui.layout.ContentScale.Fit, modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp, max = 460.dp).clip(RoundedCornerShape(12.dp)).background(C.card2))
             Spacer(Modifier.height(12.dp))
-            Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(C.greenD).clickable(onClick = onClose).padding(vertical = 12.dp), contentAlignment = Alignment.Center) { T("إغلاق", 13, FontWeight.ExtraBold, Color.White) }
+            Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(C.greenD).clickable(onClick = onClose).padding(vertical = 12.dp), contentAlignment = Alignment.Center) { T(tr("إغلاق", "Close"), 13, FontWeight.ExtraBold, Color.White) }
         }
     }
 }
@@ -200,7 +200,7 @@ private fun OrderDetailDialog(d: OrderDetailResp, onClose: () -> Unit, onChat: (
             Column(Modifier.fillMaxWidth().background(Grad.green).padding(18.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        T("طلب #${(d.order.order_no ?: d.order.id.toString()).substringAfterLast("-")}", 15, FontWeight.Black, Color.White)
+                        T(tr("طلب #${(d.order.order_no ?: d.order.id.toString()).substringAfterLast("-")}", "Order #${(d.order.order_no ?: d.order.id.toString()).substringAfterLast("-")}"), 15, FontWeight.Black, Color.White)
                         T(d.order.customer, 12, FontWeight.Bold, Color.White.copy(alpha = .9f))
                     }
                     val (lbl, _) = orderStatus(d.order.status)
@@ -212,7 +212,7 @@ private fun OrderDetailDialog(d: OrderDetailResp, onClose: () -> Unit, onChat: (
             OrderInfoBar(d, onChat)
             // العناصر
             Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 14.dp)) {
-                T("عناصر الطلب (${d.items.size})", 12, FontWeight.ExtraBold, C.head)
+                T(tr("عناصر الطلب (${d.items.size})", "Order items (${d.items.size})"), 12, FontWeight.ExtraBold, C.head)
                 Spacer(Modifier.height(8.dp))
                 d.items.forEach { it ->
                     Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -220,23 +220,23 @@ private fun OrderDetailDialog(d: OrderDetailResp, onClose: () -> Unit, onChat: (
                         Spacer(Modifier.width(10.dp))
                         Column(Modifier.weight(1f)) {
                             T(it.name, 12, FontWeight.Bold, C.head)
-                            if (it.addons.isNotEmpty()) T(it.addons.joinToString("، ") { a -> "${a.name} +﷼${money(a.price)}" }, 10, FontWeight.Normal, C.muted, maxLines = 2)
+                            if (it.addons.isNotEmpty()) T(it.addons.joinToString(tr("، ", ", ")) { a -> "${a.name} +﷼${money(a.price)}" }, 10, FontWeight.Normal, C.muted, maxLines = 2)
                         }
                         T("﷼${it.line_total.toInt()}", 12, FontWeight.Black, C.greenD)
                     }
                     Line()
                 }
                 Spacer(Modifier.height(10.dp))
-                SumRow("قيمة الأصناف", d.order.items_total)
-                if (d.order.discount > 0) SumRow("خصم", -d.order.discount)
-                SumRow("رسوم التوصيل", d.order.delivery_fee)
+                SumRow(tr("قيمة الأصناف", "Items value"), d.order.items_total)
+                if (d.order.discount > 0) SumRow(tr("خصم", "Discount"), -d.order.discount)
+                SumRow(tr("رسوم التوصيل", "Delivery fee"), d.order.delivery_fee)
                 Spacer(Modifier.height(4.dp))
                 Row(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-                    T("الإجمالي", 14, FontWeight.Black, C.head, Modifier.weight(1f))
+                    T(tr("الإجمالي", "Total"), 14, FontWeight.Black, C.head, Modifier.weight(1f))
                     T("﷼${d.order.total.toInt()}", 15, FontWeight.Black, C.greenD)
                 }
             }
-            Box(Modifier.fillMaxWidth().clickable(onClick = onClose).padding(14.dp), contentAlignment = Alignment.Center) { T("إغلاق", 13, FontWeight.Bold, C.muted) }
+            Box(Modifier.fillMaxWidth().clickable(onClick = onClose).padding(14.dp), contentAlignment = Alignment.Center) { T(tr("إغلاق", "Close"), 13, FontWeight.Bold, C.muted) }
         }
     }
 }
@@ -256,7 +256,7 @@ private fun OrderInfoBar(d: OrderDetailResp, onChat: ((OrderDetailResp) -> Unit)
             Ic(R.drawable.ic_cash, 14.dp, C.green); Spacer(Modifier.width(6.dp))
             T(payLabel(o.payment_method), 11, FontWeight.Bold, C.head, Modifier.weight(1f))
             Box(Modifier.clip(CircleShape).background(if (o.is_paid) C.pillLive else C.pillWait).padding(horizontal = 10.dp, vertical = 4.dp)) {
-                T(if (o.is_paid) "مدفوع ✓" else "غير مدفوع", 9, FontWeight.ExtraBold, if (o.is_paid) C.greenD else C.terraText)
+                T(if (o.is_paid) tr("مدفوع ✓", "Paid ✓") else tr("غير مدفوع", "Unpaid"), 9, FontWeight.ExtraBold, if (o.is_paid) C.greenD else C.terraText)
             }
         }
         o.phone?.takeIf { it.isNotBlank() }?.let { phone ->
@@ -265,7 +265,7 @@ private fun OrderInfoBar(d: OrderDetailResp, onChat: ((OrderDetailResp) -> Unit)
                 .clickable { runCatching { ctx.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone"))) } }
                 .padding(vertical = 11.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
                 Ic(R.drawable.ic_phone, 15.dp, C.greenD); Spacer(Modifier.width(7.dp))
-                T("اتصال بالزبون · $phone", 12, FontWeight.ExtraBold, C.greenD)
+                T(tr("اتصال بالزبون · $phone", "Call customer · $phone"), 12, FontWeight.ExtraBold, C.greenD)
             }
         }
         if (onChat != null) {
@@ -274,7 +274,7 @@ private fun OrderInfoBar(d: OrderDetailResp, onChat: ((OrderDetailResp) -> Unit)
                 .clickable { onChat(d) }
                 .padding(vertical = 11.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
                 Ic(R.drawable.ic_msg, 15.dp, C.greenD); Spacer(Modifier.width(7.dp))
-                T("محادثة الزبون", 12, FontWeight.ExtraBold, C.greenD)
+                T(tr("محادثة الزبون", "Customer chat"), 12, FontWeight.ExtraBold, C.greenD)
             }
         }
     }

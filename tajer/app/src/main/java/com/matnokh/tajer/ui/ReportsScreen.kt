@@ -26,18 +26,18 @@ fun ReportsScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Uni
     val r = rep
 
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("التقارير", onBack, onMenu)
+        ScreenHeader(tr("التقارير", "Reports"), onBack, onMenu)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             Spacer(Modifier.height(16.dp))
             Box(Modifier.padding(horizontal = 22.dp)) {
-                T("تقارير المبيعات — مبنيّة على الطلبات المسلّمة فعلياً", 11, FontWeight.Medium, C.muted)
+                T(tr("تقارير المبيعات — مبنيّة على الطلبات المسلّمة فعلياً", "Sales reports — based on actually delivered orders"), 11, FontWeight.Medium, C.muted)
             }
             Spacer(Modifier.height(12.dp))
-            ReportCard("اليوم", r?.today, C.greenD, Grad.green)
-            ReportCard("هذا الأسبوع", r?.week, C.blueText, Grad.blue)
-            ReportCard("هذا الشهر", r?.month, C.terraText, Grad.terra)
-            ReportCard("هذا العام", r?.year, C.greenD, Grad.green)
-            ReportCard("الإجمالي منذ البداية", r?.all, C.blueText, Grad.blue)
+            ReportCard(tr("اليوم", "Today"), r?.today, C.greenD, Grad.green)
+            ReportCard(tr("هذا الأسبوع", "This week"), r?.week, C.blueText, Grad.blue)
+            ReportCard(tr("هذا الشهر", "This month"), r?.month, C.terraText, Grad.terra)
+            ReportCard(tr("هذا العام", "This year"), r?.year, C.greenD, Grad.green)
+            ReportCard(tr("الإجمالي منذ البداية", "Total since the start"), r?.all, C.blueText, Grad.blue)
             Spacer(Modifier.height(24.dp))
         }
     }
@@ -54,7 +54,7 @@ private fun ReportCard(label: String, p: Period?, color: Color, grad: Brush) {
             Column(Modifier.weight(1f)) {
                 T(label, 14, FontWeight.Bold, C.head)
                 Spacer(Modifier.height(2.dp))
-                T("${p?.orders ?: 0} طلباً مسلّماً", 11, FontWeight.Normal, C.muted)
+                T(tr("${p?.orders ?: 0} طلباً مسلّماً", "${p?.orders ?: 0} orders delivered"), 11, FontWeight.Normal, C.muted)
             }
             Spacer(Modifier.width(8.dp))
             T("﷼" + money(p?.sales ?: 0.0), 18, FontWeight.Black, color)

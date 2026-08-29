@@ -17,11 +17,11 @@ import com.matnokh.tajer.R
 private data class NavItem(val key: String, val iconId: Int, val label: String)
 
 private val NAV = listOf(
-    NavItem("dash", R.drawable.ic_chart, "الرئيسية"),
-    NavItem("products", R.drawable.ic_box, "المنتجات"),
-    NavItem("orders", R.drawable.ic_list, "الطلبات"),
-    NavItem("wallet", R.drawable.ic_cash, "المحفظة"),
-    NavItem("store", R.drawable.ic_cog, "المتجر"),
+    NavItem("dash", R.drawable.ic_chart, tr("الرئيسية", "Home")),
+    NavItem("products", R.drawable.ic_box, tr("المنتجات", "Products")),
+    NavItem("orders", R.drawable.ic_list, tr("الطلبات", "Orders")),
+    NavItem("wallet", R.drawable.ic_cash, tr("المحفظة", "Wallet")),
+    NavItem("store", R.drawable.ic_cog, tr("المتجر", "Store")),
 )
 
 @Composable

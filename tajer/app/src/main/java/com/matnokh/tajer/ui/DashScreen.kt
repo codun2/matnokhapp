@@ -45,8 +45,8 @@ fun DashScreen(onMenu: () -> Unit, onOpenOrders: () -> Unit, onNotifications: ()
                 StoreLogoBox(46.dp, 16.dp, 19)
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
-                    T("صباح الخير 👋", 11, FontWeight.Normal, C.muted)
-                    T(com.matnokh.tajer.net.Session.storeName ?: "متجري", 15, FontWeight.Bold, C.text)
+                    T(tr("صباح الخير 👋", "Good morning 👋"), 11, FontWeight.Normal, C.muted)
+                    T(com.matnokh.tajer.net.Session.storeName ?: tr("متجري", "My store"), 15, FontWeight.Bold, C.text)
                 }
                 HeaderBtn(R.drawable.ic_menu, onClick = onMenu)
                 Spacer(Modifier.width(9.dp))
@@ -70,19 +70,19 @@ fun DashScreen(onMenu: () -> Unit, onOpenOrders: () -> Unit, onNotifications: ()
                     .clip(RoundedCornerShape(26.dp)).background(Grad.green).padding(20.dp)
             ) {
                 Column {
-                    T("مبيعات هذا الشهر", 12, FontWeight.Normal, Color.White.copy(alpha = .85f))
+                    T(tr("مبيعات هذا الشهر", "This month's sales"), 12, FontWeight.Normal, Color.White.copy(alpha = .85f))
                     Spacer(Modifier.height(4.dp))
                     T("﷼" + money(d?.sales_month ?: 0.0), 32, FontWeight.Black, Color.White)
                     Spacer(Modifier.height(10.dp))
                     val g = d?.growth_pct
                     val trend = when {
                         g == null -> ""
-                        g >= 0 -> "▲ $g٪ عن الشهر الماضي · "
-                        else -> "▼ ${-g}٪ عن الشهر الماضي · "
+                        g >= 0 -> tr("▲ $g٪ عن الشهر الماضي · ", "▲ $g% vs last month · ")
+                        else -> tr("▼ ${-g}٪ عن الشهر الماضي · ", "▼ ${-g}% vs last month · ")
                     }
                     Box(Modifier.clip(CircleShape).background(Color.White.copy(alpha = .22f))
                         .padding(horizontal = 14.dp, vertical = 5.dp)) {
-                        T(trend + "${d?.orders_month ?: 0} طلباً", 11, FontWeight.Bold, Color.White)
+                        T(trend + tr("${d?.orders_month ?: 0} طلباً", "${d?.orders_month ?: 0} orders"), 11, FontWeight.Bold, Color.White)
                     }
                 }
             }
@@ -92,13 +92,13 @@ fun DashScreen(onMenu: () -> Unit, onOpenOrders: () -> Unit, onNotifications: ()
                 Modifier.padding(start = 22.dp, end = 22.dp, top = 14.dp).fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                Kpi("${d?.branches ?: 0}", "فروع", C.greenD, Modifier.weight(1f))
-                Kpi("${d?.products ?: 0}", "منتجاً", C.blueText, Modifier.weight(1f))
+                Kpi("${d?.branches ?: 0}", tr("فروع", "Branches"), C.greenD, Modifier.weight(1f))
+                Kpi("${d?.products ?: 0}", tr("منتجاً", "products"), C.blueText, Modifier.weight(1f))
                 val rt = d?.rating ?: 0.0
-                Kpi(if (rt > 0) money(rt) else "—", "تقييم المتجر", C.terraText, Modifier.weight(1f), star = rt > 0)
+                Kpi(if (rt > 0) money(rt) else "—", tr("تقييم المتجر", "Store rating"), C.terraText, Modifier.weight(1f), star = rt > 0)
             }
 
-            SecTitle("مبيعات آخر 7 أيام")
+            SecTitle(tr("مبيعات آخر 7 أيام", "Last 7 days' sales"))
 
             // مخطط الأعمدة (حقيقي: مبيعات كل يوم من آخر 7 أيام)
             OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), PaddingValues(0.dp)) {
@@ -127,12 +127,12 @@ fun DashScreen(onMenu: () -> Unit, onOpenOrders: () -> Unit, onNotifications: ()
                 }
             }
 
-            SecTitle("آخر الطلبات الواردة", "عرض الكل", onLink = onOpenOrders)
+            SecTitle(tr("آخر الطلبات الواردة", "Latest incoming orders"), tr("عرض الكل", "View all"), onLink = onOpenOrders)
 
             val recent = d?.recent ?: emptyList()
             if (d != null && recent.isEmpty()) {
                 OCard(Modifier.padding(start = 22.dp, end = 22.dp, bottom = 12.dp).fillMaxWidth(), PaddingValues(18.dp)) {
-                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { T("لا توجد طلبات بعد", 12, FontWeight.Normal, C.muted) }
+                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { T(tr("لا توجد طلبات بعد", "No orders yet"), 12, FontWeight.Normal, C.muted) }
                 }
             } else recent.forEach { o -> RecentOrdRow(o) }
 
@@ -146,10 +146,10 @@ private fun RecentOrdRow(o: DashOrder) {
     val (lbl, kind) = orderStatus(o.status)
     val done = o.status == "done"
     val shortNo = (o.order_no?.substringAfterLast("-")?.trimStart('0')?.ifEmpty { "0" }) ?: o.id.toString()
-    val what = o.items ?: (if (o.items_count == 1) "صنف واحد" else "${o.items_count} أصناف")
+    val what = o.items ?: (if (o.items_count == 1) tr("صنف واحد", "One item") else tr("${o.items_count} أصناف", "${o.items_count} items"))
     val sub = buildString {
-        append("$what · ﷼${money(o.total)} · طلب #$shortNo")
-        o.driver?.let { append(" · مندوب: $it") }
+        append(tr("$what · ﷼${money(o.total)} · طلب #$shortNo", "$what · ﷼${money(o.total)} · order #$shortNo"))
+        o.driver?.let { append(tr(" · مندوب: $it", " · courier: $it")) }
     }
     OrdRow(
         if (done) R.drawable.ic_check else R.drawable.ic_box,

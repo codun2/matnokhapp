@@ -64,35 +64,35 @@ fun RegisterScreen(onDone: (String) -> Unit, onBackToLogin: () -> Unit, toast: (
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             HeaderSquare(R.drawable.ic_back, 42.dp, 14.dp, onBackToLogin)
             Spacer(Modifier.width(10.dp))
-            T("تسجيل متجر جديد", 18, FontWeight.ExtraBold, C.head)
+            T(tr("تسجيل متجر جديد", "Register a new store"), 18, FontWeight.ExtraBold, C.head)
         }
         Spacer(Modifier.height(18.dp))
         Box(Modifier.size(72.dp).clip(RoundedCornerShape(22.dp)).background(Grad.green), contentAlignment = Alignment.Center) {
             Ic(R.drawable.ic_shop, 38.dp, Color.White)
         }
         Spacer(Modifier.height(10.dp))
-        T("سجّل متجرك ويُعتمد من الإدارة", 13, FontWeight.Medium, C.muted)
+        T(tr("سجّل متجرك ويُعتمد من الإدارة", "Register your store, approved by admin"), 13, FontWeight.Medium, C.muted)
         Spacer(Modifier.height(18.dp))
 
         OCard(Modifier.fillMaxWidth()) {
-            FieldLabel("اسم المتجر", required = true)
-            FinField(store, { store = it }, "مثال: أسواق السلام")
-            FieldLabel("اسم صاحب المتجر", required = true)
-            FinField(owner, { owner = it }, "الاسم الكامل")
-            FieldLabel("رقم الهاتف", required = true)
+            FieldLabel(tr("اسم المتجر", "Store name"), required = true)
+            FinField(store, { store = it }, tr("مثال: أسواق السلام", "e.g. Al-Salam Markets"))
+            FieldLabel(tr("اسم صاحب المتجر", "Store owner name"), required = true)
+            FinField(owner, { owner = it }, tr("الاسم الكامل", "Full name"))
+            FieldLabel(tr("رقم الهاتف", "Phone number"), required = true)
             FinField(phone, { phone = it }, "05xxxxxxxx", keyboard = KeyboardType.Phone)
-            FieldLabel("البريد الإلكتروني (اختياري)")
+            FieldLabel(tr("البريد الإلكتروني (اختياري)", "Email (optional)"))
             FinField(email, { email = it }, "you@example.com", keyboard = KeyboardType.Email)
-            FieldLabel("كلمة المرور", required = true)
-            FinField(password, { password = it }, "6 أحرف على الأقل", keyboard = KeyboardType.Password)
-            FieldLabel("هاتف المسؤول عن المتجر")
-            FinField(managerPhone, { managerPhone = it }, "جوال المسؤول عن المتجر", keyboard = KeyboardType.Phone)
+            FieldLabel(tr("كلمة المرور", "Password"), required = true)
+            FinField(password, { password = it }, tr("6 أحرف على الأقل", "At least 6 characters"), keyboard = KeyboardType.Password)
+            FieldLabel(tr("هاتف المسؤول عن المتجر", "Store manager's phone"))
+            FinField(managerPhone, { managerPhone = it }, tr("جوال المسؤول عن المتجر", "Store manager's phone"), keyboard = KeyboardType.Phone)
         }
 
         Spacer(Modifier.height(12.dp))
         OCard(Modifier.fillMaxWidth()) {
-            FieldLabel("التصنيف", required = true)
-            if (categories.isEmpty()) T("جارٍ تحميل التصنيفات…", 11, FontWeight.Medium, C.muted)
+            FieldLabel(tr("التصنيف", "Category"), required = true)
+            if (categories.isEmpty()) T(tr("جارٍ تحميل التصنيفات…", "Loading categories…"), 11, FontWeight.Medium, C.muted)
             else Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 categories.forEach { c -> Chip(c.name, catId == c.id) { catId = c.id } }
             }
@@ -101,41 +101,41 @@ fun RegisterScreen(onDone: (String) -> Unit, onBackToLogin: () -> Unit, toast: (
         StoreLocationCard(lat, lng, autoLocate = true) { la, ln -> lat = la; lng = ln }
         Spacer(Modifier.height(12.dp))
         OCard(Modifier.fillMaxWidth()) {
-            OcTitle(R.drawable.ic_doc, "وثائق المتجر")
-            RegPhoto("رخصة سارية للمتجر", licensePhoto, { licensePhoto = it }, toast)
-            RegPhoto("السجل التجاري", commercialPhoto, { commercialPhoto = it }, toast)
-            RegPhoto("صورة هوية المسؤول عن المتجر", managerIdPhoto, { managerIdPhoto = it }, toast)
+            OcTitle(R.drawable.ic_doc, tr("وثائق المتجر", "Store documents"))
+            RegPhoto(tr("رخصة سارية للمتجر", "Valid store license"), licensePhoto, { licensePhoto = it }, toast)
+            RegPhoto(tr("السجل التجاري", "Commercial register"), commercialPhoto, { commercialPhoto = it }, toast)
+            RegPhoto(tr("صورة هوية المسؤول عن المتجر", "Store manager's ID photo"), managerIdPhoto, { managerIdPhoto = it }, toast)
         }
         Spacer(Modifier.height(12.dp))
         OCard(Modifier.fillMaxWidth()) {
-            OcTitle(R.drawable.ic_card, "باقة الاشتراك", required = true)
-            if (plans.isEmpty()) T("جارٍ تحميل الباقات…", 11, FontWeight.Medium, C.muted)
+            OcTitle(R.drawable.ic_card, tr("باقة الاشتراك", "Subscription package"), required = true)
+            if (plans.isEmpty()) T(tr("جارٍ تحميل الباقات…", "Loading packages…"), 11, FontWeight.Medium, C.muted)
             else {
                 val regularP = plans.filter { it.type != "marketing" }
                 val marketingP = plans.filter { it.type == "marketing" }
-                if (regularP.isNotEmpty()) { T("الباقات العادية", 11, FontWeight.ExtraBold, C.muted, Modifier.padding(vertical = 4.dp)); regularP.forEach { pp -> RegPlanRow(pp, planId == pp.id) { planId = pp.id } } }
-                if (marketingP.isNotEmpty()) { T("الباقات التسويقية 📣", 11, FontWeight.ExtraBold, C.muted, Modifier.padding(top = 8.dp, bottom = 4.dp)); marketingP.forEach { pp -> RegPlanRow(pp, planId == pp.id) { planId = pp.id } } }
+                if (regularP.isNotEmpty()) { T(tr("الباقات العادية", "Regular packages"), 11, FontWeight.ExtraBold, C.muted, Modifier.padding(vertical = 4.dp)); regularP.forEach { pp -> RegPlanRow(pp, planId == pp.id) { planId = pp.id } } }
+                if (marketingP.isNotEmpty()) { T(tr("الباقات التسويقية 📣", "Marketing packages 📣"), 11, FontWeight.ExtraBold, C.muted, Modifier.padding(top = 8.dp, bottom = 4.dp)); marketingP.forEach { pp -> RegPlanRow(pp, planId == pp.id) { planId = pp.id } } }
             }
         }
         Spacer(Modifier.height(16.dp))
         Box(Modifier.fillMaxWidth()) {
-            WideButton(if (loading) "…" else "إنشاء المتجر", if (loading) null else R.drawable.ic_check) {
+            WideButton(if (loading) "…" else tr("إنشاء المتجر", "Create store"), if (loading) null else R.drawable.ic_check) {
                 if (loading) return@WideButton
                 if (store.isBlank() || owner.isBlank() || phone.isBlank() || password.length < 6) {
-                    toast("أكمل الحقول المطلوبة (كلمة المرور 6 أحرف فأكثر)"); return@WideButton
+                    toast(tr("أكمل الحقول المطلوبة (كلمة المرور 6 أحرف فأكثر)", "Complete the required fields (password 6+ characters)")); return@WideButton
                 }
-                if (catId == null) { toast("اختر تصنيف المتجر"); return@WideButton }
-                if (licensePhoto == null || commercialPhoto == null || managerIdPhoto == null) { toast("ارفع وثائق المتجر الثلاث: رخصة سارية، سجل تجاري، هوية المسؤول"); return@WideButton }
-                if (planId == null) { toast("اختر باقة الاشتراك"); return@WideButton }
+                if (catId == null) { toast(tr("اختر تصنيف المتجر", "Choose the store category")); return@WideButton }
+                if (licensePhoto == null || commercialPhoto == null || managerIdPhoto == null) { toast(tr("ارفع وثائق المتجر الثلاث: رخصة سارية، سجل تجاري، هوية المسؤول", "Upload the store's three documents: valid license, commercial register, manager ID")); return@WideButton }
+                if (planId == null) { toast(tr("اختر باقة الاشتراك", "Choose a subscription package")); return@WideButton }
                 scope.launch {
                     loading = true
                     try {
                         val r = Net.api.register(RegisterBody(store.trim(), owner.trim(), phone.trim(), email.trim().ifBlank { null }, password, catId, lat, lng, license_photo = licensePhoto, commercial_register_photo = commercialPhoto, manager_phone = managerPhone.trim().ifBlank { null }, manager_id_photo = managerIdPhoto, subscription_plan_id = planId))
-                        onDone(r.message ?: "تم إنشاء متجرك — بانتظار اعتماد الإدارة")
+                        onDone(r.message ?: tr("تم إنشاء متجرك — بانتظار اعتماد الإدارة", "Your store was created — awaiting admin approval"))
                     } catch (e: retrofit2.HttpException) {
-                        toast(errorMessage(e) ?: "تعذّر التسجيل")
+                        toast(errorMessage(e) ?: tr("تعذّر التسجيل", "Registration failed"))
                     } catch (e: Exception) {
-                        toast("تعذّر الاتصال بالخادم")
+                        toast(tr("تعذّر الاتصال بالخادم", "Couldn't reach the server"))
                     } finally { loading = false }
                 }
             }
@@ -159,9 +159,9 @@ private fun RegPhoto(label: String, url: String?, onUploaded: (String) -> Unit, 
                 if (bytes != null) {
                     val part = MultipartBody.Part.createFormData("file", "doc.jpg", bytes.toRequestBody("image/*".toMediaTypeOrNull()))
                     val up = Net.api.registerUpload(part)
-                    onUploaded(up.url); toast("تم رفع " + label + " ✓")
+                    onUploaded(up.url); toast(tr("تم رفع ", "Uploaded ") + label + " ✓")
                 }
-            } catch (e: Exception) { toast("تعذّر رفع " + label) }
+            } catch (e: Exception) { toast(tr("تعذّر رفع ", "Couldn't upload ") + label) }
             busy = false
         }
     }
@@ -172,8 +172,8 @@ private fun RegPhoto(label: String, url: String?, onUploaded: (String) -> Unit, 
             else Ic(R.drawable.ic_doc, 22.dp, C.muted)
         }
         Spacer(Modifier.width(12.dp))
-        Column(Modifier.weight(1f)) { T(label, 12, FontWeight.Bold, C.head); T(if (url != null) "تم الرفع ✓" else "مطلوب", 10, FontWeight.Normal, if (url != null) C.muted else C.greenD) }
-        Box(Modifier.clip(RoundedCornerShape(11.dp)).background(Color(0xFFEEF4EF)).clickable(enabled = !busy) { picker.launch("image/*") }.padding(horizontal = 14.dp, vertical = 9.dp)) { T(if (url != null) "تغيير" else "رفع", 11, FontWeight.ExtraBold, C.green) }
+        Column(Modifier.weight(1f)) { T(label, 12, FontWeight.Bold, C.head); T(if (url != null) tr("تم الرفع ✓", "Uploaded ✓") else tr("مطلوب", "Required"), 10, FontWeight.Normal, if (url != null) C.muted else C.greenD) }
+        Box(Modifier.clip(RoundedCornerShape(11.dp)).background(Color(0xFFEEF4EF)).clickable(enabled = !busy) { picker.launch("image/*") }.padding(horizontal = 14.dp, vertical = 9.dp)) { T(if (url != null) tr("تغيير", "Change") else tr("رفع", "Upload"), 11, FontWeight.ExtraBold, C.green) }
     }
 }
 
@@ -192,8 +192,8 @@ private fun RegPlanRow(p: com.matnokh.tajer.net.PlanDto, selected: Boolean, onCl
         Spacer(Modifier.width(11.dp))
         Column(Modifier.weight(1f)) {
             T(p.name, 13, FontWeight.Bold, C.head, maxLines = 1)
-            T(if (p.duration_days % 30 == 0 && p.duration_days > 0) "${p.duration_days / 30} شهر" else "${p.duration_days} يوم", 10, FontWeight.Medium, C.muted)
+            T(if (p.duration_days % 30 == 0 && p.duration_days > 0) tr("${p.duration_days / 30} شهر", "${p.duration_days / 30} months") else tr("${p.duration_days} يوم", "${p.duration_days} days"), 10, FontWeight.Medium, C.muted)
         }
-        T(if (p.price <= 0.0) "مجاناً" else "·﷼${money(p.price)}", 14, FontWeight.ExtraBold, C.greenD)
+        T(if (p.price <= 0.0) tr("مجاناً", "Free") else "·﷼${money(p.price)}", 14, FontWeight.ExtraBold, C.greenD)
     }
 }

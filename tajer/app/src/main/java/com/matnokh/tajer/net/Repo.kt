@@ -1,4 +1,5 @@
 package com.matnokh.tajer.net
+import com.matnokh.tajer.ui.tr
 
 import retrofit2.HttpException
 
@@ -6,9 +7,9 @@ import retrofit2.HttpException
 suspend fun <T> call(block: suspend () -> T, onError: (String) -> Unit): T? = try {
     block()
 } catch (e: HttpException) {
-    onError(errorMessage(e) ?: "تعذّر تنفيذ العملية")
+    onError(errorMessage(e) ?: tr("تعذّر تنفيذ العملية", "Couldn't complete the operation"))
     null
 } catch (e: Exception) {
-    onError("تعذّر الاتصال بالخادم")
+    onError(tr("تعذّر الاتصال بالخادم", "Couldn't reach the server"))
     null
 }

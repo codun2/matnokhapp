@@ -1,4 +1,5 @@
 package com.matnokh.tajer
+import com.matnokh.tajer.ui.tr
 
 import android.Manifest
 import android.os.Build
@@ -33,10 +34,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Session.init(this)
+        com.matnokh.tajer.ui.Lang.init(this)
         Fcm.init(this)
         enableEdgeToEdge()
         handleNotificationIntent(intent)
-        setContent { MatnokhTheme { Root() } }
+        setContent { MatnokhTheme { androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides if (com.matnokh.tajer.ui.Lang.isAr) androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr) { Root() } } }
     }
 
     override fun onNewIntent(intent: android.content.Intent) {
@@ -103,7 +105,7 @@ fun Root() {
                 Box(Modifier.weight(1f)) {
                     when (screen) {
                         "dash" -> DashScreen(onMenu = openMenu, onOpenOrders = { screen = "orders" }, onNotifications = { screen = "notifications" }, toast = toast)
-                        "products" -> ProductsScreen(onBack = { screen = "dash" }, onMenu = openMenu, onNewProduct = { if (subActive) { editProductId = null; screen = "newproduct" } else toast("عذراً، يرجى إكمال عملية الدفع أو التواصل مع مدير التطبيق") }, onEdit = { if (subActive) { editProductId = it; screen = "newproduct" } else toast("عذراً، يرجى إكمال عملية الدفع أو التواصل مع مدير التطبيق") }, toast = toast)
+                        "products" -> ProductsScreen(onBack = { screen = "dash" }, onMenu = openMenu, onNewProduct = { if (subActive) { editProductId = null; screen = "newproduct" } else toast(tr("عذراً، يرجى إكمال عملية الدفع أو التواصل مع مدير التطبيق", "Sorry, please complete the payment or contact the app admin")) }, onEdit = { if (subActive) { editProductId = it; screen = "newproduct" } else toast(tr("عذراً، يرجى إكمال عملية الدفع أو التواصل مع مدير التطبيق", "Sorry, please complete the payment or contact the app admin")) }, toast = toast)
                         "newproduct" -> NewProductScreen(productId = editProductId, onBack = { screen = "products" }, onMenu = openMenu, onNewSection = { screen = "sections" }, toast = toast)
                         "sections" -> SectionsScreen(onBack = { screen = "store" }, onMenu = openMenu, toast = toast, canWrite = subActive)
                         "branches" -> BranchesScreen(onBack = { screen = "store" }, onMenu = openMenu, toast = toast)

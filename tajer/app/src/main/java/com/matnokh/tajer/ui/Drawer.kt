@@ -35,30 +35,30 @@ private data class Group(val title: String) : MenuEntry
 private data class Item(val name: String, val iconId: Int, val view: String?, val action: String?, val badge: String? = null, val out: Boolean = false) : MenuEntry
 
 private val MENU = listOf(
-    Group("المتجر"),
-    Item("لوحة المتجر", R.drawable.ic_chart, "dash", null),
-    Item("المنتجات", R.drawable.ic_box, "products", null),
-    Item("منتج جديد", R.drawable.ic_plus, "newproduct", null),
-    Item("الطلبات", R.drawable.ic_list, "orders", null),
-    Item("الفروع", R.drawable.ic_pin, "branches", null),
-    Item("أقسام المتجر", R.drawable.ic_list, "sections", null),
-    Group("المالية"),
-    Item("المحفظة", R.drawable.ic_cash, "wallet", null),
-    Item("باقات الاشتراك", R.drawable.ic_card, "packages", null),
-    Item("بوابات الدفع", R.drawable.ic_card, "payments", null),
-    Item("التقارير", R.drawable.ic_chart, "reports", null),
-    Group("الإدارة"),
-    Item("إعدادات المتجر", R.drawable.ic_cog, "store", null),
-    Item("بيانات المتجر", R.drawable.ic_shop, "storedata", null),
-    Item("العروض والخصومات", R.drawable.ic_zap, "offers", null),
-    Item("الوثائق", R.drawable.ic_doc, "documents", null),
-    Item("الإشعارات", R.drawable.ic_bell, "notifications", null),
-    Group("التطبيق"),
-    Item("اللغة", R.drawable.ic_globe, null, "اللغة الحالية: العربية"),
-    Item("الدعم الفني", R.drawable.ic_msg, null, "الدعم الفني — تواصل معنا على مدار الساعة"),
-    Item("حول التطبيق", R.drawable.ic_info, null, "مطنوخ تاجر — الإصدار 1.0"),
-    Item("مشاركة المتجر", R.drawable.ic_share, null, "تم نسخ رابط متجرك ✓"),
-    Item("تسجيل الخروج", R.drawable.ic_out, "splash", null, out = true),
+    Group(tr("المتجر", "Store")),
+    Item(tr("لوحة المتجر", "Store dashboard"), R.drawable.ic_chart, "dash", null),
+    Item(tr("المنتجات", "Products"), R.drawable.ic_box, "products", null),
+    Item(tr("منتج جديد", "New product"), R.drawable.ic_plus, "newproduct", null),
+    Item(tr("الطلبات", "Orders"), R.drawable.ic_list, "orders", null),
+    Item(tr("الفروع", "Branches"), R.drawable.ic_pin, "branches", null),
+    Item(tr("أقسام المتجر", "Store sections"), R.drawable.ic_list, "sections", null),
+    Group(tr("المالية", "Finance")),
+    Item(tr("المحفظة", "Wallet"), R.drawable.ic_cash, "wallet", null),
+    Item(tr("باقات الاشتراك", "Subscription packages"), R.drawable.ic_card, "packages", null),
+    Item(tr("بوابات الدفع", "Payment gateways"), R.drawable.ic_card, "payments", null),
+    Item(tr("التقارير", "Reports"), R.drawable.ic_chart, "reports", null),
+    Group(tr("الإدارة", "Admin")),
+    Item(tr("إعدادات المتجر", "Store settings"), R.drawable.ic_cog, "store", null),
+    Item(tr("بيانات المتجر", "Store details"), R.drawable.ic_shop, "storedata", null),
+    Item(tr("العروض والخصومات", "Offers & discounts"), R.drawable.ic_zap, "offers", null),
+    Item(tr("الوثائق", "Documents"), R.drawable.ic_doc, "documents", null),
+    Item(tr("الإشعارات", "Notifications"), R.drawable.ic_bell, "notifications", null),
+    Group(tr("التطبيق", "App")),
+    Item(tr("اللغة", "Language"), R.drawable.ic_globe, null, tr("اللغة الحالية: العربية", "Current language: English")),
+    Item(tr("الدعم الفني", "Technical support"), R.drawable.ic_msg, null, tr("الدعم الفني — تواصل معنا على مدار الساعة", "Technical support — contact us around the clock")),
+    Item(tr("حول التطبيق", "About the app"), R.drawable.ic_info, null, tr("مطنوخ تاجر — الإصدار 1.0", "Matnokh Merchant — version 1.0")),
+    Item(tr("مشاركة المتجر", "Share the store"), R.drawable.ic_share, null, tr("تم نسخ رابط متجرك ✓", "Your store link was copied ✓")),
+    Item(tr("تسجيل الخروج", "Log out"), R.drawable.ic_out, "splash", null, out = true),
 )
 
 @Composable
@@ -92,16 +92,21 @@ fun DrawerOverlay(open: Boolean, current: String, onClose: () -> Unit, onNavigat
                         Ic(R.drawable.ic_shop, 30.dp, Color.White)
                     }
                     Spacer(Modifier.height(10.dp))
-                    T("مطنوخ تاجر", 22, FontWeight.Black, Color.White)
-                    T("متجرك يوصل لكل بيت.", 11, FontWeight.Normal, Color.White.copy(alpha = .85f))
+                    T(tr("مطنوخ تاجر", "Matnokh Merchant"), 22, FontWeight.Black, Color.White)
+                    T(tr("متجرك يوصل لكل بيت.", "Your store reaches every home."), 11, FontWeight.Normal, Color.White.copy(alpha = .85f))
                 }
                 // المستخدم
                 Row(Modifier.fillMaxWidth().background(C.bg).padding(horizontal = 18.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                     StoreLogoBox(48.dp, 16.dp, 20)
                     Spacer(Modifier.width(12.dp))
-                    Column { T(Session.storeName ?: "متجري", 14, FontWeight.Bold, C.head, maxLines = 1); T("تطبيق التاجر — مطنوخ", 10, FontWeight.Normal, C.muted) }
+                    Column { T(Session.storeName ?: tr("متجري", "My store"), 14, FontWeight.Bold, C.head, maxLines = 1); T(tr("تطبيق التاجر — مطنوخ", "Merchant app — Matnokh"), 10, FontWeight.Normal, C.muted) }
                 }
                 Line()
+                Row(Modifier.fillMaxWidth().clickable { Lang.toggle() }.padding(horizontal = 18.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    T("🌐", 16, FontWeight.Bold, C.head)
+                    Spacer(Modifier.width(10.dp))
+                    T(if (Lang.isAr) "English" else "العربية", 13, FontWeight.Bold, C.greenD)
+                }
                 // القائمة
                 LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(top = 6.dp, bottom = 22.dp)) {
                     items2(MENU) { e ->

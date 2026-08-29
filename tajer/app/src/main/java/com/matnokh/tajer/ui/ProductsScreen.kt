@@ -46,14 +46,14 @@ fun ProductsScreen(onBack: () -> Unit, onMenu: () -> Unit, onNewProduct: () -> U
             Row(Modifier.fillMaxWidth().statusBarsPadding().padding(start = 22.dp, end = 22.dp, top = 8.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                 HeaderSquare(R.drawable.ic_back, 42.dp, 14.dp, onBack)
                 Spacer(Modifier.width(10.dp))
-                T("المنتجات", 18, FontWeight.ExtraBold, C.head, Modifier.weight(1f))
-                products?.let { StatusPill("${it.size} منتجاً", PillKind.Live) }
+                T(tr("المنتجات", "Products"), 18, FontWeight.ExtraBold, C.head, Modifier.weight(1f))
+                products?.let { StatusPill(tr("${it.size} منتجاً", "${it.size} products"), PillKind.Live) }
                 Spacer(Modifier.width(9.dp))
                 HeaderSquare(R.drawable.ic_menu, 44.dp, 15.dp, onMenu)
             }
             Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(CircleShape).background(C.card).border(1.dp, C.line, CircleShape).padding(5.dp),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                listOf("all" to "الكل", "active" to "نشط", "draft" to "مسودة", "archived" to "مؤرشف").forEach { (k, lbl) ->
+                listOf("all" to tr("الكل", "All"), "active" to tr("نشط", "Active"), "draft" to tr("مسودة", "Draft"), "archived" to tr("مؤرشف", "Archived")).forEach { (k, lbl) ->
                     val on = filter == k
                     Box(Modifier.weight(1f).clip(CircleShape).then(if (on) Modifier.background(Grad.green) else Modifier).clickable { filter = k }.padding(vertical = 9.dp), contentAlignment = Alignment.Center) {
                         T(lbl, 11, FontWeight.ExtraBold, if (on) Color.White else C.muted)
@@ -65,7 +65,7 @@ fun ProductsScreen(onBack: () -> Unit, onMenu: () -> Unit, onNewProduct: () -> U
             val all = products
             if (all == null) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = C.green) }; return@Column }
             val list = if (filter == "all") all else all.filter { it.status == filter }
-            if (list.isEmpty()) Box(Modifier.fillMaxWidth().padding(26.dp), contentAlignment = Alignment.Center) { T("لا توجد منتجات في هذا التبويب", 12, FontWeight.Normal, C.muted) }
+            if (list.isEmpty()) Box(Modifier.fillMaxWidth().padding(26.dp), contentAlignment = Alignment.Center) { T(tr("لا توجد منتجات في هذا التبويب", "No products in this tab"), 12, FontWeight.Normal, C.muted) }
             else LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(bottom = 100.dp)) {
                 items(list) { p ->
                     ProductCard(p, branches,
@@ -83,7 +83,7 @@ fun ProductsScreen(onBack: () -> Unit, onMenu: () -> Unit, onNewProduct: () -> U
     stockDialog?.let { (p, bi) ->
         StockDialog(p, bi, onClose = { stockDialog = null }, onSave = { qty ->
             val branchId = p.stock.getOrNull(bi)?.branch_id ?: return@StockDialog
-            scope.launch { call({ Net.api.setStock(p.id, StockBody(branchId, qty)) }, toast)?.let { stockDialog = null; toast(it.message ?: "تم"); load() } }
+            scope.launch { call({ Net.api.setStock(p.id, StockBody(branchId, qty)) }, toast)?.let { stockDialog = null; toast(it.message ?: tr("تم", "Done")); load() } }
         })
     }
 }
@@ -100,7 +100,7 @@ private fun ProductCard(p: ProductDto, branches: List<BranchMini>, onToggle: () 
             Column(Modifier.weight(1f)) {
                 T(p.name, 13, FontWeight.Bold, C.head, maxLines = 2)
                 Spacer(Modifier.height(2.dp))
-                val extra = buildString { append(p.section ?: "بلا قسم"); if (p.addons.isNotEmpty()) append(" · ${p.addons.size} إضافات"); if (p.images.size > 1) append(" · ${p.images.size} صور") }
+                val extra = buildString { append(p.section ?: tr("بلا قسم", "No section")); if (p.addons.isNotEmpty()) append(tr(" · ${p.addons.size} إضافات", " · ${p.addons.size} add-ons")); if (p.images.size > 1) append(tr(" · ${p.images.size} صور", " · ${p.images.size} images")) }
                 T(extra, 10, FontWeight.Normal, C.muted, maxLines = 1)
             }
             Spacer(Modifier.width(8.dp))
@@ -108,7 +108,7 @@ private fun ProductCard(p: ProductDto, branches: List<BranchMini>, onToggle: () 
                 T("﷼${money(p.price)}", 14, FontWeight.Black, C.greenD)
                 if (p.price_before > 0) {
                     Text("﷼${money(p.price_before)}", fontFamily = Cairo, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = C.strike, textDecoration = TextDecoration.LineThrough)
-                    Spacer(Modifier.height(4.dp)); StatusPill("خصم ${p.discount}٪", PillKind.Wait)
+                    Spacer(Modifier.height(4.dp)); StatusPill(tr("خصم ${p.discount}٪", "${p.discount}% off"), PillKind.Wait)
                 }
             }
             Spacer(Modifier.width(10.dp))
@@ -119,14 +119,14 @@ private fun ProductCard(p: ProductDto, branches: List<BranchMini>, onToggle: () 
             horizontalArrangement = Arrangement.spacedBy(7.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
             p.stock.forEachIndexed { bi, st ->
                 val has = st.in_stock > 0
-                val short = st.branch.replace("الفرع ", "").replace("فرع ", "")
+                val short = st.branch.replace(tr("الفرع ", "Branch "), "").replace(tr("فرع ", "Branch "), "")
                 Row(Modifier.clip(CircleShape).background(if (has) C.pillLive else C.redBg).clickable { onChip(bi) }.padding(horizontal = 11.dp, vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
                     T(short, 10, FontWeight.ExtraBold, if (has) C.greenD else C.redText)
                     Spacer(Modifier.width(5.dp))
                     if (has) T("${st.in_stock}", 10, FontWeight.Black, C.greenD) else T("✕", 10, FontWeight.Black, C.redText)
                 }
             }
-            if (p.stock.isEmpty()) T("أضف فرعاً لإدارة الكمية", 10, FontWeight.Medium, C.muted)
+            if (p.stock.isEmpty()) T(tr("أضف فرعاً لإدارة الكمية", "Add a branch to manage quantity"), 10, FontWeight.Medium, C.muted)
         }
     }
 }
@@ -144,8 +144,8 @@ private fun StockDialog(p: ProductDto, bi: Int, onClose: () -> Unit, onSave: (In
             }
             Column(Modifier.padding(20.dp)) {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    if (st.in_stock > 0) T("الكمية الحالية: ${st.in_stock} قطعة", 11, FontWeight.Bold, C.greenD)
-                    else T("نفدت الكمية في هذا الفرع", 11, FontWeight.Bold, C.redText)
+                    if (st.in_stock > 0) T(tr("الكمية الحالية: ${st.in_stock} قطعة", "Current quantity: ${st.in_stock} pieces"), 11, FontWeight.Bold, C.greenD)
+                    else T(tr("نفدت الكمية في هذا الفرع", "Out of stock at this branch"), 11, FontWeight.Bold, C.redText)
                 }
                 Spacer(Modifier.height(12.dp))
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -154,11 +154,11 @@ private fun StockDialog(p: ProductDto, bi: Int, onClose: () -> Unit, onSave: (In
                     StepBtn("+") { qty += 1 }
                 }
                 Spacer(Modifier.height(16.dp))
-                WideButton("حفظ الكمية", R.drawable.ic_check) { onSave(qty) }
+                WideButton(tr("حفظ الكمية", "Save quantity"), R.drawable.ic_check) { onSave(qty) }
                 Spacer(Modifier.height(8.dp))
-                Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(C.redBg).clickable { onSave(0) }.padding(14.dp), contentAlignment = Alignment.Center) { T("نفاذ الكمية في هذا الفرع", 13, FontWeight.ExtraBold, C.redText) }
+                Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(C.redBg).clickable { onSave(0) }.padding(14.dp), contentAlignment = Alignment.Center) { T(tr("نفاذ الكمية في هذا الفرع", "Out of stock at this branch"), 13, FontWeight.ExtraBold, C.redText) }
                 Spacer(Modifier.height(4.dp))
-                Box(Modifier.fillMaxWidth().clickable(onClick = onClose).padding(9.dp), contentAlignment = Alignment.Center) { T("إغلاق", 13, FontWeight.Bold, C.muted) }
+                Box(Modifier.fillMaxWidth().clickable(onClick = onClose).padding(9.dp), contentAlignment = Alignment.Center) { T(tr("إغلاق", "Close"), 13, FontWeight.Bold, C.muted) }
             }
         }
     }

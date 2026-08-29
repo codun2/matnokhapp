@@ -83,75 +83,75 @@ fun NewProductScreen(productId: Int?, onBack: () -> Unit, onMenu: () -> Unit, on
                 val bytes = ctx.contentResolver.openInputStream(uri)!!.use { it.readBytes() }
                 val part = MultipartBody.Part.createFormData("file", "img.jpg", bytes.toRequestBody("image/*".toMediaTypeOrNull()))
                 images.add(Net.api.upload(part).url)
-            } catch (e: Exception) { toast("تعذّر رفع الصورة") } finally { uploading = false }
+            } catch (e: Exception) { toast(tr("تعذّر رفع الصورة", "Couldn't upload the image")) } finally { uploading = false }
         }
     }
 
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader(if (editing) "تعديل منتج" else "منتج جديد", onBack, onMenu)
+        ScreenHeader(if (editing) tr("تعديل منتج", "Edit product") else tr("منتج جديد", "New product"), onBack, onMenu)
         LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             item {
                 OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                    OcTitle(R.drawable.ic_img, "صور المنتج", required = true)
+                    OcTitle(R.drawable.ic_img, tr("صور المنتج", "Product images"), required = true)
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(9.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
                         images.forEachIndexed { i, url ->
                             Box(Modifier.size(72.dp)) {
                                 AsyncImage(model = url, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)))
                                 Box(Modifier.align(Alignment.TopStart).offset(x = (-6).dp, y = (-6).dp).size(20.dp).clip(CircleShape).background(C.redBg).clickable { images.removeAt(i) }, contentAlignment = Alignment.Center) { T("×", 13, FontWeight.Black, C.redText) }
-                                if (i == 0) Box(Modifier.align(Alignment.BottomCenter).offset(y = 7.dp).clip(CircleShape).background(C.green).padding(horizontal = 7.dp, vertical = 2.dp)) { T("رئيسية", 8, FontWeight.ExtraBold, Color.White) }
+                                if (i == 0) Box(Modifier.align(Alignment.BottomCenter).offset(y = 7.dp).clip(CircleShape).background(C.green).padding(horizontal = 7.dp, vertical = 2.dp)) { T(tr("رئيسية", "Home"), 8, FontWeight.ExtraBold, Color.White) }
                             }
                         }
                         if (images.size < 4) Box(Modifier.size(72.dp).clip(RoundedCornerShape(16.dp)).background(Color(0xFFFAF8F4)).border(1.5.dp, C.line, RoundedCornerShape(16.dp)).clickable(enabled = !uploading) { picker.launch("image/*") }, contentAlignment = Alignment.Center) {
-                            if (uploading) Text("…", fontSize = 22.sp, color = C.muted) else Column(horizontalAlignment = Alignment.CenterHorizontally) { Text("+", fontSize = 24.sp, color = Color(0xFFC3C9C0)); T("صورة", 9, FontWeight.ExtraBold, Color(0xFFC3C9C0)) }
+                            if (uploading) Text("…", fontSize = 22.sp, color = C.muted) else Column(horizontalAlignment = Alignment.CenterHorizontally) { Text("+", fontSize = 24.sp, color = Color(0xFFC3C9C0)); T(tr("صورة", "Image"), 9, FontWeight.ExtraBold, Color(0xFFC3C9C0)) }
                         }
                     }
-                    Spacer(Modifier.height(8.dp)); T("أول صورة هي الرئيسية. حتى 4 صور.", 10, FontWeight.Medium, C.muted)
+                    Spacer(Modifier.height(8.dp)); T(tr("أول صورة هي الرئيسية. حتى 4 صور.", "The first image is the main one. Up to 4 images."), 10, FontWeight.Medium, C.muted)
                 }
             }
             item {
                 OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                    OcTitle(R.drawable.ic_box, "بيانات المنتج")
-                    FieldLabel("اسم المنتج", required = true); FinField(name, { name = it }, "مثال: كبسة لحم — طبق كبير")
-                    Spacer(Modifier.height(10.dp)); FieldLabel("الاسم بالإنجليزية (English)"); androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Ltr) { FinField(nameEn, { nameEn = it }, "e.g. Meat Kabsa — large", align = androidx.compose.ui.text.style.TextAlign.Left) }
-                    FieldLabel("القسم داخل المتجر", required = true)
+                    OcTitle(R.drawable.ic_box, tr("بيانات المنتج", "Product details"))
+                    FieldLabel(tr("اسم المنتج", "Product name"), required = true); FinField(name, { name = it }, tr("مثال: كبسة لحم — طبق كبير", "e.g. Meat Kabsa — large plate"))
+                    Spacer(Modifier.height(10.dp)); FieldLabel(tr("الاسم بالإنجليزية (English)", "Name in English")); androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Ltr) { FinField(nameEn, { nameEn = it }, "e.g. Meat Kabsa — large", align = androidx.compose.ui.text.style.TextAlign.Left) }
+                    FieldLabel(tr("القسم داخل المتجر", "Section within the store"), required = true)
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         sections.forEach { s -> Chip("${s.icon ?: ""} ${s.name}", secId == s.id) { secId = s.id } }
-                        Chip("+ قسم جديد", false, onClick = onNewSection)
+                        Chip(tr("+ قسم جديد", "+ New section"), false, onClick = onNewSection)
                     }
-                    FieldLabel("الوصف"); FinField(desc, { desc = it }, "وصف مختصر يظهر للزبون", singleLine = false, minHeight = 64.dp)
-                    Spacer(Modifier.height(10.dp)); FieldLabel("الوصف بالإنجليزية (English)"); androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Ltr) { FinField(descEn, { descEn = it }, "Short description shown to the customer", singleLine = false, minHeight = 64.dp, align = androidx.compose.ui.text.style.TextAlign.Left) }
+                    FieldLabel(tr("الوصف", "Description")); FinField(desc, { desc = it }, tr("وصف مختصر يظهر للزبون", "A short description shown to the customer"), singleLine = false, minHeight = 64.dp)
+                    Spacer(Modifier.height(10.dp)); FieldLabel(tr("الوصف بالإنجليزية (English)", "Description in English")); androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Ltr) { FinField(descEn, { descEn = it }, "Short description shown to the customer", singleLine = false, minHeight = 64.dp, align = androidx.compose.ui.text.style.TextAlign.Left) }
                 }
             }
             item {
                 OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                    OcTitle(R.drawable.ic_cash, "السعر والعرض")
-                    FieldLabel("السعر (﷼)", required = true); FinField(price, { price = decInput(it) }, "0", keyboard = KeyboardType.Decimal)
-                    SwRow("هل على المنتج عرض؟", "يظهر للزبون بشارة خصم وسعر مشطوب", offer) { offer = !offer }
+                    OcTitle(R.drawable.ic_cash, tr("السعر والعرض", "Price & offer"))
+                    FieldLabel(tr("السعر (﷼)", "Price (﷼)"), required = true); FinField(price, { price = decInput(it) }, "0", keyboard = KeyboardType.Decimal)
+                    SwRow(tr("هل على المنتج عرض؟", "Does the product have an offer?"), tr("يظهر للزبون بشارة خصم وسعر مشطوب", "Shows the customer a discount badge and a struck-through price"), offer) { offer = !offer }
                     if (offer) {
-                        FieldLabel("السعر قبل الخصم (﷼)"); FinField(oldPrice, { oldPrice = decInput(it) }, "0", keyboard = KeyboardType.Decimal)
+                        FieldLabel(tr("السعر قبل الخصم (﷼)", "Price before discount (﷼)")); FinField(oldPrice, { oldPrice = decInput(it) }, "0", keyboard = KeyboardType.Decimal)
                         Spacer(Modifier.height(11.dp)); CalcBox(price.toDoubleOrNull() ?: 0.0, oldPrice.toDoubleOrNull() ?: 0.0)
                     }
                 }
             }
             item {
                 OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                    SwRow("إضافات على المنتج", "مثل: جبن · صوص — يختارها الزبون ويُضاف سعرها", addonsOn, topBorder = false) { addonsOn = !addonsOn; if (addonsOn && addons.isEmpty()) addons.add(PAddon("", 0.0)); if (!addonsOn) addons.clear() }
+                    SwRow(tr("إضافات على المنتج", "Product add-ons"), tr("مثل: جبن · صوص — يختارها الزبون ويُضاف سعرها", "e.g. cheese · sauce — the customer selects them and their price is added"), addonsOn, topBorder = false) { addonsOn = !addonsOn; if (addonsOn && addons.isEmpty()) addons.add(PAddon("", 0.0)); if (!addonsOn) addons.clear() }
                     if (addonsOn) {
                         Spacer(Modifier.height(4.dp))
                         addons.forEachIndexed { i, a ->
                             Row(Modifier.fillMaxWidth().padding(bottom = 9.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Box(Modifier.weight(1f)) { FinField(a.name, { addons[i] = a.copy(name = it) }, "اسم الإضافة") }
+                                Box(Modifier.weight(1f)) { FinField(a.name, { addons[i] = a.copy(name = it) }, tr("اسم الإضافة", "Add-on name")) }
                                 Box(Modifier.width(74.dp)) { FinField(if (a.price == 0.0) "" else money(a.price), { addons[i] = a.copy(price = decInput(it).toDoubleOrNull() ?: 0.0) }, "﷼", keyboard = KeyboardType.Decimal, align = androidx.compose.ui.text.style.TextAlign.Center) }
                                 Box(Modifier.size(34.dp).clip(RoundedCornerShape(11.dp)).background(C.redBg).clickable { addons.removeAt(i) }, contentAlignment = Alignment.Center) { T("×", 15, FontWeight.Black, C.redText) }
                             }
                         }
-                        if (addons.size < 6) Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Color(0xFFF2F8F3)).border(1.5.dp, Color(0xFFCFE0D4), RoundedCornerShape(14.dp)).clickable { addons.add(PAddon("", 0.0)) }.padding(vertical = 11.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_plus, 16.dp, C.greenD); Spacer(Modifier.width(7.dp)); T("إضافة صنف إضافي", 12, FontWeight.ExtraBold, C.greenD) }
+                        if (addons.size < 6) Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Color(0xFFF2F8F3)).border(1.5.dp, Color(0xFFCFE0D4), RoundedCornerShape(14.dp)).clickable { addons.add(PAddon("", 0.0)) }.padding(vertical = 11.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_plus, 16.dp, C.greenD); Spacer(Modifier.width(7.dp)); T(tr("إضافة صنف إضافي", "Add an extra item"), 12, FontWeight.ExtraBold, C.greenD) }
                     }
                 }
             }
             item {
                 OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                    OcTitle(R.drawable.ic_pin, "الكميات حسب الفرع")
+                    OcTitle(R.drawable.ic_pin, tr("الكميات حسب الفرع", "Quantities by branch"))
                     branches.forEachIndexed { i, b ->
                         Row(Modifier.fillMaxWidth().padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                             Ic(R.drawable.ic_pin, 15.dp, C.green); Spacer(Modifier.width(8.dp))
@@ -165,28 +165,28 @@ fun NewProductScreen(productId: Int?, onBack: () -> Unit, onMenu: () -> Unit, on
                         }
                         if (i < branches.lastIndex) ProdLine()
                     }
-                    if (branches.isEmpty()) T("أضف فرعاً أولاً لإدارة الكميات", 11, FontWeight.Medium, C.muted)
+                    if (branches.isEmpty()) T(tr("أضف فرعاً أولاً لإدارة الكميات", "Add a branch first to manage quantities"), 11, FontWeight.Medium, C.muted)
                 }
             }
             item {
                 OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                    OcTitle(R.drawable.ic_check, "حالة النشر")
+                    OcTitle(R.drawable.ic_check, tr("حالة النشر", "Publish status"))
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Chip("✓ نشر مباشرة", status == "active") { status = "active" }
-                        Chip("◷ حفظ كمسودة", status == "draft") { status = "draft" }
-                        Chip("🗄 أرشفة", status == "archived") { status = "archived" }
+                        Chip(tr("✓ نشر مباشرة", "✓ Publish directly"), status == "active") { status = "active" }
+                        Chip(tr("◷ حفظ كمسودة", "◷ Save as draft"), status == "draft") { status = "draft" }
+                        Chip(tr("🗄 أرشفة", "🗄 Archive"), status == "archived") { status = "archived" }
                     }
                 }
             }
             item {
                 Column(Modifier.padding(horizontal = 22.dp)) {
-                    WideButton(if (saving) "…" else "حفظ المنتج", R.drawable.ic_check) {
+                    WideButton(if (saving) "…" else tr("حفظ المنتج", "Save product"), R.drawable.ic_check) {
                         if (saving) return@WideButton
                         val nm = name.trim()
-                        if (nm.isEmpty()) { toast("اكتب اسم المنتج أولاً"); return@WideButton }
-                        if (images.isEmpty()) { toast("أضف صورة واحدة على الأقل"); return@WideButton }
+                        if (nm.isEmpty()) { toast(tr("اكتب اسم المنتج أولاً", "Enter the product name first")); return@WideButton }
+                        if (images.isEmpty()) { toast(tr("أضف صورة واحدة على الأقل", "Add at least one image")); return@WideButton }
                         val pr = price.toDoubleOrNull() ?: 0.0
-                        if (pr <= 0.0) { toast("أدخل سعر المنتج"); return@WideButton }
+                        if (pr <= 0.0) { toast(tr("أدخل سعر المنتج", "Enter the product price")); return@WideButton }
                         val o = if (offer) (oldPrice.toDoubleOrNull() ?: 0.0) else 0.0
                         val body = ProductBody(nm, desc.ifBlank { null }, secId, pr, if (o > pr) o else null, status,
                             images.toList(), addons.filter { it.name.isNotBlank() }, stock.mapKeys { it.key.toString() }.mapValues { it.value.toIntOrNull() ?: 0 }, nameEn.ifBlank { null }, descEn.ifBlank { null })
@@ -194,14 +194,14 @@ fun NewProductScreen(productId: Int?, onBack: () -> Unit, onMenu: () -> Unit, on
                             saving = true
                             val r = call({ if (editing) Net.api.updateProduct(productId!!, body) else Net.api.createProduct(body) }, toast)
                             saving = false
-                            if (r != null) { toast(r.message ?: "تم الحفظ"); onBack() }
+                            if (r != null) { toast(r.message ?: tr("تم الحفظ", "Saved")); onBack() }
                         }
                     }
-                    Spacer(Modifier.height(9.dp)); WideButton("إلغاء", ghost = true, onClick = onBack)
+                    Spacer(Modifier.height(9.dp)); WideButton(tr("إلغاء", "Cancel"), ghost = true, onClick = onBack)
                     if (editing) {
                         Spacer(Modifier.height(9.dp))
                         Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(17.dp)).background(C.redBg).clickable { confirmDelete = true }.padding(vertical = 16.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                            Ic(R.drawable.ic_x, 16.dp, C.redText); Spacer(Modifier.width(8.dp)); T("حذف المنتج", 14, FontWeight.ExtraBold, C.redText)
+                            Ic(R.drawable.ic_x, 16.dp, C.redText); Spacer(Modifier.width(8.dp)); T(tr("حذف المنتج", "Delete product"), 14, FontWeight.ExtraBold, C.redText)
                         }
                     }
                 }
@@ -212,17 +212,17 @@ fun NewProductScreen(productId: Int?, onBack: () -> Unit, onMenu: () -> Unit, on
     if (confirmDelete) androidx.compose.material3.AlertDialog(
         onDismissRequest = { confirmDelete = false },
         containerColor = C.bg,
-        title = { T("حذف المنتج", 15, FontWeight.Black, C.head) },
-        text = { T("هل أنت متأكد من حذف «$name»؟ لا يمكن التراجع.", 13, FontWeight.Medium, C.muted, lineHeight = 20) },
+        title = { T(tr("حذف المنتج", "Delete product"), 15, FontWeight.Black, C.head) },
+        text = { T(tr("هل أنت متأكد من حذف «$name»؟ لا يمكن التراجع.", "Are you sure you want to delete «$name»? This can't be undone."), 13, FontWeight.Medium, C.muted, lineHeight = 20) },
         confirmButton = {
-            Text("حذف", fontFamily = Cairo, fontWeight = FontWeight.ExtraBold, color = C.redText,
+            Text(tr("حذف", "Delete"), fontFamily = Cairo, fontWeight = FontWeight.ExtraBold, color = C.redText,
                 modifier = Modifier.clip(RoundedCornerShape(10.dp)).clickable {
                     confirmDelete = false
-                    scope.launch { call({ Net.api.deleteProduct(productId!!) }, toast)?.let { toast(it.message ?: "حُذف المنتج"); onBack() } }
+                    scope.launch { call({ Net.api.deleteProduct(productId!!) }, toast)?.let { toast(it.message ?: tr("حُذف المنتج", "Product deleted")); onBack() } }
                 }.padding(horizontal = 14.dp, vertical = 8.dp))
         },
         dismissButton = {
-            Text("إلغاء", fontFamily = Cairo, fontWeight = FontWeight.Bold, color = C.muted,
+            Text(tr("إلغاء", "Cancel"), fontFamily = Cairo, fontWeight = FontWeight.Bold, color = C.muted,
                 modifier = Modifier.clip(RoundedCornerShape(10.dp)).clickable { confirmDelete = false }.padding(horizontal = 14.dp, vertical = 8.dp))
         },
     )
@@ -244,8 +244,8 @@ private fun CalcBox(price: Double, old: Double) {
     val invalid = old <= price
     Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Color(0xFFF9F1E9)).border(1.dp, Color(0xFFECDCC3), RoundedCornerShape(14.dp)).padding(horizontal = 14.dp, vertical = 11.dp), verticalAlignment = Alignment.CenterVertically) {
         Ic(if (invalid) R.drawable.ic_info else R.drawable.ic_zap, 15.dp, C.terra); Spacer(Modifier.width(8.dp))
-        if (invalid) T("السعر قبل الخصم يجب أن يكون أعلى من سعر البيع", 11, FontWeight.ExtraBold, Color(0xFFA06A3C), lineHeight = 18)
-        else { val off = ((1 - price.toFloat() / old) * 100).roundToInt(); T("يظهر للزبون: خصم $off٪ · وفّر ﷼${money(old - price)}", 11, FontWeight.ExtraBold, Color(0xFFA06A3C), lineHeight = 18) }
+        if (invalid) T(tr("السعر قبل الخصم يجب أن يكون أعلى من سعر البيع", "The pre-discount price must be higher than the sale price"), 11, FontWeight.ExtraBold, Color(0xFFA06A3C), lineHeight = 18)
+        else { val off = ((1 - price.toFloat() / old) * 100).roundToInt(); T(tr("يظهر للزبون: خصم $off٪ · وفّر ﷼${money(old - price)}", "Shown to the customer: $off% off · save ﷼${money(old - price)}"), 11, FontWeight.ExtraBold, Color(0xFFA06A3C), lineHeight = 18) }
     }
 }
 

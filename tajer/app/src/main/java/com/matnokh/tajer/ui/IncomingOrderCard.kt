@@ -47,7 +47,7 @@ fun IncomingOrderCard(
                 Box(Modifier.size(44.dp).clip(RoundedCornerShape(14.dp)).background(Color.White.copy(alpha = .22f)), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_box, 24.dp, Color.White) }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
-                    T("طلب جديد 🛒", 15, FontWeight.Black, Color.White)
+                    T(tr("طلب جديد 🛒", "New order 🛒"), 15, FontWeight.Black, Color.White)
                     val o = d?.order
                     T(if (o != null) "#${o.order_no ?: o.id} — ${o.customer}" else fallbackTitle, 12, FontWeight.Bold, Color.White.copy(alpha = .92f), maxLines = 1)
                 }
@@ -72,25 +72,25 @@ fun IncomingOrderCard(
                             T("﷼${it2.line_total.toInt()}", 12, FontWeight.Black, C.greenD)
                         }
                     }
-                    if (det.items.size > 3) T("+ ${det.items.size - 3} أصناف أخرى", 10, FontWeight.Medium, C.muted)
+                    if (det.items.size > 3) T(tr("+ ${det.items.size - 3} أصناف أخرى", "+ ${det.items.size - 3} more items"), 10, FontWeight.Medium, C.muted)
                     Spacer(Modifier.height(8.dp))
-                    Row(Modifier.fillMaxWidth()) { T("الإجمالي (${det.items.size} أصناف)", 13, FontWeight.Bold, C.head, Modifier.weight(1f)); T("﷼${o.total.toInt()}", 15, FontWeight.Black, C.greenD) }
+                    Row(Modifier.fillMaxWidth()) { T(tr("الإجمالي (${det.items.size} أصناف)", "Total (${det.items.size} items)"), 13, FontWeight.Bold, C.head, Modifier.weight(1f)); T("﷼${o.total.toInt()}", 15, FontWeight.Black, C.greenD) }
 
                     Spacer(Modifier.height(14.dp))
                     // الأزرار
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        CardBtn("قبول وتجهيز", R.drawable.ic_check, true, Modifier.weight(1f)) { act { call({ Net.api.acceptOrder(o.id) }, toast)?.let { toast(it.message ?: "قُبل الطلب") } } }
-                        CardBtn("رفض", R.drawable.ic_x, false, Modifier.weight(1f)) { act { call({ Net.api.rejectOrder(o.id) }, toast)?.let { toast(it.message ?: "رُفض الطلب") } } }
+                        CardBtn(tr("قبول وتجهيز", "Accept & prepare"), R.drawable.ic_check, true, Modifier.weight(1f)) { act { call({ Net.api.acceptOrder(o.id) }, toast)?.let { toast(it.message ?: tr("قُبل الطلب", "Order accepted")) } } }
+                        CardBtn(tr("رفض", "Reject"), R.drawable.ic_x, false, Modifier.weight(1f)) { act { call({ Net.api.rejectOrder(o.id) }, toast)?.let { toast(it.message ?: tr("رُفض الطلب", "Order rejected")) } } }
                     }
                     Spacer(Modifier.height(8.dp))
-                    Box(Modifier.fillMaxWidth().clickable { onClose(); onOpen() }.padding(8.dp), contentAlignment = Alignment.Center) { T("عرض في الطلبات", 12, FontWeight.ExtraBold, C.greenD) }
+                    Box(Modifier.fillMaxWidth().clickable { onClose(); onOpen() }.padding(8.dp), contentAlignment = Alignment.Center) { T(tr("عرض في الطلبات", "View in orders"), 12, FontWeight.ExtraBold, C.greenD) }
                 }
             } else {
                 // إشعار عام بلا طلب
                 Column(Modifier.padding(16.dp)) {
                     T(fallbackBody, 12, FontWeight.Medium, C.text, lineHeight = 19)
                     Spacer(Modifier.height(12.dp))
-                    Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Grad.green).clickable(onClick = onClose).padding(12.dp), contentAlignment = Alignment.Center) { T("حسناً", 13, FontWeight.ExtraBold, Color.White) }
+                    Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Grad.green).clickable(onClick = onClose).padding(12.dp), contentAlignment = Alignment.Center) { T(tr("حسناً", "OK"), 13, FontWeight.ExtraBold, Color.White) }
                 }
             }
         }
@@ -120,4 +120,4 @@ private fun CardBtn(label: String, iconId: Int, ok: Boolean, modifier: Modifier,
 }
 
 // نسخة عامة من payLabel (الأصلية private داخل OrdersScreen)
-fun payLabelPublic(m: String?): String = when (m) { "card", "tap" -> "بطاقة"; "cash" -> "نقداً"; else -> m ?: "—" }
+fun payLabelPublic(m: String?): String = when (m) { "card", "tap" -> tr("بطاقة", "Card"); "cash" -> tr("نقداً", "Cash"); else -> m ?: "—" }
