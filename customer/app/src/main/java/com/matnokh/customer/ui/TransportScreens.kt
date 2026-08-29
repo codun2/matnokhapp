@@ -246,7 +246,7 @@ fun OffersScreen(onBack: () -> Unit, onMenu: () -> Unit, onPick: (String, String
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.size(9.dp).clip(CircleShape).background(C.green))
                         Spacer(Modifier.width(12.dp))
-                        Column(Modifier.weight(1f)) { T(tr("تم بثّ طلبك ✓", "Your order was broadcast ✓"), 13, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T(tr("أُرسل لسائقي «${svc.name}» الأقرب إليك — العروض تصلك أولاً بأول", "Sent to the nearest «${trd(svc.name, svc.name_en)}» drivers — offers arrive in real time"), 10, FontWeight.Normal, C.muted, lineHeight = 16) }
+                        Column(Modifier.weight(1f)) { T(tr("تم بثّ طلبك ✓", "Your order was broadcast ✓"), 13, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T(tr("أُرسل لسائقي «${svc.name}» الأقرب إليك — العروض تصلك أولاً بأول", "Sent to the nearest «${svc.name}» drivers — offers arrive in real time"), 10, FontWeight.Normal, C.muted, lineHeight = 16) }
                         Column(Modifier.clip(RoundedCornerShape(14.dp)).background(Color(0xFFEEF4EF)).padding(horizontal = 13.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) { T("${shown.size}", 17, FontWeight.Black, C.greenD); T(tr("عروض", "Offers"), 9, FontWeight.Normal, C.muted) }
                     }
                 }

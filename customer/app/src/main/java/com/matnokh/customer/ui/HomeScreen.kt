@@ -108,7 +108,7 @@ private fun ServiceCard(svc: Service, modifier: Modifier, onClick: () -> Unit) {
         Column(Modifier.fillMaxSize()) {
             Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(svcGradients[svc.gradient]), contentAlignment = Alignment.Center) { Ic(svc.iconId, 24.dp, Color.White) }
             Spacer(Modifier.height(11.dp))
-            T(trd(svc.name, svc.name_en), 14, FontWeight.Bold, C.head, maxLines = 1)
+            T(svc.name, 14, FontWeight.Bold, C.head, maxLines = 1)
             Spacer(Modifier.height(3.dp))
             T(svc.desc, 11, FontWeight.Normal, C.muted, lineHeight = 17, maxLines = 2)
         }
