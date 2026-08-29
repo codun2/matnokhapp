@@ -223,60 +223,34 @@ private fun payEmoji(type: String): String = PAY_KINDS.firstOrNull { it.type == 
 
 @Composable
 fun AccountPayMethods(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit) {
-    val scope = rememberCoroutineScope()
-    var items by remember { mutableStateOf<List<PayMethodDto>>(emptyList()) }
-    var loading by remember { mutableStateOf(true) }
-    var adding by remember { mutableStateOf(false) }
-    suspend fun reload() { runCatching { items = Net.api.payMethods().methods }; loading = false }
-    LaunchedEffect(Unit) { if (Session.isLoggedIn()) reload() else loading = false }
-
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader(tr("وسائل الدفع", "Payment methods"), onBack, onMenu)
-        if (loading) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = C.green) }; return@Column }
-        if (!Session.isLoggedIn()) { Box(Modifier.fillMaxSize().padding(30.dp), contentAlignment = Alignment.Center) { T(tr("سجّل الدخول لإدارة وسائل الدفع", "Log in to manage payment methods"), 13, FontWeight.Bold, C.muted) }; return@Column }
-        LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(22.dp)) {
-            if (items.isNotEmpty()) item { T(tr("الأكثر استخداماً أولاً", "Most used first"), 11, FontWeight.Bold, C.muted); Spacer(Modifier.height(10.dp)) }
-            itemsIndexed(items) { idx, m ->
-                Row(Modifier.fillMaxWidth().padding(vertical = 4.dp).clip(RoundedCornerShape(16.dp)).background(C.card).border(1.dp, if (idx == 0) C.green else C.line, RoundedCornerShape(16.dp)).padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Box(Modifier.size(40.dp).clip(RoundedCornerShape(13.dp)).background(C.pillLive), contentAlignment = Alignment.Center) { T(payEmoji(m.type), 18, FontWeight.Bold, C.greenD) }
-                    Spacer(Modifier.width(12.dp))
-                    Column(Modifier.weight(1f)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) { T(payLabel(m.type, m.label), 13, FontWeight.Bold, C.head); if (idx == 0 && m.uses_count > 0) { Spacer(Modifier.width(7.dp)); Box(Modifier.clip(CircleShape).background(Grad.green).padding(horizontal = 8.dp, vertical = 2.dp)) { T(tr("الأكثر استخداماً", "Most used"), 9, FontWeight.ExtraBold, Color.White) } } }
-                        T(if (m.uses_count > 0) tr("استُخدمت ${m.uses_count} مرة", "Used ${m.uses_count} times") else tr("لم تُستخدم بعد", "Not used yet"), 10, FontWeight.Medium, C.muted)
-                    }
-                    Box(Modifier.size(30.dp).clip(RoundedCornerShape(10.dp)).background(C.redBg).clickable { scope.launch { runCatching { Net.api.delPayMethod(m.id) }; reload(); toast(tr("تم الحذف", "Deleted")) } }, contentAlignment = Alignment.Center) { T("×", 15, FontWeight.Black, C.redText) }
-                }
+        ScreenHeader(tr("طرق الدفع", "Payment methods"), onBack, onMenu)
+        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(22.dp)) {
+            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(Color(0xFFEEF4EF)).border(1.dp, Color(0xFFCFE0D4), RoundedCornerShape(18.dp)).padding(14.dp), verticalAlignment = Alignment.Top) {
+                Ic(R.drawable.ic_card, 20.dp, C.greenD, Modifier.padding(top = 1.dp))
+                Spacer(Modifier.width(11.dp))
+                T(tr("تختار طريقة الدفع عند تأكيد كل طلب. هذه هي الطرق المتاحة:", "You pick the payment method when confirming each order. These are the available methods:"), 11, FontWeight.Medium, C.greenD, lineHeight = 18)
             }
-            if (items.isEmpty()) item { Box(Modifier.fillMaxWidth().padding(vertical = 30.dp), contentAlignment = Alignment.Center) { T(tr("لم تستخدم أي وسيلة دفع بعد", "You haven't used any payment method yet"), 12, FontWeight.Medium, C.muted) } }
-            item {
-                Spacer(Modifier.height(10.dp))
-                Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(15.dp)).background(Color(0xFFF2F8F3)).border(1.5.dp, Color(0xFFCFE0D4), RoundedCornerShape(15.dp)).clickable { adding = true }.padding(vertical = 12.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                    Ic(R.drawable.ic_plus, 16.dp, C.greenD); Spacer(Modifier.width(7.dp)); T(tr("إضافة وسيلة دفع", "Add payment method"), 12, FontWeight.ExtraBold, C.greenD)
-                }
-            }
-        }
-    }
-
-    if (adding) {
-        val existing = items.map { it.type }.toSet()
-        androidx.compose.ui.window.Dialog(onDismissRequest = { adding = false }) {
-            Column(Modifier.clip(RoundedCornerShape(22.dp)).background(C.bg).padding(20.dp)) {
-                T(tr("اختر وسيلة دفع", "Choose a payment method"), 15, FontWeight.ExtraBold, C.head)
-                Spacer(Modifier.height(14.dp))
-                PAY_KINDS.filter { it.type !in existing }.forEach { k ->
-                    Row(Modifier.fillMaxWidth().padding(vertical = 4.dp).clip(RoundedCornerShape(14.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(14.dp)).clickable {
-                        scope.launch { runCatching { Net.api.addPayMethod(PayMethodBody(k.type, k.label)) }; adding = false; reload(); toast(tr("تمت الإضافة ✓", "Added ✓")) }
-                    }.padding(13.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Box(Modifier.size(36.dp).clip(RoundedCornerShape(12.dp)).background(C.pillLive), contentAlignment = Alignment.Center) { T(k.emoji, 16, FontWeight.Bold, C.greenD) }
-                        Spacer(Modifier.width(11.dp)); T(k.label, 13, FontWeight.Bold, C.head)
-                    }
-                }
-                if (PAY_KINDS.all { it.type in existing }) T(tr("أضفت كل الوسائل المتاحة", "You've added all available methods"), 12, FontWeight.Medium, C.muted)
-            }
+            Spacer(Modifier.height(14.dp))
+            PayInfoCard("\uD83D\uDCB3", tr("بطاقة", "Card"), tr("دفع إلكتروني آمن عبر بوابة الدفع — مدى · فيزا · ماستركارد.", "Secure online payment via the gateway — Mada · Visa · Mastercard."))
+            PayInfoCard("\uD83C\uDFE6", tr("تحويل بنكي", "Bank transfer"), tr("تحوّل قيمة المشتريات لحساب المتجر وترفع صورة الإيصال.", "Transfer the items value to the store's account and upload the receipt."))
+            PayInfoCard("\uD83D\uDCB5", tr("نقداً عند الاستلام", "Cash on delivery"), tr("تدفع للمندوب نقداً عند استلام طلبك.", "Pay the courier in cash when you receive your order."))
         }
     }
 }
 
+@Composable
+private fun PayInfoCard(emoji: String, title: String, desc: String) {
+    Row(Modifier.fillMaxWidth().padding(bottom = 11.dp).clip(RoundedCornerShape(18.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(18.dp)).padding(15.dp), verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.size(44.dp).clip(RoundedCornerShape(14.dp)).background(C.pillLive), contentAlignment = Alignment.Center) { T(emoji, 20, FontWeight.Bold, C.greenD) }
+        Spacer(Modifier.width(13.dp))
+        Column(Modifier.weight(1f)) {
+            T(title, 14, FontWeight.Bold, C.head)
+            Spacer(Modifier.height(3.dp))
+            T(desc, 10, FontWeight.Medium, C.muted, lineHeight = 16)
+        }
+    }
+}
 
 /* صورة الزبون المصغّرة (تظهر أينما وُجدت صورة الزبون) */
 @Composable
