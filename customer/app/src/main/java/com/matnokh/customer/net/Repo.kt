@@ -8,9 +8,9 @@ import androidx.compose.runtime.setValue
 
 // نماذج واجهة مبنيّة من الـAPI
 data class UiStore(val id: Int, val name: String, val categoryName: String, val logo: String?, val rating: String, val isOpen: Boolean, val branchesCount: Int, val dist: String, val lat: Double? = null, val lng: Double? = null)
-data class UiAddon(val name: String, val price: Double)
-data class UiProduct(val id: Int, val name: String, val desc: String, val price: Double, val oldPrice: Double, val images: List<String>, val addons: List<UiAddon>, val outBranches: List<Int> = emptyList())
-data class UiSection(val id: Int, val name: String, val items: List<UiProduct>)
+data class UiAddon(val nameAr: String, val nameEn: String?, val price: Double) { val name get() = com.matnokh.customer.ui.trd(nameAr, nameEn) }
+data class UiProduct(val id: Int, val nameAr: String, val nameEn: String?, val descAr: String, val descEn: String?, val price: Double, val oldPrice: Double, val images: List<String>, val addons: List<UiAddon>, val outBranches: List<Int> = emptyList()) { val name get() = com.matnokh.customer.ui.trd(nameAr, nameEn); val desc get() = com.matnokh.customer.ui.trd(descAr, descEn) }
+data class UiSection(val id: Int, val nameAr: String, val nameEn: String?, val items: List<UiProduct>) { val name get() = com.matnokh.customer.ui.trd(nameAr, nameEn) }
 data class UiBranch(val id: Int, val name: String)
 data class StoreDetailUi(val store: UiStore, val branches: List<UiBranch>, val sections: List<UiSection>)
 data class UiOffer(val product: UiProduct, val storeId: Int, val storeName: String, val storeLogo: String?, val storeCategory: String, val off: Int)
@@ -43,13 +43,13 @@ object Repo {
 
     private fun StoreDto.toUi() = UiStore(id, store_name, category_name ?: tr("متجر", "Store"), logo, String.format("%.1f", rating.coerceAtLeast(0.0)).let { if (rating <= 0) tr("جديد", "New") else it }, is_open, branches_count, "%.1f".format((id % 4 + 5) / 10.0 + id % 3), lat, lng)
     fun toUiStores(list: List<StoreDto>): List<UiStore> = list.map { it.toUi() }
-    private fun ProdDto.toUi(outB: List<Int> = emptyList()) = UiProduct(id, name, description ?: "", price, price_before, images, addons.map { UiAddon(it.name, it.price) }, outB)
+    private fun ProdDto.toUi(outB: List<Int> = emptyList()) = UiProduct(id, name, name_en, description ?: "", description_en, price, price_before, images, addons.map { UiAddon(it.name, it.name_en, it.price) }, outB)
 
     suspend fun loadHome() {
         categories = Net.api.categories().categories
         stores = Net.api.stores().stores.map { it.toUi() }
         offers = Net.api.offers().offers.map { o ->
-            UiOffer(UiProduct(o.id, o.name, o.description ?: "", o.price, o.price_before, o.images, o.addons.map { UiAddon(it.name, it.price) }), o.store_id, o.store_name, o.store_logo, o.store_category ?: "", o.off)
+            UiOffer(UiProduct(o.id, o.name, o.name_en, o.description ?: "", o.description_en, o.price, o.price_before, o.images, o.addons.map { UiAddon(it.name, it.name_en, it.price) }), o.store_id, o.store_name, o.store_logo, o.store_category ?: "", o.off)
         }
         runCatching { val p = Net.api.pricing(); kmMin = p.km_price_min; kmMax = p.km_price_max }
         runCatching { services = Net.api.services().services }
@@ -63,7 +63,7 @@ object Repo {
         detail = null
         val r = Net.api.storeDetail(id)
         detail = StoreDetailUi(r.store.toUi(), r.branches.map { UiBranch(it.id, it.name) }, r.sections.map { sec ->
-            UiSection(sec.id, sec.name, sec.items.map { p -> p.toUi(p.stock.filter { it.in_stock <= 0 }.map { s -> r.branches.indexOfFirst { it.id == s.branch_id } }.filter { it >= 0 }) })
+            UiSection(sec.id, sec.name, sec.name_en, sec.items.map { p -> p.toUi(p.stock.filter { it.in_stock <= 0 }.map { s -> r.branches.indexOfFirst { it.id == s.branch_id } }.filter { it >= 0 }) })
         })
     }
 }

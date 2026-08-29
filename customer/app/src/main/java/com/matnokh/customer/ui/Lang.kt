@@ -22,3 +22,6 @@ object Lang {
 
 /** يختار النص حسب اللغة الحالية. القراءة داخل Compose تُعيد التركيب عند التبديل. */
 fun tr(ar: String, en: String): String = if (Lang.isAr) ar else en
+
+/** يختار نص بيانات (منتج/قسم) مع الرجوع للعربي إن كان الإنجليزي فارغاً. */
+fun trd(ar: String?, en: String?): String = if (Lang.isAr) (ar ?: "") else (en?.takeIf { it.isNotBlank() } ?: ar ?: "")
