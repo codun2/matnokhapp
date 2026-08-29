@@ -112,14 +112,14 @@ fun NewProductScreen(productId: Int?, onBack: () -> Unit, onMenu: () -> Unit, on
                 OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
                     OcTitle(R.drawable.ic_box, "بيانات المنتج")
                     FieldLabel("اسم المنتج", required = true); FinField(name, { name = it }, "مثال: كبسة لحم — طبق كبير")
-                    Spacer(Modifier.height(10.dp)); FieldLabel("الاسم بالإنجليزية (English)"); FinField(nameEn, { nameEn = it }, "e.g. Meat Kabsa — large", align = androidx.compose.ui.text.style.TextAlign.Left)
+                    Spacer(Modifier.height(10.dp)); FieldLabel("الاسم بالإنجليزية (English)"); androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Ltr) { FinField(nameEn, { nameEn = it }, "e.g. Meat Kabsa — large", align = androidx.compose.ui.text.style.TextAlign.Left) }
                     FieldLabel("القسم داخل المتجر", required = true)
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         sections.forEach { s -> Chip("${s.icon ?: ""} ${s.name}", secId == s.id) { secId = s.id } }
                         Chip("+ قسم جديد", false, onClick = onNewSection)
                     }
                     FieldLabel("الوصف"); FinField(desc, { desc = it }, "وصف مختصر يظهر للزبون", singleLine = false, minHeight = 64.dp)
-                    Spacer(Modifier.height(10.dp)); FieldLabel("الوصف بالإنجليزية (English)"); FinField(descEn, { descEn = it }, "Short description shown to the customer", singleLine = false, minHeight = 64.dp, align = androidx.compose.ui.text.style.TextAlign.Left)
+                    Spacer(Modifier.height(10.dp)); FieldLabel("الوصف بالإنجليزية (English)"); androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Ltr) { FinField(descEn, { descEn = it }, "Short description shown to the customer", singleLine = false, minHeight = 64.dp, align = androidx.compose.ui.text.style.TextAlign.Left) }
                 }
             }
             item {

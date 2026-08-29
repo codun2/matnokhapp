@@ -55,9 +55,9 @@ fun StoreScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, onPr
         CustBackHeader(s.name, onBack, onCart, onMenu) { StorePill(if (s.isOpen) tr("متاح", "Available") else tr("مغلق", "Closed"), if (s.isOpen) C.pillLive else C.pillOff, if (s.isOpen) C.ok else Color(0xFF9AA198)) }
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp)).padding(13.dp), verticalAlignment = Alignment.CenterVertically) {
-                StoreLogo(s.logo, 52.dp, 16.dp, s.categoryName)
+                StoreLogo(s.logo, 52.dp, 16.dp, trd(s.categoryName, s.categoryNameEn))
                 Spacer(Modifier.width(13.dp))
-                Column(Modifier.weight(1f)) { T(s.name, 14, FontWeight.Bold, C.head); Spacer(Modifier.height(3.dp)); Row(verticalAlignment = Alignment.CenterVertically) { Text("★", color = Color(0xFFD9A441), fontSize = 11.sp); Spacer(Modifier.width(4.dp)); T("${s.rating} · ${s.categoryName}", 11, FontWeight.Normal, C.muted) } }
+                Column(Modifier.weight(1f)) { T(s.name, 14, FontWeight.Bold, C.head); Spacer(Modifier.height(3.dp)); Row(verticalAlignment = Alignment.CenterVertically) { Text("★", color = Color(0xFFD9A441), fontSize = 11.sp); Spacer(Modifier.width(4.dp)); T("${s.rating} · ${trd(s.categoryName, s.categoryNameEn)}", 11, FontWeight.Normal, C.muted) } }
                 Box(Modifier.clip(CircleShape).background(Color(0xFFE9F0F4)).padding(horizontal = 9.dp, vertical = 3.dp)) { T(tr("${s.dist} كم", "${s.dist} km"), 10, FontWeight.ExtraBold, C.blueText) }
             }
             FinField(query, { query = it }, placeholder = tr("ابحث في منتجات المتجر\u2026", "Search store products\u2026"), modifier = Modifier.padding(horizontal = 22.dp, vertical = 10.dp))

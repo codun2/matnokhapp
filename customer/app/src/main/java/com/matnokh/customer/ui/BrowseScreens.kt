@@ -61,7 +61,7 @@ fun StoresScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, onS
         CatBar(cat, Repo.categories) { cat = it }
         FinField(query, { query = it }, placeholder = tr("ابحث عن متجر بالاسم أو القسم\u2026", "Search stores by name or category\u2026"), modifier = Modifier.padding(start = 22.dp, end = 22.dp, top = 4.dp, bottom = 6.dp))
         Row(Modifier.fillMaxWidth().padding(start = 22.dp, end = 22.dp, top = 8.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            T(if (cat == null) tr("كل المتاجر", "All stores") else Repo.categories.firstOrNull { it.id == cat }?.name ?: tr("متاجر", "Stores"), 15, FontWeight.ExtraBold, C.head, Modifier.weight(1f))
+            T(if (cat == null) tr("كل المتاجر", "All stores") else Repo.categories.firstOrNull { it.id == cat }?.let { trd(it.name, it.name_en) } ?: tr("متاجر", "Stores"), 15, FontWeight.ExtraBold, C.head, Modifier.weight(1f))
             StorePill(tr("${stores.size}${if (hasMore) "+" else ""} متجراً", "${stores.size}${if (hasMore) "+" else ""} stores"), C.pillLive, C.greenD)
         }
         LazyColumn(Modifier.weight(1f), state = listState, contentPadding = PaddingValues(bottom = 24.dp)) {
@@ -76,7 +76,7 @@ fun StoresScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, onS
 fun CatBar(cur: Int?, cats: List<CatDto>, onPick: (Int?) -> Unit) {
     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 22.dp, vertical = 6.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
         CatChip("🏬", tr("الكل", "All"), cur == null) { onPick(null) }
-        cats.forEach { c -> CatChip(c.icon ?: "🏬", c.name, cur == c.id) { onPick(c.id) } }
+        cats.forEach { c -> CatChip(c.icon ?: "🏬", trd(c.name, c.name_en), cur == c.id) { onPick(c.id) } }
     }
 }
 
@@ -144,7 +144,7 @@ fun NearbyStoresLegacy(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Uni
                 withCoords.forEach { s ->
                     com.google.maps.android.compose.Marker(
                         state = com.google.maps.android.compose.MarkerState(com.google.android.gms.maps.model.LatLng(s.lat!!, s.lng!!)),
-                        title = s.name, snippet = s.categoryName, onClick = { onStore(s); true },
+                        title = s.name, snippet = trd(s.categoryName, s.categoryNameEn), onClick = { onStore(s); true },
                     )
                 }
             }
@@ -152,12 +152,12 @@ fun NearbyStoresLegacy(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Uni
             Row(Modifier.align(Alignment.BottomStart).fillMaxWidth().horizontalScroll(rememberScrollState()).padding(12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Repo.categories.forEach { c ->
                     val on = cat == c.id
-                    Box(Modifier.clip(CircleShape).then(if (on) Modifier.background(Grad.green) else Modifier.background(Color.White.copy(alpha = .92f))).clickable { cat = c.id }.padding(horizontal = 14.dp, vertical = 8.dp)) { T(catText(c.icon, c.name), 11, FontWeight.ExtraBold, if (on) Color.White else Color(0xFF4B5A51)) }
+                    Box(Modifier.clip(CircleShape).then(if (on) Modifier.background(Grad.green) else Modifier.background(Color.White.copy(alpha = .92f))).clickable { cat = c.id }.padding(horizontal = 14.dp, vertical = 8.dp)) { T(catText(c.icon, trd(c.name, c.name_en)), 11, FontWeight.ExtraBold, if (on) Color.White else Color(0xFF4B5A51)) }
                 }
             }
         }
         Row(Modifier.fillMaxWidth().padding(start = 22.dp, end = 22.dp, top = 16.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            T(tr("${Repo.categories.firstOrNull { it.id == cat }?.name ?: "المتاجر"} قريبة منك", "${Repo.categories.firstOrNull { it.id == cat }?.name ?: "Stores"} near you"), 15, FontWeight.ExtraBold, C.head, Modifier.weight(1f))
+            T(tr("${Repo.categories.firstOrNull { it.id == cat }?.name ?: "المتاجر"} قريبة منك", "${Repo.categories.firstOrNull { it.id == cat }?.let { it.name_en ?: it.name } ?: "Stores"} near you"), 15, FontWeight.ExtraBold, C.head, Modifier.weight(1f))
             StorePill("${list.size}", C.pillLive, C.greenD)
         }
         LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(bottom = 24.dp)) {

@@ -49,7 +49,7 @@ fun ErrandScreen(store: UiStore, onBack: () -> Unit, onMenu: () -> Unit, onSend:
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), PaddingValues(14.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    StoreLogo(store.logo, 50.dp, 16.dp, store.categoryName)
+                    StoreLogo(store.logo, 50.dp, 16.dp, trd(store.categoryName, store.categoryNameEn))
                     Spacer(Modifier.width(13.dp))
                     Column(Modifier.weight(1f)) { T(store.name, 14, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T(tr("متجر قريب · اطلب عبر مندوب", "Nearby store · order via courier"), 11, FontWeight.Normal, C.muted) }
                     Box(Modifier.clip(CircleShape).background(Color(0xFFE9F0F4)).padding(horizontal = 9.dp, vertical = 3.dp)) { T(tr("${store.dist} كم", "${store.dist} km"), 10, FontWeight.ExtraBold, C.blueText) }

@@ -45,7 +45,7 @@ fun SectionsScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Un
                     FieldLabel("اسم القسم", required = true)
                     FinField(name, { name = it }, "مثال: ألبان وأجبان")
                     Spacer(Modifier.height(10.dp)); FieldLabel("الاسم بالإنجليزية (English)")
-                    FinField(nameEn, { nameEn = it }, "e.g. Dairy & Cheese", align = androidx.compose.ui.text.style.TextAlign.Left)
+                    androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Ltr) { FinField(nameEn, { nameEn = it }, "e.g. Dairy & Cheese", align = androidx.compose.ui.text.style.TextAlign.Left) }
                     FieldLabel("أيقونة القسم")
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(9.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
                         if (icons.isEmpty()) T("جارٍ تحميل أيقونات التصنيف…", 11, androidx.compose.ui.text.font.FontWeight.Medium, C.muted)

@@ -57,7 +57,7 @@ fun ProductImg(url: String?, height: Dp, corner: Dp, emojiFallback: String = "ðŸ
 @Composable
 fun StoreRow(s: UiStore, onClick: () -> Unit) {
     Row(Modifier.padding(start = 22.dp, end = 22.dp, bottom = 11.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp)).clickable(onClick = onClick).padding(13.dp), verticalAlignment = Alignment.CenterVertically) {
-        StoreLogo(s.logo, 52.dp, 16.dp, s.categoryName)
+        StoreLogo(s.logo, 52.dp, 16.dp, trd(s.categoryName, s.categoryNameEn))
         Spacer(Modifier.width(13.dp))
         Column(Modifier.weight(1f)) {
             T(s.name, 13, FontWeight.Bold, C.head, maxLines = 1)

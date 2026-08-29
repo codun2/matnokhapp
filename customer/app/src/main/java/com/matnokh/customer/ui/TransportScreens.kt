@@ -150,7 +150,7 @@ fun OrderScreen(onBack: () -> Unit, onMenu: () -> Unit, onCreated: (Int) -> Unit
                         val body = com.matnokh.customer.net.TransportBody(svc.key, svc.name, areaA ?: tr("موقع الاستلام", "Pickup location"), if (hasDropoff) (areaB ?: tr("موقع التسليم", "Drop-off location")) else null, locA!!.latitude, locA!!.longitude, note.ifBlank { null }, "bid", price, "cash", if (hasDropoff) locB?.latitude else null, if (hasDropoff) locB?.longitude else null)
                         val r = call({ com.matnokh.customer.net.Net.api.createTransport(body) }, toast)
                         sending = false
-                        if (r?.order_id != null) { Sel.svcName = svc.name; toast(r.message ?: tr("أُرسل طلبك للسائقين ✓", "Your request was sent to drivers ✓")); onCreated(r.order_id!!) }
+                        if (r?.order_id != null) { Sel.svcName = svc.name; toast(tr("أُرسل طلبك للسائقين ✓", "Your request was sent to drivers ✓")); onCreated(r.order_id!!) }
                     }
                 }.padding(vertical = 16.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
                     T(if (sending) tr("جارٍ الإرسال…", "Sending…") else tr("تأكيد الطلب واستقبال العروض", "Confirm order & receive offers"), 14, FontWeight.ExtraBold, Color.White); Spacer(Modifier.width(8.dp)); Ic(R.drawable.ic_check, 16.dp, Color.White)
@@ -402,7 +402,7 @@ fun TransportBidsScreen(onBack: () -> Unit, onMenu: () -> Unit, onTrack: () -> U
                             Spacer(Modifier.width(12.dp))
                             Column(Modifier.weight(1f)) { T(b.driver.name, 13, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T("★ " + String.format("%.1f", b.driver.rating), 11, FontWeight.Normal, C.muted) }
                             T("﷼" + money(b.amount), 16, FontWeight.Black, C.greenD); Spacer(Modifier.width(10.dp))
-                            Box(Modifier.clip(RoundedCornerShape(13.dp)).background(Grad.green).clickable { scope.launch { val r = call({ com.matnokh.customer.net.Net.api.pickTransport(o.id, com.matnokh.customer.net.PickBidBody(b.id)) }, toast); if (r != null) { toast(r.message ?: tr("تم الاختيار ✓", "Selected ✓")); onTrack() } } }.padding(horizontal = 15.dp, vertical = 9.dp)) { T(tr("قبول", "Accept"), 12, FontWeight.ExtraBold, Color.White) }
+                            Box(Modifier.clip(RoundedCornerShape(13.dp)).background(Grad.green).clickable { scope.launch { val r = call({ com.matnokh.customer.net.Net.api.pickTransport(o.id, com.matnokh.customer.net.PickBidBody(b.id)) }, toast); if (r != null) { toast(tr("تم الاختيار ✓", "Selected ✓")); onTrack() } } }.padding(horizontal = 15.dp, vertical = 9.dp)) { T(tr("قبول", "Accept"), 12, FontWeight.ExtraBold, Color.White) }
                         }
                     }
                 }

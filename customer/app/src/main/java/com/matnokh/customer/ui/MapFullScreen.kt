@@ -56,7 +56,7 @@ fun StoresMapFull(onBack: () -> Unit, onStore: (UiStore) -> Unit) {
         ) {
             OsmTiles()
             stores.forEach { s ->
-                Marker(state = MarkerState(LatLng(s.lat!!, s.lng!!)), title = s.name, snippet = s.categoryName, onClick = { onStore(s); true })
+                Marker(state = MarkerState(LatLng(s.lat!!, s.lng!!)), title = s.name, snippet = trd(s.categoryName, s.categoryNameEn), onClick = { onStore(s); true })
             }
         }
         // زر الإغلاق
@@ -69,7 +69,7 @@ fun StoresMapFull(onBack: () -> Unit, onStore: (UiStore) -> Unit) {
         // فلتر الأنواع
         Row(Modifier.align(Alignment.BottomStart).fillMaxWidth().horizontalScroll(rememberScrollState()).padding(14.dp).navigationBarsPadding(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FilterChip(tr("الكل", "All"), cat == null) { cat = null }
-            Repo.categories.forEach { c -> FilterChip(catText(c.icon, c.name), cat == c.id) { cat = c.id } }
+            Repo.categories.forEach { c -> FilterChip(catText(c.icon, trd(c.name, c.name_en)), cat == c.id) { cat = c.id } }
         }
     }
 }
