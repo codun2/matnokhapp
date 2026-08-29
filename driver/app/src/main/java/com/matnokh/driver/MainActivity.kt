@@ -122,7 +122,7 @@ fun Root() {
                         "myservices" -> DriverInfoScreen("myservices", { screen = "profile" }, openMenu, toast)
                         "mypackages" -> DriverSubscriptionsScreen({ screen = "home" }, openMenu, toast)
                         "support" -> DriverInfoScreen("support", { screen = "profile" }, openMenu, toast)
-                        "notifications" -> NotificationsScreen({ screen = "home" }, openMenu)
+                        "notifications" -> NotificationsScreen({ screen = "home" }, openMenu, onOpen = { t -> when (t) { "store_offer", "store_assigned", "new_order", "new_transport", "new_bid" -> screen = "home"; "order_update", "chat" -> screen = "myorders"; else -> {} } })
                         "payments" -> PaymentsScreen({ screen = "home" }, openMenu, toast)
                         "ordersmap" -> OrdersMapFull({ screen = "home" })
                         "routemap" -> RouteMapFull(Drv.nowOrders.firstOrNull(), { screen = "active" })

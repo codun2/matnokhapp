@@ -116,7 +116,7 @@ fun Root() {
                         "store" -> StoreScreen(onBack = { screen = "dash" }, onMenu = openMenu,
                             onBranches = { screen = "branches" }, onSections = { screen = "sections" }, onDocuments = { screen = "documents" }, onStoreData = { screen = "storedata" }, onLogout = logout, toast = toast)
                         "storedata" -> StoreDataScreen(onBack = { screen = "store" }, onMenu = openMenu, toast = toast)
-                        "notifications" -> NotificationsScreen(onBack = { screen = "dash" }, onMenu = openMenu, toast = toast)
+                        "notifications" -> NotificationsScreen(onBack = { screen = "dash" }, onMenu = openMenu, onOpen = { t -> when (t) { "chat", "new_order", "order_update", "store_offer", "store_assigned" -> screen = "orders"; "subscription", "withdraw" -> screen = "wallet"; else -> {} } }, toast = toast)
                         "packages" -> PackagesScreen(onBack = { screen = "dash" }, onMenu = openMenu, toast = toast)
                     }
                 }

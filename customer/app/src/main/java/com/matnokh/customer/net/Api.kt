@@ -50,7 +50,7 @@ data class TrackDriver(val name: String? = null, val phone: String? = null, val 
 data class LatLngDto(val lat: Double? = null, val lng: Double? = null)
 data class OrderBidsResp(val bids: List<OrderBidDto> = emptyList(), val status: String? = null, val driver_id: Int? = null, val step: Int = 0, val order_no: String? = null, val store: String? = null, val driver: TrackDriver? = null, val pickup: LatLngDto? = null, val drop: LatLngDto? = null)
 data class PickBidBody(val bid_id: Int)
-data class NotifItem(val id: Int, val title: String, val body: String, val dt: String?)
+data class NotifItem(val id: Int, val title: String, val body: String, val type: String? = null, val dt: String? = null)
 data class NotifResp(val notifications: List<NotifItem>)
 data class OrderItemBody(val product_id: Int?, val name: String, val price: Double, val qty: Int, val addons: List<String>)
 data class QuoteBody(val merchant_id: Int, val drop_lat: Double? = null, val drop_lng: Double? = null)

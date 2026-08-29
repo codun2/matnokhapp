@@ -30,7 +30,7 @@ data class RegisterBody(val store_name: String, val owner_name: String, val phon
 data class LoginResp(val token: String?, val merchant: MerchantBrief?, val message: String?, val status: String?)
 data class MsgResp(val message: String?, val status: String?, val dev_code: String?)
 data class MeResp(val merchant: MerchantBrief?)
-data class NotifItem(val id: Int, val title: String, val body: String, val dt: String?)
+data class NotifItem(val id: Int, val title: String, val body: String, val type: String? = null, val dt: String? = null)
 data class NotificationsResp(val notifications: List<NotifItem>)
 data class PlanDto(val id: Int, val name: String, val type: String = "regular", val price: Double = 0.0, val duration_days: Int = 30, val features: List<String> = emptyList(), val description: String? = null)
 data class PlansResp(val plans: List<PlanDto> = emptyList())

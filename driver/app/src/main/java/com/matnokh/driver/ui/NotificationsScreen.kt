@@ -2,6 +2,7 @@ package com.matnokh.driver.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,7 +20,7 @@ import com.matnokh.driver.net.Net
 import com.matnokh.driver.net.NotifItem
 
 @Composable
-fun NotificationsScreen(onBack: () -> Unit, onMenu: () -> Unit) {
+fun NotificationsScreen(onBack: () -> Unit, onMenu: () -> Unit, onOpen: (String?) -> Unit) {
     var items by remember { mutableStateOf<List<NotifItem>?>(null) }
     LaunchedEffect(Unit) { items = runCatching { Net.api.notifications().notifications }.getOrDefault(emptyList()) }
     Column(Modifier.fillMaxSize().background(C.bg)) {
@@ -32,7 +33,7 @@ fun NotificationsScreen(onBack: () -> Unit, onMenu: () -> Unit) {
                 list.isEmpty() -> Box(Modifier.fillMaxWidth().padding(top = 70.dp), contentAlignment = Alignment.Center) { T("لا توجد إشعارات بعد", 13, FontWeight.Medium, C.muted) }
                 else -> list.forEach { n ->
                     val (icon, grad) = notifStyle(n.type)
-                    NotifRow(icon, grad, n.title, n.body, n.dt ?: "")
+                    NotifRow(icon, grad, n.title, n.body, n.dt ?: "", onClick = { onOpen(n.type) })
                 }
             }
             Spacer(Modifier.height(110.dp))
@@ -49,10 +50,10 @@ private fun notifStyle(type: String?): Pair<Int, Brush> = when (type) {
 }
 
 @Composable
-private fun NotifRow(iconId: Int, gradient: Brush, title: String, body: String, time: String, unread: Boolean = false) {
+private fun NotifRow(iconId: Int, gradient: Brush, title: String, body: String, time: String, unread: Boolean = false, onClick: () -> Unit = {}) {
     Row(
         Modifier.padding(horizontal = 22.dp).padding(bottom = 11.dp).fillMaxWidth().clip(RoundedCornerShape(20.dp))
-            .background(if (unread) C.pillLive else C.card).border(1.dp, if (unread) C.sage else C.line, RoundedCornerShape(20.dp)).padding(14.dp),
+            .background(if (unread) C.pillLive else C.card).border(1.dp, if (unread) C.sage else C.line, RoundedCornerShape(20.dp)).clickable(onClick = onClick).padding(14.dp),
         verticalAlignment = Alignment.Top,
     ) {
         GradBadge(iconId, gradient, 42.dp, 14.dp)

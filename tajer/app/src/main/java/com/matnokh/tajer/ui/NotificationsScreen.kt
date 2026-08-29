@@ -2,6 +2,7 @@ package com.matnokh.tajer.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,7 +20,7 @@ import com.matnokh.tajer.net.Net
 import com.matnokh.tajer.net.call
 
 @Composable
-fun NotificationsScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit) {
+fun NotificationsScreen(onBack: () -> Unit, onMenu: () -> Unit, onOpen: (String?) -> Unit, toast: (String) -> Unit) {
     var items by remember { mutableStateOf<List<NotifItem>?>(null) }
     LaunchedEffect(Unit) { call({ Net.api.notifications() }, toast)?.let { items = it.notifications } }
 
@@ -37,7 +38,7 @@ fun NotificationsScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) 
             else -> LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(top = 4.dp, bottom = 24.dp)) {
                 items(list) { n ->
                     Row(Modifier.padding(start = 22.dp, end = 22.dp, bottom = 12.dp).fillMaxWidth()
-                        .clip(RoundedCornerShape(20.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(20.dp)).padding(15.dp)) {
+                        .clip(RoundedCornerShape(20.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(20.dp)).clickable { onOpen(n.type) }.padding(15.dp)) {
                         Box(Modifier.size(42.dp).clip(RoundedCornerShape(14.dp)).background(C.pillLive), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_bell, 20.dp, C.greenD) }
                         Spacer(Modifier.width(13.dp))
                         Column(Modifier.weight(1f)) {
