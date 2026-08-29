@@ -59,7 +59,7 @@ data class RateBody(val order_id: Int, val is_transport: Boolean, val stars: Int
 data class CreateOrderBody(val merchant_id: Int, val branch_id: Int?, val payment_method: String, val drop_address: String?, val items: List<OrderItemBody>, val drop_lat: Double? = null, val drop_lng: Double? = null, val payment_proof: String? = null)
 data class PlaceDto(val id: String?, val name: String, val lat: Double?, val lng: Double?, val address: String = "", val type: String = "", val rating: Double? = null)
 data class PlacesResp(val places: List<PlaceDto>)
-data class SvcDto(val id: Int, val name: String, val key: String, val point_type: String = "pickup_dropoff", val base_price: Double = 0.0, val icon: String? = null)
+data class SvcDto(val id: Int, val name: String, val key: String, val point_type: String = "pickup_dropoff", val base_price: Double = 0.0, val icon: String? = null, val name_en: String? = null)
 data class SvcResp(val services: List<SvcDto>)
 data class TBidDriver(val id: Int, val name: String, val rating: Double = 5.0, val vehicle_type: String? = null, val lat: Double? = null, val lng: Double? = null, val phone: String? = null)
 data class TBid(val id: Int, val amount: Double, val driver: TBidDriver)

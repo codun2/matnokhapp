@@ -85,13 +85,13 @@ fun OrderScreen(onBack: () -> Unit, onMenu: () -> Unit, onCreated: (Int) -> Unit
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize().background(C.bg)) {
-            ScreenHeader(tr("طلب — ${svc.name}", "Request — ${svc.name}"), onBack, onMenu)
+            ScreenHeader(tr("طلب — ${svc.name}", "Request — ${trd(svc.name, svc.name_en)}"), onBack, onMenu)
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
                 OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
                     Row(Modifier.clip(RoundedCornerShape(18.dp)).background(Color(0xFFEEF4EF)).border(1.5.dp, Color(0xFFCFE0D4), RoundedCornerShape(18.dp)).padding(horizontal = 15.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.size(46.dp).clip(RoundedCornerShape(15.dp)).background(Grad.green), contentAlignment = Alignment.Center) { val si = svc.icon; when { si != null && si.startsWith("http") -> coil.compose.AsyncImage(model = si, contentDescription = null, contentScale = androidx.compose.ui.layout.ContentScale.Crop, modifier = Modifier.size(46.dp).clip(RoundedCornerShape(15.dp))); !si.isNullOrBlank() -> T(si, 22, FontWeight.Bold, Color.White); else -> Ic(R.drawable.ic_van, 22.dp, Color.White) } }
                         Spacer(Modifier.width(12.dp))
-                        Column { T(tr("خدمة: ${svc.name}", "Service: ${svc.name}"), 13, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T(if (hasDropoff) tr("حدّد نقطة الاستلام والتسليم — يصل طلبك لسائقي هذه الخدمة فقط", "Set pickup & drop-off — your request reaches this service's drivers only") else tr("حدّد نقطة الاستلام فقط — يصل لسائقي هذه الخدمة", "Set the pickup point only — sent to this service's drivers"), 10, FontWeight.Normal, C.muted, lineHeight = 16) }
+                        Column { T(tr("خدمة: ${svc.name}", "Service: ${trd(svc.name, svc.name_en)}"), 13, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T(if (hasDropoff) tr("حدّد نقطة الاستلام والتسليم — يصل طلبك لسائقي هذه الخدمة فقط", "Set pickup & drop-off — your request reaches this service's drivers only") else tr("حدّد نقطة الاستلام فقط — يصل لسائقي هذه الخدمة", "Set the pickup point only — sent to this service's drivers"), 10, FontWeight.Normal, C.muted, lineHeight = 16) }
                     }
                 }
                 Spacer(Modifier.height(14.dp))
@@ -246,7 +246,7 @@ fun OffersScreen(onBack: () -> Unit, onMenu: () -> Unit, onPick: (String, String
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.size(9.dp).clip(CircleShape).background(C.green))
                         Spacer(Modifier.width(12.dp))
-                        Column(Modifier.weight(1f)) { T(tr("تم بثّ طلبك ✓", "Your order was broadcast ✓"), 13, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T(tr("أُرسل لسائقي «${svc.name}» الأقرب إليك — العروض تصلك أولاً بأول", "Sent to the nearest «${svc.name}» drivers — offers arrive in real time"), 10, FontWeight.Normal, C.muted, lineHeight = 16) }
+                        Column(Modifier.weight(1f)) { T(tr("تم بثّ طلبك ✓", "Your order was broadcast ✓"), 13, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T(tr("أُرسل لسائقي «${svc.name}» الأقرب إليك — العروض تصلك أولاً بأول", "Sent to the nearest «${trd(svc.name, svc.name_en)}» drivers — offers arrive in real time"), 10, FontWeight.Normal, C.muted, lineHeight = 16) }
                         Column(Modifier.clip(RoundedCornerShape(14.dp)).background(Color(0xFFEEF4EF)).padding(horizontal = 13.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) { T("${shown.size}", 17, FontWeight.Black, C.greenD); T(tr("عروض", "Offers"), 9, FontWeight.Normal, C.muted) }
                     }
                 }
