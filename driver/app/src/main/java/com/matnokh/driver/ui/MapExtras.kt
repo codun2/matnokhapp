@@ -68,11 +68,11 @@ fun ProfileAvatar(toast: (String) -> Unit) {
             busy = true
             try {
                 val bytes = ctx.contentResolver.openInputStream(uri)?.use { it.readBytes() }
-                if (bytes == null) { toast("تعذّرت قراءة الصورة"); busy = false; return@launch }
+                if (bytes == null) { toast(tr("تعذّرت قراءة الصورة", "Couldn't read the image")); busy = false; return@launch }
                 val part = MultipartBody.Part.createFormData("file", "avatar.jpg", bytes.toRequestBody("image/*".toMediaTypeOrNull()))
                 val up = Net.api.upload(part)
-                if (up.url != null) { Net.api.updateProfile(ProfileBody(avatar = up.url)); Drv.avatarUrl.value = up.url; url = up.url; toast("تم تحديث صورتك ✓") } else toast("فشل الرفع")
-            } catch (e: Exception) { toast("تعذّر رفع الصورة") }
+                if (up.url != null) { Net.api.updateProfile(ProfileBody(avatar = up.url)); Drv.avatarUrl.value = up.url; url = up.url; toast(tr("تم تحديث صورتك ✓", "Your photo was updated ✓")) } else toast(tr("فشل الرفع", "Upload failed"))
+            } catch (e: Exception) { toast(tr("تعذّر رفع الصورة", "Couldn't upload the image")) }
             busy = false
         }
     }

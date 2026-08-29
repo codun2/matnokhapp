@@ -37,17 +37,17 @@ fun CompanyScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Uni
         loading = false
     }
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("شركتي", onBack, onMenu)
+        ScreenHeader(tr("شركتي", "My company"), onBack, onMenu)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 22.dp)) {
             Spacer(Modifier.height(6.dp))
             val d = data
             val company = d?.company
             when {
-                loading -> T("جارٍ التحميل…", 13, FontWeight.Medium, C.muted, Modifier.padding(vertical = 30.dp))
-                company == null -> T("لست تابعاً لأي شركة توصيل.", 13, FontWeight.Medium, C.muted, Modifier.padding(vertical = 30.dp))
+                loading -> T(tr("جارٍ التحميل…", "Loading…"), 13, FontWeight.Medium, C.muted, Modifier.padding(vertical = 30.dp))
+                company == null -> T(tr("لست تابعاً لأي شركة توصيل.", "You're not affiliated with any delivery company."), 13, FontWeight.Medium, C.muted, Modifier.padding(vertical = 30.dp))
                 else -> {
                     Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp)).padding(16.dp)) {
-                        T("الشركة التابع لها", 11, FontWeight.Medium, C.muted)
+                        T(tr("الشركة التابع لها", "Affiliated company"), 11, FontWeight.Medium, C.muted)
                         Spacer(Modifier.height(4.dp))
                         T(company.name, 18, FontWeight.ExtraBold, C.head)
                         val phone = company.phone
@@ -55,18 +55,18 @@ fun CompanyScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Uni
                     }
                     Spacer(Modifier.height(12.dp))
                     Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp)).padding(16.dp)) {
-                        T("رصيدك الحالي لدى الشركة", 11, FontWeight.Medium, C.muted)
+                        T(tr("رصيدك الحالي لدى الشركة", "Your current balance with the company"), 11, FontWeight.Medium, C.muted)
                         Spacer(Modifier.height(4.dp))
                         T("﷼${(d?.balance ?: 0.0).toInt()}", 22, FontWeight.ExtraBold, C.greenD)
                         Spacer(Modifier.height(2.dp))
-                        T("يُصفّى عند استلامك الدفعة من الشركة.", 10, FontWeight.Normal, C.muted)
+                        T(tr("يُصفّى عند استلامك الدفعة من الشركة.", "Settled when you receive the payout from the company."), 10, FontWeight.Normal, C.muted)
                     }
                     Spacer(Modifier.height(16.dp))
-                    T("سجلّ السحوبات والوصولات", 14, FontWeight.Bold, C.head)
+                    T(tr("سجلّ السحوبات والوصولات", "Withdrawals & receipts log"), 14, FontWeight.Bold, C.head)
                     Spacer(Modifier.height(8.dp))
                     val settlements = d?.settlements ?: emptyList()
                     if (settlements.isEmpty()) {
-                        T("لا توجد عمليات سحب بعد.", 12, FontWeight.Medium, C.muted, Modifier.padding(vertical = 14.dp))
+                        T(tr("لا توجد عمليات سحب بعد.", "No withdrawals yet."), 12, FontWeight.Medium, C.muted, Modifier.padding(vertical = 14.dp))
                     } else {
                         settlements.forEach { s ->
                             Column(Modifier.fillMaxWidth().padding(bottom = 10.dp).clip(RoundedCornerShape(18.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(18.dp)).padding(14.dp)) {
@@ -76,12 +76,12 @@ fun CompanyScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Uni
                                 }
                                 Spacer(Modifier.height(4.dp))
                                 val extra = s.reference?.takeIf { it.isNotBlank() }?.let { " · $it" } ?: ""
-                                T("${s.orders_count} طلب · ${s.method ?: "—"}$extra", 11, FontWeight.Medium, C.muted)
+                                T(tr("${s.orders_count} طلب · ${s.method ?: "—"}$extra", "${s.orders_count} orders · ${s.method ?: "—"}$extra"), 11, FontWeight.Medium, C.muted)
                                 val proof = s.payment_proof
                                 if (!proof.isNullOrBlank()) {
                                     Spacer(Modifier.height(8.dp))
                                     Row(Modifier.clip(RoundedCornerShape(10.dp)).background(C.pillLive).clickable { runCatching { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(proof))) } }.padding(horizontal = 12.dp, vertical = 7.dp), verticalAlignment = Alignment.CenterVertically) {
-                                        Ic(R.drawable.ic_doc, 13.dp, C.greenD); Spacer(Modifier.width(5.dp)); T("عرض إشعار الدفع", 11, FontWeight.ExtraBold, C.greenD)
+                                        Ic(R.drawable.ic_doc, 13.dp, C.greenD); Spacer(Modifier.width(5.dp)); T(tr("عرض إشعار الدفع", "View payment notice"), 11, FontWeight.ExtraBold, C.greenD)
                                     }
                                 }
                             }

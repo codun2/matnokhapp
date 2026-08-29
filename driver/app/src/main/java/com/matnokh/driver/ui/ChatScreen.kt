@@ -80,7 +80,7 @@ fun ChatScreen(kind: String, orderId: Int, title: String, onBack: () -> Unit, on
             uploading = true
             try {
                 val bytes = ctx.contentResolver.openInputStream(uri)?.use { it.readBytes() }
-                if (bytes == null) { toast("تعذّرت قراءة الصورة"); uploading = false; return@launch }
+                if (bytes == null) { toast(tr("تعذّرت قراءة الصورة", "Couldn't read the image")); uploading = false; return@launch }
                 val part = MultipartBody.Part.createFormData("file", "chat.jpg", bytes.toRequestBody("image/*".toMediaTypeOrNull()))
                 val up = call({ Net.api.upload(part) }, toast)
                 up?.url?.let { sendNow(null, it) }
@@ -114,7 +114,7 @@ fun ChatScreen(kind: String, orderId: Int, title: String, onBack: () -> Unit, on
         }
         if (locked) {
             Box(Modifier.fillMaxWidth().background(C.card).padding(14.dp), contentAlignment = Alignment.Center) {
-                T("انتهى الطلب — المحادثة مقفلة", 12, FontWeight.Bold, C.muted)
+                T(tr("انتهى الطلب — المحادثة مقفلة", "Order finished — chat locked"), 12, FontWeight.Bold, C.muted)
             }
         } else {
             Row(Modifier.fillMaxWidth().background(C.card).padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -123,7 +123,7 @@ fun ChatScreen(kind: String, orderId: Int, title: String, onBack: () -> Unit, on
                 }
                 Spacer(Modifier.width(8.dp))
                 Box(Modifier.weight(1f).clip(RoundedCornerShape(21.dp)).background(C.bg).border(1.dp, C.line, RoundedCornerShape(21.dp)).padding(horizontal = 14.dp, vertical = 11.dp)) {
-                    if (input.isEmpty()) T("اكتب رسالتك…", 13, FontWeight.Normal, C.muted)
+                    if (input.isEmpty()) T(tr("اكتب رسالتك…", "Type your message…"), 13, FontWeight.Normal, C.muted)
                     BasicTextField(value = input, onValueChange = { input = it }, textStyle = TextStyle(fontSize = 13.sp, color = C.head), maxLines = 4, modifier = Modifier.fillMaxWidth())
                 }
                 Spacer(Modifier.width(8.dp))

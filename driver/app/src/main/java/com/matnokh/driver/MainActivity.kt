@@ -1,4 +1,5 @@
 package com.matnokh.driver
+import com.matnokh.driver.ui.tr
 
 import android.content.Intent
 import android.os.Bundle
@@ -27,11 +28,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Session.init(this)
+        com.matnokh.driver.ui.Lang.init(this)
         DrvNotif.open = intent?.getStringExtra("open")
         DrvNotif.kind = intent?.getStringExtra("kind")
         DrvNotif.orderId = intent?.getStringExtra("order_id")?.toIntOrNull()
         enableEdgeToEdge()
-        setContent { MatnokhTheme { Root() } }
+        setContent { MatnokhTheme { androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides if (com.matnokh.driver.ui.Lang.isAr) androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr) { Root() } } }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -100,19 +102,19 @@ fun Root() {
                         "home" -> HomeScreen(openMenu, onNotifications = { screen = "notifications" },
                             onBid = { bidJob = it; screen = "bid" },
                             onAcceptDirect = { j -> scope.launch { val ok = if (j.isStore) repoStoreAccept(j.oid, toast) else repoAccept(j.oid, toast); if (ok) { Drv.received.removeAll { it.oid == j.oid }; Drv.nowOrders.clear(); if (j.isStore) repoStoreActive(toast) else repoNow(toast); screen = "active" } } },
-                            onStoreReject = { j -> scope.launch { repoStoreReject(j.oid, toast); Drv.received.removeAll { it.oid == j.oid }; toast("تم رفض الطلب — نبحث عن مندوب آخر") } }, toast = toast, onExpandMap = { screen = "ordersmap" })
-                        "myorders" -> MyOrdersScreen({ screen = "home" }, openMenu, onOpenActive = { if (Drv.nowOrders.isNotEmpty()) screen = "active" else toast("لا يوجد طلب نشط") }, toast = toast)
+                            onStoreReject = { j -> scope.launch { repoStoreReject(j.oid, toast); Drv.received.removeAll { it.oid == j.oid }; toast(tr("تم رفض الطلب — نبحث عن مندوب آخر", "Order rejected — looking for another courier")) } }, toast = toast, onExpandMap = { screen = "ordersmap" })
+                        "myorders" -> MyOrdersScreen({ screen = "home" }, openMenu, onOpenActive = { if (Drv.nowOrders.isNotEmpty()) screen = "active" else toast(tr("لا يوجد طلب نشط", "No active order")) }, toast = toast)
                         "myoffers" -> MyOffersScreen({ screen = "home" }, openMenu, toast)
                         "bid" -> bidJob?.let { j -> BidScreen(j, { screen = "home" }, openMenu, onSend = { amt -> scope.launch { val ok = if (j.isStore) repoStoreBid(j.oid, amt, toast) else repoBid(j.oid, amt, toast); if (ok) screen = "wait" } }) }
-                        "wait" -> WaitScreen(bidJob?.cust ?: "الزبون", bidJob?.let { Drv.received.firstOrNull { o -> o.oid == it.oid }?.price ?: it.price } ?: 0, { screen = "home" }, openMenu)
+                        "wait" -> WaitScreen(bidJob?.cust ?: tr("الزبون", "Customer"), bidJob?.let { Drv.received.firstOrNull { o -> o.oid == it.oid }?.price ?: it.price } ?: 0, { screen = "home" }, openMenu)
                         "active" -> ActiveScreen(Drv.nowOrders.firstOrNull(), Drv.fare.value, { screen = "home" }, openMenu, toast,
                             onStatus = { st -> scope.launch { Drv.nowOrders.firstOrNull()?.let { o -> if (o.isStore) { val mapped = if (st == "loaded") "picked_up" else st; if (repoStoreStatus(o.oid, mapped, toast)) { if (st == "delivered") Drv.activeStep.value = 4 else { val idx = Drv.nowOrders.indexOfFirst { it.oid == o.oid }; if (idx >= 0) Drv.nowOrders[idx] = Drv.nowOrders[idx].copy(status = mapped); Drv.activeStep.value = statusToStep(mapped) } } } else { if (repoStatus(o.oid, st, toast)) { if (st == "delivered") Drv.activeStep.value = 4 else { repoActive(toast) } } } } } },
                             onFinish = { scope.launch { repoNow(toast); repoPast(toast); repoDash(toast) }; screen = "home" }, onExpand = { screen = "routemap" },
                             onChat = { if (Drv.nowOrders.isNotEmpty()) { DrvNotif.kind = null; DrvNotif.orderId = null; screen = "chat" } })
                         "chat" -> {
                             val nk = DrvNotif.kind; val nid = DrvNotif.orderId
-                            if (nid != null) ChatScreen(nk ?: "store", nid, "محادثة الزبون", { DrvNotif.kind = null; DrvNotif.orderId = null; screen = "home" }, openMenu, toast)
-                            else Drv.nowOrders.firstOrNull()?.let { j -> ChatScreen(if (j.isStore) "store" else "transport", j.oid, "محادثة ${j.cust}", { screen = "active" }, openMenu, toast) } ?: run { screen = "home" }
+                            if (nid != null) ChatScreen(nk ?: "store", nid, tr("محادثة الزبون", "Customer chat"), { DrvNotif.kind = null; DrvNotif.orderId = null; screen = "home" }, openMenu, toast)
+                            else Drv.nowOrders.firstOrNull()?.let { j -> ChatScreen(if (j.isStore) "store" else "transport", j.oid, tr("محادثة ${j.cust}", "${j.cust} chat"), { screen = "active" }, openMenu, toast) } ?: run { screen = "home" }
                         }
                         "earn" -> EarnScreen({ screen = "home" }, openMenu, toast)
                         "profile" -> ProfileScreen({ screen = "home" }, openMenu, onLogout = { logout() }, toast, onNav = { screen = it })

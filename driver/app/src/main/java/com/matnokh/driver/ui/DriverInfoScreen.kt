@@ -28,16 +28,16 @@ import com.matnokh.driver.R
 import com.matnokh.driver.net.Net
 
 fun svcLabel(k: String): String = when (k) {
-    "errand" -> "متاجر قريبة"
-    "store" -> "متاجر مطنوخ"
-    "fast" -> "توصيل سريع"
-    "furniture", "furn" -> "نقل أثاث"
-    "cold" -> "نقل مبرّد"
-    "heavy", "sand", "crane" -> "نقل ثقيل"
-    "water" -> "توصيل مياه"
-    "goods" -> "مشتريات وبضائع"
-    "transport" -> "نقل عام"
-    else -> "خدمة نقل"
+    "errand" -> tr("متاجر قريبة", "Nearby stores")
+    "store" -> tr("متاجر مطنوخ", "Matnokh stores")
+    "fast" -> tr("توصيل سريع", "Fast delivery")
+    "furniture", "furn" -> tr("نقل أثاث", "Furniture moving")
+    "cold" -> tr("نقل مبرّد", "Refrigerated transport")
+    "heavy", "sand", "crane" -> tr("نقل ثقيل", "Heavy transport")
+    "water" -> tr("توصيل مياه", "Water delivery")
+    "goods" -> tr("مشتريات وبضائع", "Purchases & goods")
+    "transport" -> tr("نقل عام", "General transport")
+    else -> tr("خدمة نقل", "Transport service")
 }
 
 @Composable
@@ -46,7 +46,7 @@ fun DriverInfoScreen(kind: String, onBack: () -> Unit, onMenu: () -> Unit, toast
     var svcNames by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     LaunchedEffect(kind) { if (kind == "myservices") runCatching { svcNames = Net.api.driverServices().services.associate { it.key to it.name } } }
     val title = when (kind) {
-        "vehicle" -> "مركبتي"; "documents" -> "مستنداتي"; "myservices" -> "خدماتي المفعّلة"; else -> "الدعم الفني"
+        "vehicle" -> tr("مركبتي", "My vehicle"); "documents" -> tr("مستنداتي", "My documents"); "myservices" -> tr("خدماتي المفعّلة", "My enabled services"); else -> tr("الدعم الفني", "Technical support")
     }
     Column(Modifier.fillMaxSize().background(C.bg)) {
         ScreenHeader(title, onBack, onMenu)
@@ -59,36 +59,36 @@ fun DriverInfoScreen(kind: String, onBack: () -> Unit, onMenu: () -> Unit, toast
                             Spacer(Modifier.width(13.dp))
                             Column(Modifier.weight(1f)) {
                                 T(Drv.vehicle.value, 15, FontWeight.Bold, C.head)
-                                T(Drv.plate.value?.takeIf { it.isNotBlank() }?.let { "اللوحة: $it" } ?: "بدون لوحة", 11, FontWeight.Normal, C.muted)
+                                T(Drv.plate.value?.takeIf { it.isNotBlank() }?.let { tr("اللوحة: $it", "Plate: $it") } ?: tr("بدون لوحة", "No plate"), 11, FontWeight.Normal, C.muted)
                             }
                         }
                     }
                     Spacer(Modifier.height(12.dp))
                     OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                        T("صورة المركبة", 12, FontWeight.ExtraBold, C.head)
+                        T(tr("صورة المركبة", "Vehicle photo"), 12, FontWeight.ExtraBold, C.head)
                         Spacer(Modifier.height(10.dp))
                         val ph = Drv.vehiclePhoto.value
                         if (!ph.isNullOrBlank()) AsyncImage(model = ph, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxWidth().height(180.dp).clip(RoundedCornerShape(16.dp)))
-                        else Box(Modifier.fillMaxWidth().height(120.dp).clip(RoundedCornerShape(16.dp)).background(C.card2), contentAlignment = Alignment.Center) { T("لا توجد صورة للمركبة", 12, FontWeight.Medium, C.muted) }
+                        else Box(Modifier.fillMaxWidth().height(120.dp).clip(RoundedCornerShape(16.dp)).background(C.card2), contentAlignment = Alignment.Center) { T(tr("لا توجد صورة للمركبة", "No vehicle photo"), 12, FontWeight.Medium, C.muted) }
                     }
                 }
                 "documents" -> {
-                    InfoCard("رقم الهوية الوطنية", Drv.nationalId.value?.takeIf { it.isNotBlank() } ?: "غير مُدخل")
+                    InfoCard(tr("رقم الهوية الوطنية", "National ID number"), Drv.nationalId.value?.takeIf { it.isNotBlank() } ?: tr("غير مُدخل", "Not entered"))
                     Spacer(Modifier.height(10.dp))
-                    InfoCard("رقم رخصة القيادة", Drv.license.value?.takeIf { it.isNotBlank() } ?: "غير مُدخل")
+                    InfoCard(tr("رقم رخصة القيادة", "Driver's license number"), Drv.license.value?.takeIf { it.isNotBlank() } ?: tr("غير مُدخل", "Not entered"))
                     Spacer(Modifier.height(10.dp))
-                    listOf("رخصة القيادة" to Drv.licensePhoto.value, "صورة الهوية" to Drv.idPhoto.value, "جواز السفر" to Drv.passportPhoto.value).forEach { (lbl, u) ->
+                    listOf(tr("رخصة القيادة", "Driver's license") to Drv.licensePhoto.value, tr("صورة الهوية", "ID photo") to Drv.idPhoto.value, tr("جواز السفر", "Passport") to Drv.passportPhoto.value).forEach { (lbl, u) ->
                         if (!u.isNullOrBlank()) { Spacer(Modifier.height(10.dp)); OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) { T(lbl, 11, FontWeight.Normal, C.muted); Spacer(Modifier.height(6.dp)); AsyncImage(model = u, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxWidth().height(150.dp).clip(RoundedCornerShape(14.dp))) } }
                     }
                     Spacer(Modifier.height(10.dp))
                     OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                        Row(verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_shield, 16.dp, C.greenD); Spacer(Modifier.width(8.dp)); T("حالة الحساب: ${if (Drv.name.value.isNotBlank()) "موثّق" else "قيد المراجعة"}", 12, FontWeight.Bold, C.head) }
+                        Row(verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_shield, 16.dp, C.greenD); Spacer(Modifier.width(8.dp)); T(tr("حالة الحساب: ${if (Drv.name.value.isNotBlank()) "موثّق" else "قيد المراجعة"}", "Account status: ${if (Drv.name.value.isNotBlank()) "Verified" else "Under review"}"), 12, FontWeight.Bold, C.head) }
                     }
                 }
                 "myservices" -> {
-                    if (Drv.services.isEmpty()) Box(Modifier.fillMaxWidth().padding(30.dp), contentAlignment = Alignment.Center) { T("لا توجد خدمات مفعّلة", 13, FontWeight.Bold, C.muted) }
+                    if (Drv.services.isEmpty()) Box(Modifier.fillMaxWidth().padding(30.dp), contentAlignment = Alignment.Center) { T(tr("لا توجد خدمات مفعّلة", "No enabled services"), 13, FontWeight.Bold, C.muted) }
                     else Column(Modifier.padding(horizontal = 22.dp)) {
-                        T("تصلك طلبات هذه الخدمات فقط:", 11, FontWeight.Medium, C.muted)
+                        T(tr("تصلك طلبات هذه الخدمات فقط:", "You'll only receive orders for these services:"), 11, FontWeight.Medium, C.muted)
                         Spacer(Modifier.height(10.dp))
                         Drv.services.forEach { k ->
                             Row(Modifier.fillMaxWidth().padding(vertical = 4.dp).clip(RoundedCornerShape(15.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(15.dp)).padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -100,12 +100,12 @@ fun DriverInfoScreen(kind: String, onBack: () -> Unit, onMenu: () -> Unit, toast
                 }
                 else -> { // support
                     OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                        T("فريق الدعم متاح على مدار الساعة لمساعدتك.", 12, FontWeight.Medium, C.muted, lineHeight = 18)
+                        T(tr("فريق الدعم متاح على مدار الساعة لمساعدتك.", "The support team is available around the clock to help you."), 12, FontWeight.Medium, C.muted, lineHeight = 18)
                     }
                     Spacer(Modifier.height(12.dp))
-                    SupportBtn(R.drawable.ic_phone, "اتصال بالدعم") { runCatching { ctx.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:920000000"))) }.onFailure { toast("تعذّر فتح الاتصال") } }
+                    SupportBtn(R.drawable.ic_phone, tr("اتصال بالدعم", "Call support")) { runCatching { ctx.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:920000000"))) }.onFailure { toast(tr("تعذّر فتح الاتصال", "Couldn't open the call")) } }
                     Spacer(Modifier.height(10.dp))
-                    SupportBtn(R.drawable.ic_msg, "واتساب الدعم") { runCatching { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/920000000"))) }.onFailure { toast("تعذّر فتح واتساب") } }
+                    SupportBtn(R.drawable.ic_msg, tr("واتساب الدعم", "Support WhatsApp")) { runCatching { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/920000000"))) }.onFailure { toast(tr("تعذّر فتح واتساب", "Couldn't open WhatsApp")) } }
                 }
             }
             Spacer(Modifier.height(24.dp))

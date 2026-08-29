@@ -29,27 +29,27 @@ fun SplashScreen(onStart: () -> Unit, onRegister: () -> Unit = {}) {
             Ic(R.drawable.ic_van, 56.dp, Color.White)
         }
         Spacer(Modifier.height(26.dp))
-        T("مطنوخ كابتن", 34, FontWeight.Black, Color(0xFF33463C))
+        T(tr("مطنوخ كابتن", "Matnokh Captain"), 34, FontWeight.Black, Color(0xFF33463C))
         Spacer(Modifier.height(6.dp))
-        T("مركبتك مصدر دخلك.", 15, FontWeight.Bold, C.green)
+        T(tr("مركبتك مصدر دخلك.", "Your vehicle is your income source."), 15, FontWeight.Bold, C.green)
         Spacer(Modifier.height(14.dp))
         androidx.compose.material3.Text(
-            "انضم لأسطول مطنوخ — استقبل الطلبات القريبة منك، قدّم سعرك بنفسك، ونفّذ بمرونة كاملة.",
+            tr("انضم لأسطول مطنوخ — استقبل الطلبات القريبة منك، قدّم سعرك بنفسك، ونفّذ بمرونة كاملة.", "Join Matnokh's fleet — receive nearby orders, set your own price, and work with full flexibility."),
             fontFamily = Cairo, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = C.muted,
             textAlign = TextAlign.Center, lineHeight = 26.sp, modifier = Modifier.widthIn(max = 300.dp),
         )
         Spacer(Modifier.height(24.dp))
         FlowRow(horizontalArrangement = Arrangement.spacedBy(9.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
-            Feat(R.drawable.ic_cash, "سعرك بيدك")
-            Feat(R.drawable.ic_clock, "دوام مرن")
-            Feat(R.drawable.ic_shield, "دفع مضمون")
+            Feat(R.drawable.ic_cash, tr("سعرك بيدك", "Your price, your call"))
+            Feat(R.drawable.ic_clock, tr("دوام مرن", "Flexible hours"))
+            Feat(R.drawable.ic_shield, tr("دفع مضمون", "Guaranteed payment"))
         }
         Spacer(Modifier.height(34.dp))
-        WideButton("ابدأ الاستقبال", R.drawable.ic_back, modifier = Modifier.widthIn(max = 300.dp), onClick = onStart)
+        WideButton(tr("ابدأ الاستقبال", "Start receiving"), R.drawable.ic_back, modifier = Modifier.widthIn(max = 300.dp), onClick = onStart)
         Spacer(Modifier.height(12.dp))
-        T("التسجيل كسائق جديد", 13, FontWeight.Bold, C.greenD, modifier = Modifier.clickable { onRegister() }.padding(8.dp))
+        T(tr("التسجيل كسائق جديد", "Register as a new driver"), 13, FontWeight.Bold, C.greenD, modifier = Modifier.clickable { onRegister() }.padding(8.dp))
         Spacer(Modifier.height(10.dp))
-        T("الإصدار 3.3", 11, FontWeight.Normal, C.muted)
+        T(tr("الإصدار 3.3", "Version 3.3"), 11, FontWeight.Normal, C.muted)
     }
 }
 

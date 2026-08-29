@@ -24,8 +24,8 @@ import kotlinx.coroutines.launch
 fun ActiveScreen(job: Job?, fare: Int, onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit, onStatus: (String) -> Unit, onFinish: () -> Unit, onExpand: () -> Unit, onChat: () -> Unit = {}) {
     if (job == null) {
         Column(Modifier.fillMaxSize().background(C.bg)) {
-            ScreenHeader("الطلب النشط", onBack, onMenu)
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { T("لا يوجد طلب نشط الآن", 13, FontWeight.Medium, C.muted) }
+            ScreenHeader(tr("الطلب النشط", "Active order"), onBack, onMenu)
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { T(tr("لا يوجد طلب نشط الآن", "No active order now"), 13, FontWeight.Medium, C.muted) }
         }
         return
     }
@@ -33,7 +33,7 @@ fun ActiveScreen(job: Job?, fare: Int, onBack: () -> Unit, onMenu: () -> Unit, t
     val scope = rememberCoroutineScope()
     var showGiveUp by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("الطلب النشط", onBack, onMenu)
+        ScreenHeader(tr("الطلب النشط", "Active order"), onBack, onMenu)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             // خريطة محاكاة
             Box(Modifier.fillMaxWidth().height(260.dp)) {
@@ -57,16 +57,16 @@ fun ActiveScreen(job: Job?, fare: Int, onBack: () -> Unit, onMenu: () -> Unit, t
                 }
                 com.google.maps.android.compose.GoogleMap(modifier = Modifier.fillMaxSize(), cameraPositionState = camera, uiSettings = com.google.maps.android.compose.MapUiSettings(zoomControlsEnabled = false, mapToolbarEnabled = false)) {
                     OsmTiles()
-                    from?.let { com.google.maps.android.compose.Marker(state = com.google.maps.android.compose.MarkerState(it), title = "الاستلام — " + job.cust) }
-                    to?.let { com.google.maps.android.compose.Marker(state = com.google.maps.android.compose.MarkerState(it), title = "التسليم") }
+                    from?.let { com.google.maps.android.compose.Marker(state = com.google.maps.android.compose.MarkerState(it), title = tr("الاستلام — ", "Pickup — ") + job.cust) }
+                    to?.let { com.google.maps.android.compose.Marker(state = com.google.maps.android.compose.MarkerState(it), title = tr("التسليم", "Delivery")) }
                     if (me != null && target != null) com.google.maps.android.compose.Polyline(points = listOf(me, target), color = C.green, width = 9f)
-                    me?.let { AnimatedCarMarker(it, "أنا", ctx, target) }
+                    me?.let { AnimatedCarMarker(it, tr("أنا", "Me"), ctx, target) }
                 }
                 Row(Modifier.align(Alignment.TopStart).padding(14.dp).clip(RoundedCornerShape(15.dp)).background(Color(0xE6FFFFFF)).padding(horizontal = 12.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
                     Ic(R.drawable.ic_nav, 15.dp, C.green); Spacer(Modifier.width(7.dp)); T("#" + job.id, 12, FontWeight.ExtraBold, Color(0xFF4B5A51))
                 }
-                Box(Modifier.align(Alignment.TopEnd).padding(14.dp).clip(RoundedCornerShape(50.dp)).background(Color(0xF2FFFFFF)).clickable(onClick = onExpand).padding(horizontal = 12.dp, vertical = 8.dp)) { T("🗺️ ملء الشاشة", 11, FontWeight.ExtraBold, C.greenD) }
-                if (me != null && target != null && step < 4) Row(Modifier.align(Alignment.BottomStart).padding(14.dp).clip(RoundedCornerShape(15.dp)).background(Color(0xE6FFFFFF)).padding(horizontal = 12.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_clock, 14.dp, C.green); Spacer(Modifier.width(6.dp)); T((if (step >= 2) "للتسليم: " else "للاستلام: ") + etaText(haversineKm(me, target)), 12, FontWeight.ExtraBold, C.greenD) }
+                Box(Modifier.align(Alignment.TopEnd).padding(14.dp).clip(RoundedCornerShape(50.dp)).background(Color(0xF2FFFFFF)).clickable(onClick = onExpand).padding(horizontal = 12.dp, vertical = 8.dp)) { T(tr("🗺️ ملء الشاشة", "🗺️ Fullscreen"), 11, FontWeight.ExtraBold, C.greenD) }
+                if (me != null && target != null && step < 4) Row(Modifier.align(Alignment.BottomStart).padding(14.dp).clip(RoundedCornerShape(15.dp)).background(Color(0xE6FFFFFF)).padding(horizontal = 12.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_clock, 14.dp, C.green); Spacer(Modifier.width(6.dp)); T((if (step >= 2) tr("للتسليم: ", "Drop-off: ") else tr("للاستلام: ", "Pickup: ")) + etaText(haversineKm(me, target)), 12, FontWeight.ExtraBold, C.greenD) }
             }
             // اللوحة السفلية
             Column(Modifier.fillMaxWidth().offset(y = (-24).dp).clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)).background(C.bg).padding(horizontal = 22.dp, vertical = 14.dp)) {
@@ -90,37 +90,37 @@ fun ActiveScreen(job: Job?, fare: Int, onBack: () -> Unit, onMenu: () -> Unit, t
                 Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp)).padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(52.dp).clip(RoundedCornerShape(17.dp)).background(Grad.terra), contentAlignment = Alignment.Center) { T(job.av, 16, FontWeight.ExtraBold, Color.White) }
                     Spacer(Modifier.width(13.dp))
-                    Column(Modifier.weight(1f)) { T(job.cust, 14, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T("${job.to} · أجرتك ﷼$fare", 11, FontWeight.Normal, C.muted, maxLines = 1) }
+                    Column(Modifier.weight(1f)) { T(job.cust, 14, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T(tr("${job.to} · أجرتك ﷼$fare", "${job.to} · your fare ﷼$fare"), 11, FontWeight.Normal, C.muted, maxLines = 1) }
                     Box(Modifier.size(44.dp).clip(RoundedCornerShape(15.dp)).background(C.card2).clickable { onChat() }, contentAlignment = Alignment.Center) { Ic(R.drawable.ic_msg, 17.dp, Color(0xFF5D6B62)) }
                     Spacer(Modifier.width(9.dp))
-                    Box(Modifier.size(44.dp).clip(RoundedCornerShape(15.dp)).background(Grad.green), contentAlignment = Alignment.Center) { Box(Modifier.clickable { toast("اتصال بالزبون") }, contentAlignment = Alignment.Center) { Ic(R.drawable.ic_phone, 17.dp, Color.White) } }
+                    Box(Modifier.size(44.dp).clip(RoundedCornerShape(15.dp)).background(Grad.green), contentAlignment = Alignment.Center) { Box(Modifier.clickable { toast(tr("اتصال بالزبون", "Call the customer")) }, contentAlignment = Alignment.Center) { Ic(R.drawable.ic_phone, 17.dp, Color.White) } }
                 }
                 Spacer(Modifier.height(14.dp))
                 // زر المرحلة
                 when (step) {
                     1 -> Column {
-                        WideButton("حمّلت الشحنة — انطلق", R.drawable.ic_check) { onStatus("loaded") }
+                        WideButton(tr("حمّلت الشحنة — انطلق", "Loaded the shipment — go"), R.drawable.ic_check) { onStatus("loaded") }
                         Spacer(Modifier.height(10.dp))
                         if (!showGiveUp) {
-                            WideButton("تخلّي عن الطلب", ghost = true) { showGiveUp = true }
+                            WideButton(tr("تخلّي عن الطلب", "Relinquish order"), ghost = true) { showGiveUp = true }
                         } else {
                             Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(18.dp)).padding(14.dp)) {
-                                T("التخلّي عن الطلب سيُسنده لمندوب آخر ويُسجّل عليك. متأكد؟", 12, FontWeight.Bold, C.head)
+                                T(tr("التخلّي عن الطلب سيُسنده لمندوب آخر ويُسجّل عليك. متأكد؟", "Relinquishing the order will assign it to another courier and be recorded against you. Are you sure?"), 12, FontWeight.Bold, C.head)
                                 Spacer(Modifier.height(10.dp))
                                 Row {
-                                    Box(Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).background(Grad.terra).clickable { showGiveUp = false; scope.launch { val ok = if (job.isStore) repoStoreRelinquish(job.oid, toast) else repoTransportRelinquish(job.oid, toast); if (ok) onFinish() } }.padding(vertical = 11.dp), contentAlignment = Alignment.Center) { T("نعم، تخلّيت", 13, FontWeight.ExtraBold, Color.White) }
+                                    Box(Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).background(Grad.terra).clickable { showGiveUp = false; scope.launch { val ok = if (job.isStore) repoStoreRelinquish(job.oid, toast) else repoTransportRelinquish(job.oid, toast); if (ok) onFinish() } }.padding(vertical = 11.dp), contentAlignment = Alignment.Center) { T(tr("نعم، تخلّيت", "Yes, I relinquished"), 13, FontWeight.ExtraBold, Color.White) }
                                     Spacer(Modifier.width(10.dp))
-                                    Box(Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).background(C.card2).clickable { showGiveUp = false }.padding(vertical = 11.dp), contentAlignment = Alignment.Center) { T("تراجع", 13, FontWeight.ExtraBold, C.muted) }
+                                    Box(Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).background(C.card2).clickable { showGiveUp = false }.padding(vertical = 11.dp), contentAlignment = Alignment.Center) { T(tr("تراجع", "Back"), 13, FontWeight.ExtraBold, C.muted) }
                                 }
                             }
                         }
                     }
-                    2 -> WideButton("بدأت الرحلة — في الطريق", R.drawable.ic_nav) { onStatus("on_the_way") }
-                    3 -> WideButton("تم التسليم للزبون", R.drawable.ic_flag) { onStatus("delivered") }
+                    2 -> WideButton(tr("بدأت الرحلة — في الطريق", "Trip started — on the way"), R.drawable.ic_nav) { onStatus("on_the_way") }
+                    3 -> WideButton(tr("تم التسليم للزبون", "Delivered to the customer"), R.drawable.ic_flag) { onStatus("delivered") }
                     else -> Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp)).padding(18.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        T("أنجزت الرحلة 🎉  +﷼$fare", 15, FontWeight.Black, C.greenD)
-                        Spacer(Modifier.height(8.dp)); T("انتقل الطلب إلى «طلباتي — السابقة» وعدت متاحاً", 11, FontWeight.Normal, C.muted)
-                        Spacer(Modifier.height(14.dp)); WideButton("العودة للاستقبال", R.drawable.ic_nav, onClick = onFinish)
+                        T(tr("أنجزت الرحلة 🎉  +﷼$fare", "Trip completed 🎉  +﷼$fare"), 15, FontWeight.Black, C.greenD)
+                        Spacer(Modifier.height(8.dp)); T(tr("انتقل الطلب إلى «طلباتي — السابقة» وعدت متاحاً", "The order moved to «My orders — Past» and you're available again"), 11, FontWeight.Normal, C.muted)
+                        Spacer(Modifier.height(14.dp)); WideButton(tr("العودة للاستقبال", "Back to receiving"), R.drawable.ic_nav, onClick = onFinish)
                     }
                 }
                 Spacer(Modifier.height(100.dp))

@@ -1,4 +1,5 @@
 package com.matnokh.driver
+import com.matnokh.driver.ui.tr
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -82,12 +83,12 @@ class LocationService : Service() {
         val mgr = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             mgr.createNotificationChannel(
-                NotificationChannel(CHANNEL, "تتبّع الموقع", NotificationManager.IMPORTANCE_LOW).apply { setShowBadge(false) }
+                NotificationChannel(CHANNEL, tr("تتبّع الموقع", "Location tracking"), NotificationManager.IMPORTANCE_LOW).apply { setShowBadge(false) }
             )
         }
         val n: Notification = NotificationCompat.Builder(this, CHANNEL)
-            .setContentTitle("مطنوخ")
-            .setContentText("يشارك موقعك أثناء الدوام لاستقبال الطلبات وتتبّع التوصيل")
+            .setContentTitle(tr("مطنوخ", "Matnokh"))
+            .setContentText(tr("يشارك موقعك أثناء الدوام لاستقبال الطلبات وتتبّع التوصيل", "Your location is shared during your shift to receive orders and track delivery"))
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)

@@ -24,13 +24,13 @@ fun NotificationsScreen(onBack: () -> Unit, onMenu: () -> Unit, onOpen: (String?
     var items by remember { mutableStateOf<List<NotifItem>?>(null) }
     LaunchedEffect(Unit) { items = runCatching { Net.api.notifications().notifications }.getOrDefault(emptyList()) }
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("الإشعارات", onBack, onMenu)
+        ScreenHeader(tr("الإشعارات", "Notifications"), onBack, onMenu)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             Spacer(Modifier.height(6.dp))
             val list = items
             when {
                 list == null -> Box(Modifier.fillMaxWidth().padding(top = 60.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = C.green) }
-                list.isEmpty() -> Box(Modifier.fillMaxWidth().padding(top = 70.dp), contentAlignment = Alignment.Center) { T("لا توجد إشعارات بعد", 13, FontWeight.Medium, C.muted) }
+                list.isEmpty() -> Box(Modifier.fillMaxWidth().padding(top = 70.dp), contentAlignment = Alignment.Center) { T(tr("لا توجد إشعارات بعد", "No notifications yet"), 13, FontWeight.Medium, C.muted) }
                 else -> list.forEach { n ->
                     val (icon, grad) = notifStyle(n.type)
                     NotifRow(icon, grad, n.title, n.body, n.dt ?: "", onClick = { onOpen(n.type) })

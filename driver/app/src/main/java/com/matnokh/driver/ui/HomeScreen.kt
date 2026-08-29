@@ -58,7 +58,7 @@ fun HomeScreen(onMenu: () -> Unit, onNotifications: () -> Unit, onBid: (Job) -> 
             Row(Modifier.fillMaxWidth().background(C.bg).statusBarsPadding().padding(start = 22.dp, end = 22.dp, top = 8.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(46.dp).clip(RoundedCornerShape(16.dp)).background(Grad.sand), contentAlignment = Alignment.Center) { T(Drv.avatar.value, 15, FontWeight.ExtraBold, Color(0xFF6B5335)) }
                 Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f)) { T("أهلاً كابتن 🚚", 11, FontWeight.Normal, C.muted); T(Drv.name.value, 15, FontWeight.Bold, C.head, maxLines = 1) }
+                Column(Modifier.weight(1f)) { T(tr("أهلاً كابتن 🚚", "Hello captain 🚚"), 11, FontWeight.Normal, C.muted); T(Drv.name.value, 15, FontWeight.Bold, C.head, maxLines = 1) }
                 HeaderBtn(R.drawable.ic_menu, onClick = onMenu); Spacer(Modifier.width(9.dp)); HeaderBtn(R.drawable.ic_bell, badge = true, onClick = onNotifications)
             }
             Drv.shiftToday.value?.shift?.let { sh ->
@@ -96,19 +96,19 @@ fun HomeScreen(onMenu: () -> Unit, onNotifications: () -> Unit, onBid: (Job) -> 
                 Box(Modifier.size(50.dp).clip(RoundedCornerShape(17.dp)).background(if (avail) Grad.green else Grad.sand), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_nav, 24.dp, Color.White) }
                 Spacer(Modifier.width(13.dp))
                 Column(Modifier.weight(1f)) {
-                    T(if (avail) "متاح لاستقبال الطلبات" else "غير متاح حالياً", 14, FontWeight.Bold, C.head)
-                    T(if (avail) "يجري تحديث موقعك دورياً · ${Drv.vehicle.value}" else "لن تصلك طلبات جديدة", 11, FontWeight.Normal, C.muted, maxLines = 1)
+                    T(if (avail) tr("متاح لاستقبال الطلبات", "Available to receive orders") else tr("غير متاح حالياً", "Currently unavailable"), 14, FontWeight.Bold, C.head)
+                    T(if (avail) tr("يجري تحديث موقعك دورياً · ${Drv.vehicle.value}", "Your location is updated periodically · ${Drv.vehicle.value}") else tr("لن تصلك طلبات جديدة", "You won't receive new orders"), 11, FontWeight.Normal, C.muted, maxLines = 1)
                 }
                 Sw(avail) { scope.launch { repoSetAvailable(!avail, toast); if (Drv.available.value) { Drv.received.clear(); repoNearby(toast); repoStoreOrders(toast) } } }
             }
             Row(Modifier.padding(horizontal = 22.dp).padding(top = 14.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Kpi("${Drv.tripsToday.value}", "رحلات اليوم", C.greenD, Modifier.weight(1f))
-                Kpi("﷼${Drv.earningsToday.value}", "أرباح اليوم", C.blueText, Modifier.weight(1f))
-                Kpi("${Drv.rating.value} ★", "تقييمي", C.terraText, Modifier.weight(1f))
+                Kpi("${Drv.tripsToday.value}", tr("رحلات اليوم", "Today's trips"), C.greenD, Modifier.weight(1f))
+                Kpi("﷼${Drv.earningsToday.value}", tr("أرباح اليوم", "Today's earnings"), C.blueText, Modifier.weight(1f))
+                Kpi("${Drv.rating.value} ★", tr("تقييمي", "My rating"), C.terraText, Modifier.weight(1f))
             }
-            SecTitle("الطلبات الواردة") { if (avail) Row(verticalAlignment = Alignment.CenterVertically) { Box(Modifier.size(9.dp).clip(CircleShape).background(C.green)); Spacer(Modifier.width(5.dp)); T("بثّ مباشر", 11, FontWeight.ExtraBold, C.greenD) } }
-            if (!avail) CenterNote("أنت غير متاح حالياً — فعّل التوفّر ليصلك بثّ الطلبات القريبة")
-            else if (Drv.received.isEmpty()) CenterNote("بانتظار وصول أول طلب…")
+            SecTitle(tr("الطلبات الواردة", "Incoming orders")) { if (avail) Row(verticalAlignment = Alignment.CenterVertically) { Box(Modifier.size(9.dp).clip(CircleShape).background(C.green)); Spacer(Modifier.width(5.dp)); T(tr("بثّ مباشر", "Live broadcast"), 11, FontWeight.ExtraBold, C.greenD) } }
+            if (!avail) CenterNote(tr("أنت غير متاح حالياً — فعّل التوفّر ليصلك بثّ الطلبات القريبة", "You're currently unavailable — turn on availability to receive nearby order broadcasts"))
+            else if (Drv.received.isEmpty()) CenterNote(tr("بانتظار وصول أول طلب…", "Waiting for the first order…"))
             else Drv.received.forEach { job -> JobCard(job, onBid = { onBid(job) }, onAccept = { onAcceptDirect(job) }, onReject = { if (job.isStore) onStoreReject(job) else { Drv.hidden.add(job.oid); Drv.received.removeAll { it.oid == job.oid } } }) }
             Spacer(Modifier.height(120.dp))
         }
@@ -142,16 +142,16 @@ private fun RadarBox(avail: Boolean, onExpand: () -> Unit) {
             uiSettings = com.google.maps.android.compose.MapUiSettings(myLocationButtonEnabled = granted, zoomControlsEnabled = false, mapToolbarEnabled = false),
         ) {
             OsmTiles()
-            here?.let { com.google.maps.android.compose.Marker(state = com.google.maps.android.compose.MarkerState(it), title = "موقعي") }
+            here?.let { com.google.maps.android.compose.Marker(state = com.google.maps.android.compose.MarkerState(it), title = tr("موقعي", "My location")) }
             Drv.received.forEach { j ->
                 val la = j.fromLat; val ln = j.fromLng
-                if (la != null && ln != null) com.google.maps.android.compose.Marker(state = com.google.maps.android.compose.MarkerState(com.google.android.gms.maps.model.LatLng(la, ln)), title = j.svc, snippet = "\u00B7 " + j.price + " ريال")
+                if (la != null && ln != null) com.google.maps.android.compose.Marker(state = com.google.maps.android.compose.MarkerState(com.google.android.gms.maps.model.LatLng(la, ln)), title = j.svc, snippet = "\u00B7 " + j.price + tr(" ريال", " SAR"))
             }
         }
         Row(Modifier.align(Alignment.TopStart).padding(14.dp).clip(RoundedCornerShape(15.dp)).background(Color(0xE6FFFFFF)).padding(horizontal = 12.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(9.dp).clip(CircleShape).background(if (avail) C.green else Color(0xFF9AA198))); Spacer(Modifier.width(7.dp)); T(if (avail) "بانتظار الطلبات القريبة…" else "التوفّر متوقّف", 12, FontWeight.ExtraBold, Color(0xFF4B5A51))
+            Box(Modifier.size(9.dp).clip(CircleShape).background(if (avail) C.green else Color(0xFF9AA198))); Spacer(Modifier.width(7.dp)); T(if (avail) tr("بانتظار الطلبات القريبة…", "Waiting for nearby orders…") else tr("التوفّر متوقّف", "Availability off"), 12, FontWeight.ExtraBold, Color(0xFF4B5A51))
         }
-        Box(Modifier.align(Alignment.TopEnd).padding(14.dp).clip(RoundedCornerShape(50.dp)).background(Color(0xF2FFFFFF)).clickable(onClick = onExpand).padding(horizontal = 12.dp, vertical = 8.dp)) { T("🗺️ ملء الشاشة", 11, FontWeight.ExtraBold, C.greenD) }
+        Box(Modifier.align(Alignment.TopEnd).padding(14.dp).clip(RoundedCornerShape(50.dp)).background(Color(0xF2FFFFFF)).clickable(onClick = onExpand).padding(horizontal = 12.dp, vertical = 8.dp)) { T(tr("🗺️ ملء الشاشة", "🗺️ Fullscreen"), 11, FontWeight.ExtraBold, C.greenD) }
     }
 }
 
@@ -161,20 +161,20 @@ private fun JobCard(job: Job, onBid: () -> Unit, onAccept: () -> Unit, onReject:
         Row(verticalAlignment = Alignment.CenterVertically) {
             GradBadge(job.iconId, jobGradients[job.gradient])
             Spacer(Modifier.width(11.dp))
-            Column(Modifier.weight(1f)) { T(job.svc, 13, FontWeight.Bold, C.head, maxLines = 1); T("#${job.id} · ${job.cust} · ${job.km} كم عنك", 10, FontWeight.Normal, C.muted, maxLines = 1) }
-            StatusPill(if (job.bid) "مزايدة" else if (job.companyFixed) "سعر الشركة" else "قبول مباشر", if (job.bid) PillKind.Wait else PillKind.Live)
+            Column(Modifier.weight(1f)) { T(job.svc, 13, FontWeight.Bold, C.head, maxLines = 1); T(tr("#${job.id} · ${job.cust} · ${job.km} كم عنك", "#${job.id} · ${job.cust} · ${job.km} km from you"), 10, FontWeight.Normal, C.muted, maxLines = 1) }
+            StatusPill(if (job.bid) tr("مزايدة", "Bidding") else if (job.companyFixed) tr("سعر الشركة", "Company price") else tr("قبول مباشر", "Direct accept"), if (job.bid) PillKind.Wait else PillKind.Live)
         }
         Spacer(Modifier.height(11.dp)); RouteBox(job.from, job.to); Spacer(Modifier.height(11.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) { T("${if (job.bid) "سعر مقترح" else "الأجرة"}: ﷼${job.price}", 11, FontWeight.Bold, C.head, maxLines = 1); T(job.opts, 10, FontWeight.Normal, C.muted, maxLines = 1) }
+            Column(Modifier.weight(1f)) { T(tr("${if (job.bid) "سعر مقترح" else "الأجرة"}: ﷼${job.price}", "${if (job.bid) "Suggested price" else "Fare"}: ﷼${job.price}"), 11, FontWeight.Bold, C.head, maxLines = 1); T(job.opts, 10, FontWeight.Normal, C.muted, maxLines = 1) }
             if (job.isStore || job.companyFixed) {
-                Box(Modifier.clip(RoundedCornerShape(13.dp)).background(Color(0xFFFAF8F4)).border(1.dp, C.line, RoundedCornerShape(13.dp)).clickable(onClick = onReject).padding(horizontal = 15.dp, vertical = 10.dp), contentAlignment = Alignment.Center) { T("رفض", 12, FontWeight.ExtraBold, C.muted) }
+                Box(Modifier.clip(RoundedCornerShape(13.dp)).background(Color(0xFFFAF8F4)).border(1.dp, C.line, RoundedCornerShape(13.dp)).clickable(onClick = onReject).padding(horizontal = 15.dp, vertical = 10.dp), contentAlignment = Alignment.Center) { T(tr("رفض", "Reject"), 12, FontWeight.ExtraBold, C.muted) }
                 Spacer(Modifier.width(8.dp))
             }
             Row(
                 Modifier.clip(RoundedCornerShape(13.dp)).background(if (job.bid) Grad.green else Grad.terra).clickable(onClick = if (job.bid) onBid else onAccept).padding(horizontal = 15.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
-            ) { Ic(if (job.bid) R.drawable.ic_cash else R.drawable.ic_check, 15.dp, Color.White); Spacer(Modifier.width(6.dp)); T(if (job.bid) "قدّم عرضك" else "قبول", 12, FontWeight.ExtraBold, Color.White) }
+            ) { Ic(if (job.bid) R.drawable.ic_cash else R.drawable.ic_check, 15.dp, Color.White); Spacer(Modifier.width(6.dp)); T(if (job.bid) tr("قدّم عرضك", "Submit your offer") else tr("قبول", "Accept"), 12, FontWeight.ExtraBold, Color.White) }
         }
     }
 }
@@ -185,16 +185,16 @@ private fun HeadsUpCard(job: Job, onGo: () -> Unit, onIgnore: () -> Unit) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             GradBadge(job.iconId, jobGradients[job.gradient], 40.dp, 14.dp)
             Spacer(Modifier.width(10.dp))
-            Column(Modifier.weight(1f)) { T("طلب جديد من ${job.cust}", 13, FontWeight.Bold, C.head, maxLines = 1); T("${job.svc} · ${job.km} كم عنك", 10, FontWeight.Normal, C.muted, maxLines = 1) }
-            Column(Modifier.clip(RoundedCornerShape(13.dp)).background(C.pillLive).padding(horizontal = 11.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) { T("﷼${job.price}", 14, FontWeight.Black, C.greenD); T("السعر المقترح", 8, FontWeight.Normal, C.muted) }
+            Column(Modifier.weight(1f)) { T(tr("طلب جديد من ${job.cust}", "New order from ${job.cust}"), 13, FontWeight.Bold, C.head, maxLines = 1); T(tr("${job.svc} · ${job.km} كم عنك", "${job.svc} · ${job.km} km from you"), 10, FontWeight.Normal, C.muted, maxLines = 1) }
+            Column(Modifier.clip(RoundedCornerShape(13.dp)).background(C.pillLive).padding(horizontal = 11.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) { T("﷼${job.price}", 14, FontWeight.Black, C.greenD); T(tr("السعر المقترح", "Suggested price"), 8, FontWeight.Normal, C.muted) }
         }
         Spacer(Modifier.height(9.dp)); RouteBox(job.from, job.to)
         Spacer(Modifier.height(10.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(Modifier.weight(1f).clip(RoundedCornerShape(13.dp)).background(Grad.green).clickable(onClick = onGo).padding(vertical = 10.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                Ic(if (job.bid) R.drawable.ic_cash else R.drawable.ic_check, 14.dp, Color.White); Spacer(Modifier.width(6.dp)); T(if (job.bid) "اكتب سعرك" else "قبول المشوار", 12, FontWeight.ExtraBold, Color.White)
+                Ic(if (job.bid) R.drawable.ic_cash else R.drawable.ic_check, 14.dp, Color.White); Spacer(Modifier.width(6.dp)); T(if (job.bid) tr("اكتب سعرك", "Enter your price") else tr("قبول المشوار", "Accept the trip"), 12, FontWeight.ExtraBold, Color.White)
             }
-            Box(Modifier.width(84.dp).clip(RoundedCornerShape(13.dp)).background(Color(0xFFFAF8F4)).border(1.dp, C.line, RoundedCornerShape(13.dp)).clickable(onClick = onIgnore).padding(vertical = 10.dp), contentAlignment = Alignment.Center) { T("تجاهل", 12, FontWeight.ExtraBold, C.muted) }
+            Box(Modifier.width(84.dp).clip(RoundedCornerShape(13.dp)).background(Color(0xFFFAF8F4)).border(1.dp, C.line, RoundedCornerShape(13.dp)).clickable(onClick = onIgnore).padding(vertical = 10.dp), contentAlignment = Alignment.Center) { T(tr("تجاهل", "Dismiss"), 12, FontWeight.ExtraBold, C.muted) }
         }
     }
 }

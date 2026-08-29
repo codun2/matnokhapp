@@ -45,33 +45,33 @@ fun statusToStep(s: String?): Int = when (s) {
 }
 
 val DSTEPS = listOf(
-    "تم الإسناد" to R.drawable.ic_check,
-    "تم التحميل" to R.drawable.ic_box,
-    "في الطريق" to R.drawable.ic_van,
-    "التسليم" to R.drawable.ic_flag,
+    tr("تم الإسناد", "Assigned") to R.drawable.ic_check,
+    tr("تم التحميل", "Loaded") to R.drawable.ic_box,
+    tr("في الطريق", "On the way") to R.drawable.ic_van,
+    tr("التسليم", "Delivery") to R.drawable.ic_flag,
 )
 
 private fun JobDto.toJob() = Job(
-    oid = id, id = order_no ?: "WS-$id", cust = customer ?: "زبون",
-    av = (customer ?: "زب").take(2), svc = service_name,
+    oid = id, id = order_no ?: "WS-$id", cust = customer ?: tr("زبون", "Customer"),
+    av = (customer ?: tr("زب", "Cu")).take(2), svc = service_name,
     iconId = svcIcon(service_key), gradient = svcGrad(service_key),
     from = from ?: "-", to = to ?: "-",
-    km = km?.let { String.format("%.1f", it) } ?: "؟",
+    km = km?.let { String.format("%.1f", it) } ?: tr("؟", "?"),
     weight = weight ?: "-", opts = options?.ifBlank { "—" } ?: "—", note = note,
     price = ((offer_price ?: final_fare ?: price)).toInt(), bid = if (company_fixed == true) false else (mode != "direct"), companyFixed = (company_fixed == true),
     status = status ?: "broadcasting",
     fromLat = from_lat, fromLng = from_lng, toLat = to_lat, toLng = to_lng,
 )
 private fun StoreOrderDto.toJob() = Job(
-    oid = id, id = order_no ?: "WS-$id", cust = store ?: "متجر", av = (store ?: "مت").take(2),
-    svc = "توصيل: " + (store ?: "متجر"), iconId = R.drawable.ic_box, gradient = 2,
-    from = from ?: "-", to = to ?: "-", km = km?.let { String.format("%.1f", it) } ?: "؟",
+    oid = id, id = order_no ?: "WS-$id", cust = store ?: tr("متجر", "Store"), av = (store ?: tr("مت", "Ma")).take(2),
+    svc = tr("توصيل: ", "Delivery: ") + (store ?: tr("متجر", "Store")), iconId = R.drawable.ic_box, gradient = 2,
+    from = from ?: "-", to = to ?: "-", km = km?.let { String.format("%.1f", it) } ?: tr("؟", "?"),
     weight = "-", opts = "—", price = (offer_price ?: fee).toInt(), bid = false, companyFixed = (company_fixed == true), status = status ?: "ready",
     fromLat = from_lat, fromLng = from_lng, toLat = to_lat, toLng = to_lng, isStore = true,
 )
 
 private fun JobDto.toDone() = DoneOrder(
-    id = order_no ?: "WS-$id", cust = customer ?: "زبون", svc = service_name,
+    id = order_no ?: "WS-$id", cust = customer ?: tr("زبون", "Customer"), svc = service_name,
     iconId = svcIcon(service_key), gradient = svcGrad(service_key),
     from = from ?: "-", to = to ?: "-", fare = ((final_fare ?: price)).toInt(),
     dt = dt ?: "", rating = "—",
@@ -94,8 +94,8 @@ object Drv {
     var earningsToday = mutableStateOf(0)
     var rating = mutableStateOf("5.0")
     var balance = mutableStateOf(0)
-    var name = mutableStateOf("كابتن")
-    var avatar = mutableStateOf("كب")
+    var name = mutableStateOf(tr("كابتن", "Captain"))
+    var avatar = mutableStateOf(tr("كب", "Ca"))
     var avatarUrl = mutableStateOf<String?>(null)
     var plate = mutableStateOf<String?>(null)
     var vehiclePhoto = mutableStateOf<String?>(null)
@@ -105,7 +105,7 @@ object Drv {
     var licensePhoto = mutableStateOf<String?>(null)
     var idPhoto = mutableStateOf<String?>(null)
     var passportPhoto = mutableStateOf<String?>(null)
-    var vehicle = mutableStateOf("مركبتي")
+    var vehicle = mutableStateOf(tr("مركبتي", "My vehicle"))
     var city = mutableStateOf("—")
     var companyId = mutableStateOf<Int?>(null)
     var companyName = mutableStateOf("")
@@ -126,7 +126,7 @@ suspend fun repoMe(toast: (String) -> Unit) {
         Drv.available.value = d.is_available; Drv.rating.value = String.format("%.1f", d.rating)
         Drv.balance.value = d.balance.toInt(); Drv.driverLat.value = d.lat; Drv.driverLng.value = d.lng
         Drv.vehicle.value = when (d.vehicle_type) {
-            "small" -> "مركبة صغيرة"; "medium" -> "مركبة متوسطة"; "large" -> "مركبة كبيرة"; else -> "مركبتي"
+            "small" -> tr("مركبة صغيرة", "Small vehicle"); "medium" -> tr("مركبة متوسطة", "Medium vehicle"); "large" -> tr("مركبة كبيرة", "Large vehicle"); else -> tr("مركبتي", "My vehicle")
         }
         Drv.plate.value = d.vehicle_plate; Drv.vehiclePhoto.value = d.vehicle_photo
         Drv.nationalId.value = d.national_id; Drv.license.value = d.license_number
@@ -178,7 +178,7 @@ suspend fun repoPast(toast: (String) -> Unit) {
     }
 }
 private fun JobDto.toDoneUi() = this.let {
-    DoneOrder(order_no ?: "WS-$id", customer ?: "زبون", service_name, svcIcon(service_key), svcGrad(service_key), from ?: "-", to ?: "-", ((final_fare ?: price)).toInt(), dt ?: "", driver_rating?.let { String.format("%.1f", it) })
+    DoneOrder(order_no ?: "WS-$id", customer ?: tr("زبون", "Customer"), service_name, svcIcon(service_key), svcGrad(service_key), from ?: "-", to ?: "-", ((final_fare ?: price)).toInt(), dt ?: "", driver_rating?.let { String.format("%.1f", it) })
 }
 suspend fun repoDash(toast: (String) -> Unit) {
     call({ Net.api.dashboard() }, toast)?.let { d ->
@@ -190,17 +190,17 @@ suspend fun repoSetAvailable(v: Boolean, toast: (String) -> Unit) {
     call({ Net.api.availability(AvailBody(v)) }, toast)?.let { Drv.available.value = it.is_available; toast(it.message ?: "") }
 }
 suspend fun repoBid(oid: Int, amount: Int, toast: (String) -> Unit): Boolean =
-    call({ Net.api.bid(oid, BidBody(amount.toDouble())) }, toast)?.let { toast(it.message ?: "أُرسل عرضك"); true } ?: false
+    call({ Net.api.bid(oid, BidBody(amount.toDouble())) }, toast)?.let { toast(it.message ?: tr("أُرسل عرضك", "Your offer was sent")); true } ?: false
 suspend fun repoAccept(oid: Int, toast: (String) -> Unit): Boolean =
     call({ Net.api.accept(oid) }, toast)?.let { true } ?: false
 suspend fun repoStatus(oid: Int, status: String, toast: (String) -> Unit): Boolean =
     call({ Net.api.updateStatus(oid, StatusBody(status)) }, toast)?.let { true } ?: false
 suspend fun repoStoreBid(oid: Int, amount: Int, toast: (String) -> Unit): Boolean =
-    call({ Net.api.storeBid(oid, BidBody(amount.toDouble())) }, toast)?.let { toast(it.message ?: "أُرسل عرضك"); true } ?: false
+    call({ Net.api.storeBid(oid, BidBody(amount.toDouble())) }, toast)?.let { toast(it.message ?: tr("أُرسل عرضك", "Your offer was sent")); true } ?: false
 suspend fun repoStoreStatus(oid: Int, status: String, toast: (String) -> Unit): Boolean =
     call({ Net.api.storeStatus(oid, StatusBody(status)) }, toast)?.let { true } ?: false
 suspend fun repoStoreAccept(oid: Int, toast: (String) -> Unit): Boolean =
-    call({ Net.api.storeAccept(oid) }, toast)?.let { toast(it.message ?: "تم إسناد الطلب إليك"); true } ?: false
+    call({ Net.api.storeAccept(oid) }, toast)?.let { toast(it.message ?: tr("تم إسناد الطلب إليك", "The order was assigned to you")); true } ?: false
 suspend fun repoStoreReject(oid: Int, toast: (String) -> Unit): Boolean =
     call({ Net.api.storeReject(oid) }, toast)?.let { true } ?: false
 

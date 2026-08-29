@@ -35,19 +35,19 @@ fun LoginScreen(onLoggedIn: () -> Unit, onRegister: () -> Unit, toast: (String) 
         Spacer(Modifier.height(70.dp))
         Box(Modifier.size(96.dp).clip(RoundedCornerShape(28.dp)).background(Grad.green), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_van, 48.dp, Color.White) }
         Spacer(Modifier.height(18.dp))
-        T("مطنوخ كابتن", 28, FontWeight.Black, C.head)
-        Spacer(Modifier.height(4.dp)); T("سجّل الدخول لاستقبال الطلبات", 13, FontWeight.Medium, C.muted)
+        T(tr("مطنوخ كابتن", "Matnokh Captain"), 28, FontWeight.Black, C.head)
+        Spacer(Modifier.height(4.dp)); T(tr("سجّل الدخول لاستقبال الطلبات", "Log in to receive orders"), 13, FontWeight.Medium, C.muted)
         Spacer(Modifier.height(30.dp))
         OCard(Modifier.fillMaxWidth()) {
-            FieldLabel("رقم الجوال")
+            FieldLabel(tr("رقم الجوال", "Phone number"))
             FinField(phone, { phone = it }, "05xxxxxxxx", keyboard = KeyboardType.Phone)
             Spacer(Modifier.height(12.dp))
-            FieldLabel("كلمة المرور")
+            FieldLabel(tr("كلمة المرور", "Password"))
             FinField(password, { password = it }, "••••••••", keyboard = KeyboardType.Password)
             Spacer(Modifier.height(18.dp))
-            WideButton(if (loading) "جارٍ الدخول…" else "دخول", R.drawable.ic_nav) {
+            WideButton(if (loading) tr("جارٍ الدخول…", "Logging in…") else tr("دخول", "Log in"), R.drawable.ic_nav) {
                 if (loading) return@WideButton
-                if (phone.isBlank() || password.isBlank()) { toast("أدخل رقم الجوال وكلمة المرور"); return@WideButton }
+                if (phone.isBlank() || password.isBlank()) { toast(tr("أدخل رقم الجوال وكلمة المرور", "Enter your phone and password")); return@WideButton }
                 loading = true
                 scope.launch {
                     val resp = call({ Net.api.login(LoginBody("phone_password", phone = phone.trim(), password = password)) }, toast)
@@ -58,7 +58,7 @@ fun LoginScreen(onLoggedIn: () -> Unit, onRegister: () -> Unit, toast: (String) 
             }
         }
         Spacer(Modifier.height(14.dp))
-        T("سائق جديد؟ سجّل الآن", 13, FontWeight.Bold, C.greenD, Modifier.clickable(onClick = onRegister))
+        T(tr("سائق جديد؟ سجّل الآن", "New driver? Register now"), 13, FontWeight.Bold, C.greenD, Modifier.clickable(onClick = onRegister))
         Spacer(Modifier.height(30.dp))
     }
 }

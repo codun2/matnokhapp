@@ -62,10 +62,10 @@ fun haversineKm(a: LatLng, b: LatLng): Double {
 }
 
 fun etaText(km: Double): String {
-    if (km < 0.12) return "وصل تقريباً"
+    if (km < 0.12) return tr("وصل تقريباً", "Almost there")
     val mins = max(1, (km / 25.0 * 60.0).roundToInt())
-    val dist = if (km < 1.0) "${(km * 1000).toInt()} م" else String.format("%.1f كم", km)
-    return "يصل خلال $mins دقيقة · $dist"
+    val dist = if (km < 1.0) tr("${(km * 1000).toInt()} م", "${(km * 1000).toInt()} m") else String.format(tr("%.1f كم", "%.1f km"), km)
+    return tr("يصل خلال $mins دقيقة · $dist", "Arrives in $mins min · $dist")
 }
 
 /** علامة سيارة تنزلق بنعومة، ومقدّمتها تتّجه نحو الوجهة (toward) إن وُجدت وإلا اتجاه الحركة. */

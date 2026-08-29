@@ -20,13 +20,13 @@ fun MyOffersScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Un
     var jobs by remember { mutableStateOf<List<Job>?>(null) }
     LaunchedEffect(Unit) { jobs = repoMyOffers(toast) }
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("عروضي المقدَّمة", onBack, onMenu)
+        ScreenHeader(tr("عروضي المقدَّمة", "My submitted offers"), onBack, onMenu)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             Spacer(Modifier.height(6.dp))
             val list = jobs
             when {
                 list == null -> Box(Modifier.fillMaxWidth().padding(top = 60.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = C.green) }
-                list.isEmpty() -> Box(Modifier.fillMaxWidth().padding(top = 70.dp), contentAlignment = Alignment.Center) { T("لا توجد عروض مقدَّمة بانتظار اختيار الزبون", 13, FontWeight.Medium, C.muted) }
+                list.isEmpty() -> Box(Modifier.fillMaxWidth().padding(top = 70.dp), contentAlignment = Alignment.Center) { T(tr("لا توجد عروض مقدَّمة بانتظار اختيار الزبون", "No submitted offers awaiting the customer's choice"), 13, FontWeight.Medium, C.muted) }
                 else -> list.forEach { j -> OfferCard(j) }
             }
             Spacer(Modifier.height(90.dp))
@@ -40,13 +40,13 @@ private fun OfferCard(job: Job) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             GradBadge(job.iconId, jobGradients[job.gradient])
             Spacer(Modifier.width(11.dp))
-            Column(Modifier.weight(1f)) { T(job.svc, 13, FontWeight.Bold, C.head, maxLines = 1); T("#${job.id} · ${job.cust} · ${job.km} كم", 10, FontWeight.Normal, C.muted, maxLines = 1) }
-            StatusPill("بانتظار اختيار الزبون", PillKind.Wait)
+            Column(Modifier.weight(1f)) { T(job.svc, 13, FontWeight.Bold, C.head, maxLines = 1); T(tr("#${job.id} · ${job.cust} · ${job.km} كم", "#${job.id} · ${job.cust} · ${job.km} km"), 10, FontWeight.Normal, C.muted, maxLines = 1) }
+            StatusPill(tr("بانتظار اختيار الزبون", "Awaiting customer's choice"), PillKind.Wait)
         }
         Spacer(Modifier.height(11.dp)); RouteBox(job.from, job.to); Spacer(Modifier.height(11.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Ic(R.drawable.ic_cash, 15.dp, C.greenD); Spacer(Modifier.width(6.dp))
-            T("عرضك المقدَّم: ﷼${job.price}", 12, FontWeight.ExtraBold, C.greenD)
+            T(tr("عرضك المقدَّم: ﷼${job.price}", "Your submitted offer: ﷼${job.price}"), 12, FontWeight.ExtraBold, C.greenD)
         }
     }
 }

@@ -21,37 +21,37 @@ import com.matnokh.driver.R
 fun BidScreen(job: Job, onBack: () -> Unit, onMenu: () -> Unit, onSend: (Int) -> Unit) {
     var bid by remember(job.id) { mutableStateOf(job.price) }
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("تقديم عرض سعر", onBack, onMenu)
+        ScreenHeader(tr("تقديم عرض سعر", "Submit a price offer"), onBack, onMenu)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
                 OcTitle(job.iconId, "${job.svc} — #${job.id}")
-                RouteBox(job.from, "${job.to} (${job.km} كم)")
+                RouteBox(job.from, tr("${job.to} (${job.km} كم)", "${job.to} (${job.km} km)"))
                 job.note?.takeIf { it.isNotBlank() }?.let {
                     Spacer(Modifier.height(10.dp))
                     Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Color(0xFFEEF4EF)).border(1.dp, C.line, RoundedCornerShape(14.dp)).padding(12.dp)) {
                         Ic(R.drawable.ic_msg, 16.dp, C.green); Spacer(Modifier.width(9.dp))
-                        Column { T("طلب الزبون / ملاحظات", 10, FontWeight.ExtraBold, C.green); Spacer(Modifier.height(3.dp)); T(it, 12, FontWeight.Medium, C.head, lineHeight = 19) }
+                        Column { T(tr("طلب الزبون / ملاحظات", "Customer request / notes"), 10, FontWeight.ExtraBold, C.green); Spacer(Modifier.height(3.dp)); T(it, 12, FontWeight.Medium, C.head, lineHeight = 19) }
                     }
                 }
                 Spacer(Modifier.height(12.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    CargoCell("الزبون", R.drawable.ic_user, job.cust, Modifier.weight(1f))
-                    CargoCell("الدفع", R.drawable.ic_card, "بطاقة", Modifier.weight(1f))
+                    CargoCell(tr("الزبون", "Customer"), R.drawable.ic_user, job.cust, Modifier.weight(1f))
+                    CargoCell(tr("الدفع", "Payment"), R.drawable.ic_card, tr("بطاقة", "Card"), Modifier.weight(1f))
                 }
             }
             Spacer(Modifier.height(12.dp))
             OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                OcTitle(R.drawable.ic_cash, "عرضك للأجرة الكاملة (﷼)")
+                OcTitle(R.drawable.ic_cash, tr("عرضك للأجرة الكاملة (﷼)", "Your full-fare offer (﷼)"))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
                     BStep("−") { bid = maxOf(20, bid - 5) }
                     Box(Modifier.weight(1f).height(56.dp).clip(RoundedCornerShape(17.dp)).background(Color.White).border(1.5.dp, Color(0xFFCFE0D4), RoundedCornerShape(17.dp)), contentAlignment = Alignment.Center) { T("﷼$bid", 24, FontWeight.Black, C.greenD) }
                     BStep("+") { bid += 5 }
                 }
                 Spacer(Modifier.height(10.dp))
-                T("السعر المقترح من المنصّة: ﷼${job.price} (سعر الكيلو × المسافة + الإضافات). عرضك يصل الزبون فوراً — وقد يزايد سائقون آخرون.", 10, FontWeight.Medium, C.muted, lineHeight = 17)
+                T(tr("السعر المقترح من المنصّة: ﷼${job.price} (سعر الكيلو × المسافة + الإضافات). عرضك يصل الزبون فوراً — وقد يزايد سائقون آخرون.", "Platform-suggested price: ﷼${job.price} (per-km price × distance + extras). Your offer reaches the customer instantly — other drivers may bid too."), 10, FontWeight.Medium, C.muted, lineHeight = 17)
             }
             Spacer(Modifier.height(16.dp))
-            WideButton("إرسال العرض للزبون", R.drawable.ic_check, modifier = Modifier.padding(horizontal = 22.dp)) { onSend(bid) }
+            WideButton(tr("إرسال العرض للزبون", "Send offer to customer"), R.drawable.ic_check, modifier = Modifier.padding(horizontal = 22.dp)) { onSend(bid) }
             Spacer(Modifier.height(24.dp))
         }
     }

@@ -19,31 +19,31 @@ import com.matnokh.driver.R
 @Composable
 fun MyOrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, onOpenActive: () -> Unit, toast: (String) -> Unit) {
     var tab by remember { mutableStateOf("now") }
-    val stepNames = listOf("—", "تم الإسناد", "تم التحميل", "في الطريق", "بانتظار التأكيد")
+    val stepNames = listOf("—", tr("تم الإسناد", "Assigned"), tr("تم التحميل", "Loaded"), tr("في الطريق", "On the way"), tr("بانتظار التأكيد", "Awaiting confirmation"))
     LaunchedEffect(Unit) { repoNow(toast); repoPast(toast) }
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        ScreenHeader("طلباتي", onBack, onMenu)
+        ScreenHeader(tr("طلباتي", "My orders"), onBack, onMenu)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             Row(Modifier.padding(horizontal = 22.dp).padding(top = 14.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Kpi("${338 + Drv.pastDone.size}", "رحلة مكتملة", C.greenD, Modifier.weight(1f))
-                Kpi("${Drv.nowOrders.size}", "قيد التنفيذ", C.blueText, Modifier.weight(1f))
-                Kpi("﷼${Drv.pastDone.sumOf { it.fare }}", "أرباح الطلبات", C.terraText, Modifier.weight(1f))
+                Kpi("${338 + Drv.pastDone.size}", tr("رحلة مكتملة", "Completed trip"), C.greenD, Modifier.weight(1f))
+                Kpi("${Drv.nowOrders.size}", tr("قيد التنفيذ", "In progress"), C.blueText, Modifier.weight(1f))
+                Kpi("﷼${Drv.pastDone.sumOf { it.fare }}", tr("أرباح الطلبات", "Order earnings"), C.terraText, Modifier.weight(1f))
             }
             // تبويبات
             Row(Modifier.padding(horizontal = 22.dp).padding(top = 14.dp).fillMaxWidth().clip(RoundedCornerShape(50.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(50.dp)).padding(5.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                SegBtn("الحالية", tab == "now", Modifier.weight(1f)) { tab = "now" }
-                SegBtn("السابقة", tab == "past", Modifier.weight(1f)) { tab = "past" }
+                SegBtn(tr("الحالية", "Current"), tab == "now", Modifier.weight(1f)) { tab = "now" }
+                SegBtn(tr("السابقة", "Past"), tab == "past", Modifier.weight(1f)) { tab = "past" }
             }
             Spacer(Modifier.height(14.dp))
             if (tab == "now") {
-                if (Drv.nowOrders.isEmpty()) NoteRow("لا يوجد طلب قيد التنفيذ الآن")
+                if (Drv.nowOrders.isEmpty()) NoteRow(tr("لا يوجد طلب قيد التنفيذ الآن", "No order in progress now"))
                 else Drv.nowOrders.forEach { j ->
-                    OrderRow(j.iconId, j.gradient, j.svc, "#${j.id} · ${j.cust}", j.from, j.to, Drv.fare.value, stepNames.getOrElse(Drv.activeStep.value) { "قيد التنفيذ" }, PillKind.Live, rating = null, onClick = onOpenActive)
+                    OrderRow(j.iconId, j.gradient, j.svc, "#${j.id} · ${j.cust}", j.from, j.to, Drv.fare.value, stepNames.getOrElse(Drv.activeStep.value) { tr("قيد التنفيذ", "In progress") }, PillKind.Live, rating = null, onClick = onOpenActive)
                 }
             } else {
-                if (Drv.pastDone.isEmpty()) NoteRow("لا توجد طلبات سابقة")
+                if (Drv.pastDone.isEmpty()) NoteRow(tr("لا توجد طلبات سابقة", "No past orders"))
                 else Drv.pastDone.forEach { o ->
-                    OrderRow(o.iconId, o.gradient, o.svc, "#${o.id} · ${o.cust} · ${o.dt}", o.from, o.to, o.fare, "مكتمل", PillKind.Ok, rating = o.rating, onClick = null)
+                    OrderRow(o.iconId, o.gradient, o.svc, "#${o.id} · ${o.cust} · ${o.dt}", o.from, o.to, o.fare, tr("مكتمل", "Completed"), PillKind.Ok, rating = o.rating, onClick = null)
                 }
             }
             Spacer(Modifier.height(110.dp))
@@ -72,7 +72,7 @@ private fun OrderRow(iconId: Int, gradient: Int, title: String, sub: String, fro
         }
         Spacer(Modifier.height(11.dp)); RouteBox(from, to); Spacer(Modifier.height(10.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) { if (rating != null) T("تقييم الزبون: ★ $rating", 11, FontWeight.Bold, C.terraText) else T("أجرتك", 11, FontWeight.Bold, C.muted) }
+            Column(Modifier.weight(1f)) { if (rating != null) T(tr("تقييم الزبون: ★ $rating", "Customer rating: ★ $rating"), 11, FontWeight.Bold, C.terraText) else T(tr("أجرتك", "Your fare"), 11, FontWeight.Bold, C.muted) }
             T("﷼$fare", 15, FontWeight.Black, C.greenD)
         }
     }

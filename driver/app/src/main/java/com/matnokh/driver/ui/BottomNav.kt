@@ -20,11 +20,11 @@ fun BottomNav(current: String, onSelect: (String) -> Unit) {
         Modifier.fillMaxWidth().background(C.card.copy(alpha = .96f)).border(1.dp, C.line, RoundedCornerShape(0.dp)).navigationBarsPadding().padding(start = 8.dp, end = 8.dp, top = 10.dp, bottom = 10.dp),
         verticalAlignment = Alignment.Top,
     ) {
-        Tab("home", R.drawable.ic_nav, "الاستقبال", current, onSelect, Modifier.weight(1f))
-        Tab("myorders", R.drawable.ic_list, "طلباتي", current, onSelect, Modifier.weight(1f))
-        Tab("active", R.drawable.ic_van, "النشط", current, onSelect, Modifier.weight(1f))
-        Tab("earn", R.drawable.ic_card, "الأرباح", current, onSelect, Modifier.weight(1f))
-        Tab("profile", R.drawable.ic_user, "حسابي", current, onSelect, Modifier.weight(1f))
+        Tab("home", R.drawable.ic_nav, tr("الاستقبال", "Receiving"), current, onSelect, Modifier.weight(1f))
+        Tab("myorders", R.drawable.ic_list, tr("طلباتي", "My orders"), current, onSelect, Modifier.weight(1f))
+        Tab("active", R.drawable.ic_van, tr("النشط", "Active"), current, onSelect, Modifier.weight(1f))
+        Tab("earn", R.drawable.ic_card, tr("الأرباح", "Earnings"), current, onSelect, Modifier.weight(1f))
+        Tab("profile", R.drawable.ic_user, tr("حسابي", "My account"), current, onSelect, Modifier.weight(1f))
     }
 }
 

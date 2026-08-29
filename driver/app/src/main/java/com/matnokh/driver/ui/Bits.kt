@@ -61,8 +61,8 @@ fun RouteBox(from: String, to: String) {
             .border(1.dp, C.line, RoundedCornerShape(15.dp)).padding(horizontal = 12.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(7.dp),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_pin, 14.dp, C.green); Spacer(Modifier.width(8.dp)); T("استلام", 9, FontWeight.Bold, C.green); Spacer(Modifier.width(6.dp)); T(from, 11, FontWeight.Bold, C.head, maxLines = 1) }
-        Row(verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_flag, 14.dp, C.terra); Spacer(Modifier.width(8.dp)); T("تسليم", 9, FontWeight.Bold, C.terra); Spacer(Modifier.width(6.dp)); T(to, 11, FontWeight.Bold, C.head, maxLines = 1) }
+        Row(verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_pin, 14.dp, C.green); Spacer(Modifier.width(8.dp)); T(tr("استلام", "Pickup"), 9, FontWeight.Bold, C.green); Spacer(Modifier.width(6.dp)); T(from, 11, FontWeight.Bold, C.head, maxLines = 1) }
+        Row(verticalAlignment = Alignment.CenterVertically) { Ic(R.drawable.ic_flag, 14.dp, C.terra); Spacer(Modifier.width(8.dp)); T(tr("تسليم", "Deliver"), 9, FontWeight.Bold, C.terra); Spacer(Modifier.width(6.dp)); T(to, 11, FontWeight.Bold, C.head, maxLines = 1) }
     }
 }
 

@@ -56,11 +56,11 @@ private fun MapShell(title: String, center: LatLng, onBack: () -> Unit, myLocati
 @Composable
 fun OrdersMapFull(onBack: () -> Unit) {
     val center = LatLng(Drv.driverLat.value ?: 24.7136, Drv.driverLng.value ?: 46.6753)
-    MapShell("الطلبات القريبة منك", center, onBack, myLocation = true) {
-        Marker(state = MarkerState(center), title = "موقعي")
+    MapShell(tr("الطلبات القريبة منك", "Orders near you"), center, onBack, myLocation = true) {
+        Marker(state = MarkerState(center), title = tr("موقعي", "My location"))
         Drv.received.forEach { j ->
             val la = j.fromLat; val ln = j.fromLng
-            if (la != null && ln != null) Marker(state = MarkerState(LatLng(la, ln)), title = j.svc, snippet = j.price.toString() + " ريال")
+            if (la != null && ln != null) Marker(state = MarkerState(LatLng(la, ln)), title = j.svc, snippet = j.price.toString() + tr(" ريال", " SAR"))
         }
     }
 }
@@ -71,8 +71,8 @@ fun RouteMapFull(job: Job?, onBack: () -> Unit) {
     val fLat = job?.fromLat; val fLng = job?.fromLng
     val from = if (fLat != null && fLng != null) LatLng(fLat, fLng) else LatLng(Drv.driverLat.value ?: 24.7136, Drv.driverLng.value ?: 46.6753)
     val tLat = job?.toLat; val tLng = job?.toLng
-    MapShell("مسار الطلب النشط", from, onBack) {
-        Marker(state = MarkerState(from), title = "الاستلام")
-        if (tLat != null && tLng != null) Marker(state = MarkerState(LatLng(tLat, tLng)), title = "التسليم")
+    MapShell(tr("مسار الطلب النشط", "Active order route"), from, onBack) {
+        Marker(state = MarkerState(from), title = tr("الاستلام", "Pickup"))
+        if (tLat != null && tLng != null) Marker(state = MarkerState(LatLng(tLat, tLng)), title = tr("التسليم", "Delivery"))
     }
 }
