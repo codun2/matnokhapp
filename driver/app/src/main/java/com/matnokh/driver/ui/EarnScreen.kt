@@ -62,7 +62,7 @@ fun EarnScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit) 
                 val ops = d.operations
                 if (data == null) Box(Modifier.fillMaxWidth().padding(20.dp), contentAlignment = Alignment.Center) { T(tr("جارٍ التحميل…", "Loading…"), 11, FontWeight.Medium, C.muted) }
                 else if (ops.isEmpty()) Box(Modifier.fillMaxWidth().padding(20.dp), contentAlignment = Alignment.Center) { T(tr("لا توجد عمليات بعد", "No transactions yet"), 12, FontWeight.Medium, C.muted) }
-                else ops.forEach { op -> Tx(svcIcon(op.key), C.pillLive, C.greenD, op.title, op.dt, "+ ﷼${op.amount.toInt()}", C.greenD) }
+                else ops.forEach { op -> Tx(svcIcon(op.key), C.pillLive, C.greenD, trData(op.title), op.dt, "+ ﷼${op.amount.toInt()}", C.greenD) }
             }
             Spacer(Modifier.height(110.dp))
         }

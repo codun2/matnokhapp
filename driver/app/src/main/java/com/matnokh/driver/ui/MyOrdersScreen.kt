@@ -38,12 +38,12 @@ fun MyOrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, onOpenActive: () -> U
             if (tab == "now") {
                 if (Drv.nowOrders.isEmpty()) NoteRow(tr("لا يوجد طلب قيد التنفيذ الآن", "No order in progress now"))
                 else Drv.nowOrders.forEach { j ->
-                    OrderRow(j.iconId, j.gradient, j.svc, "#${j.id} · ${j.cust}", j.from, j.to, Drv.fare.value, stepNames.getOrElse(Drv.activeStep.value) { tr("قيد التنفيذ", "In progress") }, PillKind.Live, rating = null, onClick = onOpenActive)
+                    OrderRow(j.iconId, j.gradient, trData(j.svc), "#${j.id} · ${j.cust}", trData(j.from), trData(j.to), Drv.fare.value, stepNames.getOrElse(Drv.activeStep.value) { tr("قيد التنفيذ", "In progress") }, PillKind.Live, rating = null, onClick = onOpenActive)
                 }
             } else {
                 if (Drv.pastDone.isEmpty()) NoteRow(tr("لا توجد طلبات سابقة", "No past orders"))
                 else Drv.pastDone.forEach { o ->
-                    OrderRow(o.iconId, o.gradient, o.svc, "#${o.id} · ${o.cust} · ${o.dt}", o.from, o.to, o.fare, tr("مكتمل", "Completed"), PillKind.Ok, rating = o.rating, onClick = null)
+                    OrderRow(o.iconId, o.gradient, trData(o.svc), "#${o.id} · ${o.cust} · ${o.dt}", trData(o.from), trData(o.to), o.fare, tr("مكتمل", "Completed"), PillKind.Ok, rating = o.rating, onClick = null)
                 }
             }
             Spacer(Modifier.height(110.dp))

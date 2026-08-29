@@ -43,8 +43,8 @@ fun svcLabel(k: String): String = when (k) {
 @Composable
 fun DriverInfoScreen(kind: String, onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit) {
     val ctx = LocalContext.current
-    var svcNames by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
-    LaunchedEffect(kind) { if (kind == "myservices") runCatching { svcNames = Net.api.driverServices().services.associate { it.key to it.name } } }
+    var svcNames by remember { mutableStateOf<Map<String, com.matnokh.driver.net.SvcLite>>(emptyMap()) }
+    LaunchedEffect(kind) { if (kind == "myservices") runCatching { svcNames = Net.api.driverServices().services.associate { it.key to it } } }
     val title = when (kind) {
         "vehicle" -> tr("مركبتي", "My vehicle"); "documents" -> tr("مستنداتي", "My documents"); "myservices" -> tr("خدماتي المفعّلة", "My enabled services"); else -> tr("الدعم الفني", "Technical support")
     }
@@ -93,7 +93,7 @@ fun DriverInfoScreen(kind: String, onBack: () -> Unit, onMenu: () -> Unit, toast
                         Drv.services.forEach { k ->
                             Row(Modifier.fillMaxWidth().padding(vertical = 4.dp).clip(RoundedCornerShape(15.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(15.dp)).padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Box(Modifier.size(38.dp).clip(RoundedCornerShape(12.dp)).background(Grad.green), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_zap, 17.dp, Color.White) }
-                                Spacer(Modifier.width(12.dp)); T(svcNames[k] ?: svcLabel(k), 13, FontWeight.Bold, C.head)
+                                Spacer(Modifier.width(12.dp)); T(svcNames[k]?.let { trd(it.name, it.name_en) } ?: svcLabel(k), 13, FontWeight.Bold, C.head)
                             }
                         }
                     }

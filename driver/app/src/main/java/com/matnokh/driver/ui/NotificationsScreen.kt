@@ -33,7 +33,7 @@ fun NotificationsScreen(onBack: () -> Unit, onMenu: () -> Unit, onOpen: (String?
                 list.isEmpty() -> Box(Modifier.fillMaxWidth().padding(top = 70.dp), contentAlignment = Alignment.Center) { T(tr("لا توجد إشعارات بعد", "No notifications yet"), 13, FontWeight.Medium, C.muted) }
                 else -> list.forEach { n ->
                     val (icon, grad) = notifStyle(n.type)
-                    NotifRow(icon, grad, n.title, n.body, n.dt ?: "", onClick = { onOpen(n.type) })
+                    NotifRow(icon, grad, trNotif(n.title), trNotif(n.body), n.dt ?: "", onClick = { onOpen(n.type) })
                 }
             }
             Spacer(Modifier.height(110.dp))

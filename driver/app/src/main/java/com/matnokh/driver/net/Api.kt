@@ -21,7 +21,7 @@ data class DriverBrief(
     val delivery_company_id: Int? = null, val company_name: String? = null,
 )
 data class MethodsResp(val methods: List<String>)
-data class SvcLite(val id: Int, val name: String, val key: String, val vehicle_sizes: List<String> = emptyList())
+data class SvcLite(val id: Int, val name: String, val name_en: String? = null, val key: String, val vehicle_sizes: List<String> = emptyList())
 data class DriverServicesResp(val services: List<SvcLite>)
 data class DrvPackage(val id: Int, val name: String, val service: String? = null, val service_key: String? = null, val price: Double = 0.0, val duration_days: Int = 30)
 data class DrvPackagesResp(val packages: List<DrvPackage> = emptyList())

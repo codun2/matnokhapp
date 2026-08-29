@@ -187,7 +187,7 @@ suspend fun repoDash(toast: (String) -> Unit) {
     }
 }
 suspend fun repoSetAvailable(v: Boolean, toast: (String) -> Unit) {
-    call({ Net.api.availability(AvailBody(v)) }, toast)?.let { Drv.available.value = it.is_available; toast(it.message ?: "") }
+    call({ Net.api.availability(AvailBody(v)) }, toast)?.let { Drv.available.value = it.is_available; toast(if (it.is_available) tr("أصبحت متاحًا لاستقبال الطلبات", "You're now available to receive orders") else tr("أصبحت غير متاح حاليًا", "You're now unavailable")) }
 }
 suspend fun repoBid(oid: Int, amount: Int, toast: (String) -> Unit): Boolean =
     call({ Net.api.bid(oid, BidBody(amount.toDouble())) }, toast)?.let { toast(it.message ?: tr("أُرسل عرضك", "Your offer was sent")); true } ?: false

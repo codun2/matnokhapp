@@ -29,7 +29,7 @@ private sealed interface MenuEntry
 private data class Group(val title: String) : MenuEntry
 private data class Item(val name: String, val iconId: Int, val view: String?, val action: String?, val badge: String? = null, val out: Boolean = false) : MenuEntry
 
-private val MENU = listOf(
+private val MENU get() = listOf(
     Group(tr("العمل", "Work")),
     Item(tr("شاشة الاستقبال", "Receiving screen"), R.drawable.ic_nav, "home", null),
     Item(tr("طلباتي", "My orders"), R.drawable.ic_list, "myorders", null),

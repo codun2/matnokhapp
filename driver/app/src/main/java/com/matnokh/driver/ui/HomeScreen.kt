@@ -161,10 +161,10 @@ private fun JobCard(job: Job, onBid: () -> Unit, onAccept: () -> Unit, onReject:
         Row(verticalAlignment = Alignment.CenterVertically) {
             GradBadge(job.iconId, jobGradients[job.gradient])
             Spacer(Modifier.width(11.dp))
-            Column(Modifier.weight(1f)) { T(job.svc, 13, FontWeight.Bold, C.head, maxLines = 1); T(tr("#${job.id} · ${job.cust} · ${job.km} كم عنك", "#${job.id} · ${job.cust} · ${job.km} km from you"), 10, FontWeight.Normal, C.muted, maxLines = 1) }
+            Column(Modifier.weight(1f)) { T(trData(job.svc), 13, FontWeight.Bold, C.head, maxLines = 1); T(tr("#${job.id} · ${job.cust} · ${job.km} كم عنك", "#${job.id} · ${job.cust} · ${job.km} km from you"), 10, FontWeight.Normal, C.muted, maxLines = 1) }
             StatusPill(if (job.bid) tr("مزايدة", "Bidding") else if (job.companyFixed) tr("سعر الشركة", "Company price") else tr("قبول مباشر", "Direct accept"), if (job.bid) PillKind.Wait else PillKind.Live)
         }
-        Spacer(Modifier.height(11.dp)); RouteBox(job.from, job.to); Spacer(Modifier.height(11.dp))
+        Spacer(Modifier.height(11.dp)); RouteBox(trData(job.from), trData(job.to)); Spacer(Modifier.height(11.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) { T(tr("${if (job.bid) "سعر مقترح" else "الأجرة"}: ﷼${job.price}", "${if (job.bid) "Suggested price" else "Fare"}: ﷼${job.price}"), 11, FontWeight.Bold, C.head, maxLines = 1); T(job.opts, 10, FontWeight.Normal, C.muted, maxLines = 1) }
             if (job.isStore || job.companyFixed) {
@@ -188,7 +188,7 @@ private fun HeadsUpCard(job: Job, onGo: () -> Unit, onIgnore: () -> Unit) {
             Column(Modifier.weight(1f)) { T(tr("طلب جديد من ${job.cust}", "New order from ${job.cust}"), 13, FontWeight.Bold, C.head, maxLines = 1); T(tr("${job.svc} · ${job.km} كم عنك", "${job.svc} · ${job.km} km from you"), 10, FontWeight.Normal, C.muted, maxLines = 1) }
             Column(Modifier.clip(RoundedCornerShape(13.dp)).background(C.pillLive).padding(horizontal = 11.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) { T("﷼${job.price}", 14, FontWeight.Black, C.greenD); T(tr("السعر المقترح", "Suggested price"), 8, FontWeight.Normal, C.muted) }
         }
-        Spacer(Modifier.height(9.dp)); RouteBox(job.from, job.to)
+        Spacer(Modifier.height(9.dp)); RouteBox(trData(job.from), trData(job.to))
         Spacer(Modifier.height(10.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(Modifier.weight(1f).clip(RoundedCornerShape(13.dp)).background(Grad.green).clickable(onClick = onGo).padding(vertical = 10.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
