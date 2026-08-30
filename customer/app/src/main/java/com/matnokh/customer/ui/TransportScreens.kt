@@ -133,8 +133,8 @@ fun OrderScreen(onBack: () -> Unit, onMenu: () -> Unit, onCreated: (Int) -> Unit
                 Row(Modifier.padding(horizontal = 22.dp, vertical = 12.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.5.dp, Color(0xFFCFE0D4), RoundedCornerShape(22.dp)).padding(17.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         T(tr("التكلفة التقديرية", "Estimated cost"), 11, FontWeight.Normal, C.muted)
-                        if (hasDist) { T("﷼${base + distExtraMin} – ﷼${base + distExtraMax}", 20, FontWeight.Black, C.greenD); T(tr("~${Math.round(distanceKm(locA!!, locB!!))} كم × سعر الكيلو", "~${Math.round(distanceKm(locA!!, locB!!))} km × per-km price"), 10, FontWeight.Medium, C.muted) }
-                        else if (!hasDropoff) T(if (base > 0) "﷼$base" else tr("حسب عرض السائق", "Per the driver's offer"), 18, FontWeight.Black, C.greenD)
+                        if (hasDist) { T("$RY${base + distExtraMin} – $RY${base + distExtraMax}", 20, FontWeight.Black, C.greenD); T(tr("~${Math.round(distanceKm(locA!!, locB!!))} كم × سعر الكيلو", "~${Math.round(distanceKm(locA!!, locB!!))} km × per-km price"), 10, FontWeight.Medium, C.muted) }
+                        else if (!hasDropoff) T(if (base > 0) "$RY$base" else tr("حسب عرض السائق", "Per the driver's offer"), 18, FontWeight.Black, C.greenD)
                         else T(tr("حدّد النقطتين للتقدير", "Set both points to estimate"), 15, FontWeight.Bold, C.muted)
                     }
                     T(tr("تقديري — السعر النهائي\nحسب عرض السائق الفائز", "Estimated — final price\nper the winning driver's offer"), 10, FontWeight.Normal, C.muted, lineHeight = 16)
@@ -259,7 +259,7 @@ fun OffersScreen(onBack: () -> Unit, onMenu: () -> Unit, onPick: (String, String
                     Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(Grad.sand), contentAlignment = Alignment.Center) { T(d.avatar, 14, FontWeight.ExtraBold, Color(0xFF6B5335)) }
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) { T(d.name, 13, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(2.dp)); Row(verticalAlignment = Alignment.CenterVertically) { Text("★", color = Color(0xFFD9A441), fontSize = 11.sp); Spacer(Modifier.width(4.dp)); T("${d.rating} · ${svc.vehicle} · ${d.eta}", 10, FontWeight.Normal, C.muted, maxLines = 1) } }
-                    Column(Modifier.clip(RoundedCornerShape(14.dp)).background(Color(0xFFEEF4EF)).padding(horizontal = 12.dp, vertical = 7.dp), horizontalAlignment = Alignment.CenterHorizontally) { T("﷼$price", 15, FontWeight.Black, C.greenD); T(tr("عرض السائق", "Driver's offer"), 9, FontWeight.Normal, C.muted) }
+                    Column(Modifier.clip(RoundedCornerShape(14.dp)).background(Color(0xFFEEF4EF)).padding(horizontal = 12.dp, vertical = 7.dp), horizontalAlignment = Alignment.CenterHorizontally) { T("$RY$price", 15, FontWeight.Black, C.greenD); T(tr("عرض السائق", "Driver's offer"), 9, FontWeight.Normal, C.muted) }
                     Spacer(Modifier.width(10.dp))
                     Box(Modifier.clip(RoundedCornerShape(13.dp)).background(Grad.green).clickable { onPick(d.name, d.avatar, "${d.rating} · ${svc.vehicle}", price) }.padding(horizontal = 14.dp, vertical = 10.dp)) { T(tr("اختيار", "Select"), 11, FontWeight.ExtraBold, Color.White) }
                 }
@@ -334,7 +334,7 @@ fun TrackScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit,
                 Spacer(Modifier.height(12.dp))
                 // معلومات الحمولة
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    CargoBox(tr("الحمولة", "Load"), R.drawable.ic_box, ord?.service_name ?: Sel.svcName, Modifier.weight(1f)); CargoBox(tr("الدفع", "Payment"), R.drawable.ic_card, tr("بطاقة · ﷼${Sel.payAmount}", "Card · ﷼${Sel.payAmount}"), Modifier.weight(1f))
+                    CargoBox(tr("الحمولة", "Load"), R.drawable.ic_box, ord?.service_name ?: Sel.svcName, Modifier.weight(1f)); CargoBox(tr("الدفع", "Payment"), R.drawable.ic_card, tr("بطاقة · $RY${Sel.payAmount}", "Card · $RY${Sel.payAmount}"), Modifier.weight(1f))
                 }
                 Spacer(Modifier.height(10.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -401,7 +401,7 @@ fun TransportBidsScreen(onBack: () -> Unit, onMenu: () -> Unit, onTrack: () -> U
                             Box(Modifier.size(46.dp).clip(CircleShape).background(Grad.sand), contentAlignment = Alignment.Center) { T(b.driver.name.take(2), 15, FontWeight.ExtraBold, Color(0xFF6B5335)) }
                             Spacer(Modifier.width(12.dp))
                             Column(Modifier.weight(1f)) { T(b.driver.name, 13, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T("★ " + String.format("%.1f", b.driver.rating), 11, FontWeight.Normal, C.muted) }
-                            T("﷼" + money(b.amount), 16, FontWeight.Black, C.greenD); Spacer(Modifier.width(10.dp))
+                            T("$RY" + money(b.amount), 16, FontWeight.Black, C.greenD); Spacer(Modifier.width(10.dp))
                             Box(Modifier.clip(RoundedCornerShape(13.dp)).background(Grad.green).clickable { scope.launch { val r = call({ com.matnokh.customer.net.Net.api.pickTransport(o.id, com.matnokh.customer.net.PickBidBody(b.id)) }, toast); if (r != null) { toast(tr("تم الاختيار ✓", "Selected ✓")); onTrack() } } }.padding(horizontal = 15.dp, vertical = 9.dp)) { T(tr("قبول", "Accept"), 12, FontWeight.ExtraBold, Color.White) }
                         }
                     }

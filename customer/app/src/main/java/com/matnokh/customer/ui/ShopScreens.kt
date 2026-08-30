@@ -91,7 +91,7 @@ private fun ProductCard(p: UiProduct, out: Boolean, modifier: Modifier, onClick:
         Column {
             ProductImg(p.images.firstOrNull(), 74.dp, 15.dp)
             Spacer(Modifier.height(9.dp)); T(p.name, 12, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(5.dp))
-            Row(verticalAlignment = Alignment.Bottom) { T("﷼${money(p.price)}", 14, FontWeight.Black, C.greenD); if (p.oldPrice > 0) { Spacer(Modifier.width(6.dp)); Text("﷼${money(p.oldPrice)}", fontFamily = Cairo, fontSize = 10.sp, color = Color(0xFF6E776D), textDecoration = TextDecoration.LineThrough) } }
+            Row(verticalAlignment = Alignment.Bottom) { T("$RY${money(p.price)}", 14, FontWeight.Black, C.greenD); if (p.oldPrice > 0) { Spacer(Modifier.width(6.dp)); Text("$RY${money(p.oldPrice)}", fontFamily = Cairo, fontSize = 10.sp, color = Color(0xFF6E776D), textDecoration = TextDecoration.LineThrough) } }
         }
         if (out) Box(Modifier.align(Alignment.TopCenter).fillMaxWidth().clip(CircleShape).background(Color(0xFFF7E7E2)).padding(vertical = 4.dp), contentAlignment = Alignment.Center) { T(tr("غير متوفر بهذا الفرع", "Not available at this branch"), 9, FontWeight.ExtraBold, C.redText) }
         else if (p.oldPrice > 0) Box(Modifier.align(Alignment.TopStart).clip(CircleShape).background(Grad.terra).padding(horizontal = 8.dp, vertical = 3.dp)) { T(tr("خصم $off٪", "$off% off"), 9, FontWeight.ExtraBold, Color.White) }
@@ -126,7 +126,7 @@ fun ProductScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, on
             OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
                 T(p.name, 15, FontWeight.Bold, C.head); Spacer(Modifier.height(3.dp)); T(p.desc.ifBlank { store.name }, 11, FontWeight.Normal, C.muted, lineHeight = 18)
                 Spacer(Modifier.height(11.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) { T("﷼${money(p.price)}", 22, FontWeight.Black, C.greenD); if (p.oldPrice > 0) { Spacer(Modifier.width(9.dp)); Text("﷼${money(p.oldPrice)}", fontFamily = Cairo, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFF6E776D), textDecoration = TextDecoration.LineThrough); Spacer(Modifier.width(9.dp)); Box(Modifier.clip(CircleShape).background(Color(0xFFF6ECE4)).padding(horizontal = 10.dp, vertical = 4.dp)) { T(tr("وفّر ﷼${money(p.oldPrice - p.price)}", "Save ﷼${money(p.oldPrice - p.price)}"), 10, FontWeight.ExtraBold, C.terraText) } } }
+                Row(verticalAlignment = Alignment.CenterVertically) { T("$RY${money(p.price)}", 22, FontWeight.Black, C.greenD); if (p.oldPrice > 0) { Spacer(Modifier.width(9.dp)); Text("$RY${money(p.oldPrice)}", fontFamily = Cairo, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFF6E776D), textDecoration = TextDecoration.LineThrough); Spacer(Modifier.width(9.dp)); Box(Modifier.clip(CircleShape).background(Color(0xFFF6ECE4)).padding(horizontal = 10.dp, vertical = 4.dp)) { T(tr("وفّر $RY${money(p.oldPrice - p.price)}", "Save $RY${money(p.oldPrice - p.price)}"), 10, FontWeight.ExtraBold, C.terraText) } } }
             }
             if (p.addons.isNotEmpty()) {
                 Spacer(Modifier.height(12.dp))
@@ -138,7 +138,7 @@ fun ProductScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, on
                             val c = addQty[i] ?: 0
                             Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).then(if (c > 0) Modifier.background(Color(0xFFEEF4EF)).border(1.5.dp, C.green, RoundedCornerShape(14.dp)) else Modifier.background(C.card2).border(1.dp, C.line, RoundedCornerShape(14.dp))).padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Text("➕", fontSize = 18.sp); Spacer(Modifier.width(10.dp))
-                                Column(Modifier.weight(1f)) { T(a.name, 12, FontWeight.ExtraBold, if (c > 0) C.greenD else C.head); Spacer(Modifier.height(1.dp)); T(tr("+﷼${money(a.price)} للحبة", "+﷼${money(a.price)} each"), 10, FontWeight.ExtraBold, C.blueText) }
+                                Column(Modifier.weight(1f)) { T(a.name, 12, FontWeight.ExtraBold, if (c > 0) C.greenD else C.head); Spacer(Modifier.height(1.dp)); T(tr("+$RY${money(a.price)} للحبة", "+$RY${money(a.price)} each"), 10, FontWeight.ExtraBold, C.blueText) }
                                 AddStep("−") { if (c > 0) { if (c <= 1) addQty.remove(i) else addQty[i] = c - 1 } }
                                 Box(Modifier.widthIn(min = 28.dp), contentAlignment = Alignment.Center) { T("$c", 15, FontWeight.Black, if (c > 0) C.greenD else C.muted) }
                                 AddStep("+") { addQty[i] = c + 1 }
@@ -162,7 +162,7 @@ fun ProductScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, on
                 if (!store.isOpen) { toast(tr("متجر ${store.name} لا يستقبل طلبات حالياً — يمكنك الطلب منه في أوقات الدوام", "${store.name} isn't accepting orders now — you can order during opening hours")); return@clickable }
                 if (Cart.lines.isNotEmpty() && Cart.merchantId != null && Cart.merchantId != store.id) { showConflict = true; return@clickable }
                 doAddToCart()
-            }.padding(vertical = 16.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) { T(if (store.isOpen) tr("أضف للسلة — ﷼${money(itemPrice)}", "Add to cart — ﷼${money(itemPrice)}") else tr("المتجر مغلق حالياً — للتصفّح فقط", "Store currently closed — browsing only"), 15, FontWeight.ExtraBold, Color.White); Spacer(Modifier.width(8.dp)); Ic(R.drawable.ic_check, 17.dp, Color.White) }
+            }.padding(vertical = 16.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) { T(if (store.isOpen) tr("أضف للسلة — $RY${money(itemPrice)}", "Add to cart — $RY${money(itemPrice)}") else tr("المتجر مغلق حالياً — للتصفّح فقط", "Store currently closed — browsing only"), 15, FontWeight.ExtraBold, Color.White); Spacer(Modifier.width(8.dp)); Ic(R.drawable.ic_check, 17.dp, Color.White) }
             if (showConflict) androidx.compose.material3.AlertDialog(
                 onDismissRequest = { showConflict = false },
                 confirmButton = { androidx.compose.material3.TextButton(onClick = { Cart.clear(); showConflict = false; doAddToCart() }) { T(tr("إفراغ السلة وإضافة", "Empty cart & add"), 13, FontWeight.Bold, C.redText) } },
@@ -233,7 +233,7 @@ fun CartScreen(onBack: () -> Unit, onMenu: () -> Unit, onOrdered: (String, Int?)
                         Box(Modifier.size(42.dp)) { ProductImg(c.image, 42.dp, 13.dp) }
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) { T("${c.name} ×${c.qty}", 12, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(1.dp)); T(if (c.addons.isEmpty()) tr("بدون إضافات", "No add-ons") else tr("إضافات: ${c.addons.joinToString(" · ")}", "Add-ons: ${c.addons.joinToString(" · ")}"), 10, FontWeight.Medium, C.muted, maxLines = 1) }
-                        Column(horizontalAlignment = Alignment.End) { T("﷼${money(c.price)}", 13, FontWeight.Black, C.greenD); if (c.oldPrice > c.price) Text("﷼${money(c.oldPrice)}", fontFamily = Cairo, fontSize = 9.sp, color = Color(0xFF6E776D), textDecoration = TextDecoration.LineThrough) }; Spacer(Modifier.width(8.dp))
+                        Column(horizontalAlignment = Alignment.End) { T("$RY${money(c.price)}", 13, FontWeight.Black, C.greenD); if (c.oldPrice > c.price) Text("$RY${money(c.oldPrice)}", fontFamily = Cairo, fontSize = 9.sp, color = Color(0xFF6E776D), textDecoration = TextDecoration.LineThrough) }; Spacer(Modifier.width(8.dp))
                         Box(Modifier.size(28.dp).clip(RoundedCornerShape(9.dp)).background(C.redBg).clickable { Cart.lines.removeAt(i) }, contentAlignment = Alignment.Center) { T("×", 14, FontWeight.Black, C.redText) }
                     }
                 }
@@ -243,12 +243,12 @@ fun CartScreen(onBack: () -> Unit, onMenu: () -> Unit, onOrdered: (String, Int?)
                 val perKmNoDest = feeMode == "per_km" && (Sel.destLat == null || Sel.destLng == null)
                 val f = if (perKmNoDest) 0.0 else (fee ?: 0.0)
                 Column(Modifier.padding(horizontal = 22.dp, vertical = 4.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.5.dp, Color(0xFFCFE0D4), RoundedCornerShape(22.dp)).padding(17.dp)) {
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { T(tr("مجموع المنتجات", "Products total"), 12, FontWeight.Medium, C.muted, Modifier.weight(1f)); T("﷼${money(itemsT)}", 13, FontWeight.Bold, C.head) }
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { T(tr("مجموع المنتجات", "Products total"), 12, FontWeight.Medium, C.muted, Modifier.weight(1f)); T("$RY${money(itemsT)}", 13, FontWeight.Bold, C.head) }
                     Spacer(Modifier.height(9.dp))
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { T(tr("أجرة التوصيل", "Delivery fee"), 12, FontWeight.Medium, C.muted, Modifier.weight(1f)); T(if (perKmNoDest) tr("حدّد الوجهة لحسابها", "Set the destination to calculate") else if (f > 0) "﷼${money(f)}" else tr("مجانية", "Free"), 12, FontWeight.Bold, if (perKmNoDest) C.muted else C.head) }
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { T(tr("أجرة التوصيل", "Delivery fee"), 12, FontWeight.Medium, C.muted, Modifier.weight(1f)); T(if (perKmNoDest) tr("حدّد الوجهة لحسابها", "Set the destination to calculate") else if (f > 0) "$RY${money(f)}" else tr("مجانية", "Free"), 12, FontWeight.Bold, if (perKmNoDest) C.muted else C.head) }
                     Spacer(Modifier.height(11.dp))
                     Box(Modifier.fillMaxWidth().height(1.dp).background(C.line)); Spacer(Modifier.height(11.dp))
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { T(tr("الإجمالي", "Total"), 14, FontWeight.Black, C.head, Modifier.weight(1f)); T("﷼${money(itemsT + f)}", 19, FontWeight.Black, C.greenD) }
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { T(tr("الإجمالي", "Total"), 14, FontWeight.Black, C.head, Modifier.weight(1f)); T("$RY${money(itemsT + f)}", 19, FontWeight.Black, C.greenD) }
                     if (feeMode == "per_km") { Spacer(Modifier.height(6.dp)); T(tr("تُحتسب أجرة التوصيل حسب بُعد وجهتك عن المتجر.", "The delivery fee is calculated by your destination's distance from the store."), 9, FontWeight.Normal, C.muted) }
                 }
             }
@@ -271,7 +271,7 @@ fun CartScreen(onBack: () -> Unit, onMenu: () -> Unit, onOrdered: (String, Int?)
                             Box(Modifier.clip(RoundedCornerShape(10.dp)).background(Grad.green).clickable { bankIban?.let { clipboard.setText(AnnotatedString(it)); toast(tr("نُسخ الآيبان ✓", "IBAN copied ✓")) } }.padding(horizontal = 12.dp, vertical = 8.dp)) { T(tr("نسخ", "Copy"), 11, FontWeight.ExtraBold, Color.White) }
                         }
                         Spacer(Modifier.height(10.dp))
-                        T(tr("المبلغ المطلوب تحويله (قيمة المنتجات فقط)", "Amount to transfer (items value only)"), 10, FontWeight.Normal, C.muted); T("﷼${money(Cart.total())}", 18, FontWeight.Black, C.greenD); Spacer(Modifier.height(6.dp)); T(tr("حوّل هذا المبلغ لحساب المتجر ثم ارفع صورة الإيصال. أمّا أجرة التوصيل ﷼${money(fee ?: 0.0)} فتُدفع للمندوب نقدًا عند استلامك الطلب.", "Transfer this amount to the store's account, then upload the receipt. The delivery fee ﷼${money(fee ?: 0.0)} is paid to the courier in cash when you receive your order."), 10, FontWeight.Normal, Color(0xFF4B5A51), lineHeight = 16)
+                        T(tr("المبلغ المطلوب تحويله (قيمة المنتجات فقط)", "Amount to transfer (items value only)"), 10, FontWeight.Normal, C.muted); T("$RY${money(Cart.total())}", 18, FontWeight.Black, C.greenD); Spacer(Modifier.height(6.dp)); T(tr("حوّل هذا المبلغ لحساب المتجر ثم ارفع صورة الإيصال. أمّا أجرة التوصيل $RY${money(fee ?: 0.0)} فتُدفع للمندوب نقدًا عند استلامك الطلب.", "Transfer this amount to the store's account, then upload the receipt. The delivery fee $RY${money(fee ?: 0.0)} is paid to the courier in cash when you receive your order."), 10, FontWeight.Normal, Color(0xFF4B5A51), lineHeight = 16)
                         Spacer(Modifier.height(10.dp))
                         Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(C.card).border(1.dp, if (proofUrl != null) C.greenD else C.line, RoundedCornerShape(12.dp)).clickable(enabled = !uploading) { picker.launch("image/*") }.padding(vertical = 12.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
                             T(if (uploading) tr("جارٍ الرفع…", "Uploading…") else if (proofUrl != null) tr("تم رفع الإيصال ✓ — تغيير", "Receipt uploaded ✓ — change") else tr("ارفع صورة إيصال التحويل", "Upload transfer receipt"), 12, FontWeight.ExtraBold, if (proofUrl != null) C.greenD else C.head)

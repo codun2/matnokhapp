@@ -52,7 +52,7 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, onTrack: () -> Unit, to
                 val spend = list.sumOf { it.total } + tlist.sumOf { it.final_fare ?: it.proposed_price }
                 if (!activeOnly) {
                 Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Kpi("$done", tr("طلب مكتمل", "Completed order"), C.greenD, Modifier.weight(1f)); Kpi("$active", tr("طلب نشط", "Active order"), C.blueText, Modifier.weight(1f)); Kpi("﷼${money(spend)}", tr("إجمالي الإنفاق", "Total spending"), C.terraText, Modifier.weight(1f))
+                    Kpi("$done", tr("طلب مكتمل", "Completed order"), C.greenD, Modifier.weight(1f)); Kpi("$active", tr("طلب نشط", "Active order"), C.blueText, Modifier.weight(1f)); Kpi("$RY${money(spend)}", tr("إجمالي الإنفاق", "Total spending"), C.terraText, Modifier.weight(1f))
                 }
                 SecTitle(tr("الأحدث", "Newest"))
                 }
@@ -64,7 +64,7 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, onTrack: () -> Unit, to
                         Row(Modifier.padding(start = 22.dp, end = 22.dp, bottom = 12.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp)).clickable { if (activeOnly || o.status in listOf("pending", "accepted", "ready", "picked_up", "on_the_way")) bidsOrder = o else onOpenDetails(o.id, false) }.padding(15.dp), verticalAlignment = Alignment.CenterVertically) {
                             Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(C.pillLive), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_box, 22.dp, C.greenD) }
                             Spacer(Modifier.width(13.dp))
-                            Column(Modifier.weight(1f)) { T(tr("طلب من ${o.store}", "Order from ${o.store}"), 13, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(2.dp)); T(tr("${o.dt ?: ""} · ﷼${money(o.total)} · رقم ${(o.order_no ?: o.id.toString()).substringAfterLast("-")}", "${o.dt ?: ""} · ﷼${money(o.total)} · No. ${(o.order_no ?: o.id.toString()).substringAfterLast("-")}"), 11, FontWeight.Normal, C.muted, maxLines = 1) }
+                            Column(Modifier.weight(1f)) { T(tr("طلب من ${o.store}", "Order from ${o.store}"), 13, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(2.dp)); T(tr("${o.dt ?: ""} · $RY${money(o.total)} · رقم ${(o.order_no ?: o.id.toString()).substringAfterLast("-")}", "${o.dt ?: ""} · $RY${money(o.total)} · No. ${(o.order_no ?: o.id.toString()).substringAfterLast("-")}"), 11, FontWeight.Normal, C.muted, maxLines = 1) }
                             StatusPill(lbl, kind)
                         }
                     } else if (item is TOrder) {
@@ -73,7 +73,7 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, onTrack: () -> Unit, to
                         Row(Modifier.padding(start = 22.dp, end = 22.dp, bottom = 12.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp)).clickable { if (activeOnly) onTransport(t.id, t.status) else onOpenDetails(t.id, true) }.padding(15.dp), verticalAlignment = Alignment.CenterVertically) {
                             Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(C.pillOk), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_truck, 22.dp, C.blueText) }
                             Spacer(Modifier.width(13.dp))
-                            Column(Modifier.weight(1f)) { T(t.service_name ?: tr("خدمة نقل", "Transport service"), 13, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(2.dp)); T(tr("${t.from ?: ""} ← ${t.to ?: "-"} · ﷼${money(t.final_fare ?: t.proposed_price)} · رقم ${t.order_no.substringAfterLast("-")}", "${t.from ?: ""} ← ${t.to ?: "-"} · ﷼${money(t.final_fare ?: t.proposed_price)} · No. ${t.order_no.substringAfterLast("-")}"), 11, FontWeight.Normal, C.muted, maxLines = 1) }
+                            Column(Modifier.weight(1f)) { T(t.service_name ?: tr("خدمة نقل", "Transport service"), 13, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(2.dp)); T(tr("${t.from ?: ""} ← ${t.to ?: "-"} · $RY${money(t.final_fare ?: t.proposed_price)} · رقم ${t.order_no.substringAfterLast("-")}", "${t.from ?: ""} ← ${t.to ?: "-"} · $RY${money(t.final_fare ?: t.proposed_price)} · No. ${t.order_no.substringAfterLast("-")}"), 11, FontWeight.Normal, C.muted, maxLines = 1) }
                             StatusPill(tl, tk)
                         }
                     }

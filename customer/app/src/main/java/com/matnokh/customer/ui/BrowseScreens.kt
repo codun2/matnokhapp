@@ -117,11 +117,11 @@ private fun OfferRowCard(o: UiOffer, onClick: () -> Unit) {
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
             T(o.product.name, 13, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(2.dp)); T("${o.storeName} · ${o.storeCategory}", 10, FontWeight.Normal, C.muted, maxLines = 1)
-            Spacer(Modifier.height(4.dp)); Box(Modifier.clip(CircleShape).background(Color(0xFFF6ECE4)).padding(horizontal = 8.dp, vertical = 2.dp)) { T(tr("وفّر ﷼${money(o.product.oldPrice - o.product.price)}", "Save ﷼${money(o.product.oldPrice - o.product.price)}"), 9, FontWeight.ExtraBold, C.terraText) }
+            Spacer(Modifier.height(4.dp)); Box(Modifier.clip(CircleShape).background(Color(0xFFF6ECE4)).padding(horizontal = 8.dp, vertical = 2.dp)) { T(tr("وفّر $RY${money(o.product.oldPrice - o.product.price)}", "Save $RY${money(o.product.oldPrice - o.product.price)}"), 9, FontWeight.ExtraBold, C.terraText) }
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            T("﷼${money(o.product.price)}", 16, FontWeight.Black, C.greenD)
-            Text("﷼${money(o.product.oldPrice)}", fontFamily = Cairo, fontSize = 11.sp, color = Color(0xFF6E776D), textDecoration = TextDecoration.LineThrough)
+            T("$RY${money(o.product.price)}", 16, FontWeight.Black, C.greenD)
+            Text("$RY${money(o.product.oldPrice)}", fontFamily = Cairo, fontSize = 11.sp, color = Color(0xFF6E776D), textDecoration = TextDecoration.LineThrough)
         }
         Spacer(Modifier.width(8.dp)); Box(Modifier.clip(CircleShape).background(Grad.terra).padding(horizontal = 9.dp, vertical = 4.dp)) { T(tr("−${o.off}٪", "−${o.off}%"), 10, FontWeight.Black, Color.White) }
     }
