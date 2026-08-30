@@ -91,7 +91,7 @@ private fun SvcCard(svc: com.matnokh.customer.net.SvcDto, modifier: Modifier, on
             Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(Grad.green), contentAlignment = Alignment.Center) {
                 val si = svc.icon
                 when {
-                    si != null && si.startsWith("http") -> coil.compose.AsyncImage(model = si, contentDescription = null, contentScale = androidx.compose.ui.layout.ContentScale.Crop, modifier = Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)))
+                    si != null && si.startsWith("http") -> coil.compose.AsyncImage(model = thumb(si, 128), contentDescription = null, contentScale = androidx.compose.ui.layout.ContentScale.Crop, modifier = Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)))
                     !si.isNullOrBlank() -> T(si, 24, FontWeight.Bold, Color.White)
                     else -> Ic(R.drawable.ic_van, 24.dp, Color.White)
                 }

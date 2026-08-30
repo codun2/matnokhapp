@@ -74,7 +74,7 @@ fun ProfileAvatar(toast: (String) -> Unit) {
     ) {
         when {
             busy -> CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.size(22.dp))
-            !url.isNullOrBlank() -> AsyncImage(model = url, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+            !url.isNullOrBlank() -> AsyncImage(model = thumb(url, 640), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
             else -> T(Session.name?.take(2) ?: tr("زا", "Za"), 18, FontWeight.ExtraBold, Color.White)
         }
         if (Session.isLoggedIn() && !busy) Box(Modifier.align(Alignment.BottomEnd).size(20.dp).clip(CircleShape).background(Grad.green), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_plus, 12.dp, Color.White) }
@@ -256,7 +256,7 @@ private fun PayInfoCard(emoji: String, title: String, desc: String) {
 @Composable
 fun MiniAvatar(size: Dp, corner: Dp, font: Int = 15) {
     val url = Session.avatar
-    if (!url.isNullOrBlank()) AsyncImage(model = url, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(size).clip(RoundedCornerShape(corner)))
+    if (!url.isNullOrBlank()) AsyncImage(model = thumb(url, 128), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(size).clip(RoundedCornerShape(corner)))
     else Box(Modifier.size(size).clip(RoundedCornerShape(corner)).background(Grad.terra), contentAlignment = Alignment.Center) { T(Session.name?.take(2) ?: tr("زا", "Za"), font, FontWeight.ExtraBold, Color.White) }
 }
 

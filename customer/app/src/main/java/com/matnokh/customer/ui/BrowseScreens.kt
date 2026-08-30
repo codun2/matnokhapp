@@ -83,7 +83,7 @@ fun CatBar(cur: Int?, cats: List<CatDto>, onPick: (Int?) -> Unit) {
 @Composable
 private fun CatChip(emoji: String, name: String, on: Boolean, onClick: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable(onClick = onClick)) {
-        Box(Modifier.size(62.dp).clip(RoundedCornerShape(21.dp)).then(if (on) Modifier.background(Grad.green) else Modifier.background(C.card).border(1.5.dp, C.line, RoundedCornerShape(21.dp))), contentAlignment = Alignment.Center) { if (emoji.startsWith("http")) coil.compose.AsyncImage(model = emoji, contentDescription = null, contentScale = androidx.compose.ui.layout.ContentScale.Crop, modifier = Modifier.size(62.dp).clip(RoundedCornerShape(21.dp))) else Text(emoji, fontSize = 27.sp) }
+        Box(Modifier.size(62.dp).clip(RoundedCornerShape(21.dp)).then(if (on) Modifier.background(Grad.green) else Modifier.background(C.card).border(1.5.dp, C.line, RoundedCornerShape(21.dp))), contentAlignment = Alignment.Center) { if (emoji.startsWith("http")) coil.compose.AsyncImage(model = thumb(emoji, 128), contentDescription = null, contentScale = androidx.compose.ui.layout.ContentScale.Crop, modifier = Modifier.size(62.dp).clip(RoundedCornerShape(21.dp))) else Text(emoji, fontSize = 27.sp) }
         Spacer(Modifier.height(7.dp)); T(name, 11, FontWeight.ExtraBold, if (on) C.greenD else C.muted, maxLines = 1)
     }
 }
@@ -161,7 +161,7 @@ fun NearbyStoresLegacy(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Uni
             StorePill("${list.size}", C.pillLive, C.greenD)
         }
         LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(bottom = 24.dp)) {
-            items(list) { s -> StoreRow(s) { onStore(s) } }
+            items(list, key = { it.id }) { s -> StoreRow(s) { onStore(s) } }
             if (list.isEmpty()) item { CenterHint(tr("لا توجد متاجر قريبة في هذا القسم", "No nearby stores in this category")) }
         }
     }
