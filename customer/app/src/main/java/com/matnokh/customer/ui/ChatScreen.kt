@@ -43,21 +43,43 @@ catch (e: Exception) { onErr(tr("تعذّر الاتصال بالخادم", "Cou
 /** المحادثة المفتوحة حالياً — تكتم إشعارات نفس المحادثة أثناء وجود المستخدم داخلها. */
 object ChatOpen { @Volatile var key: String? = null }
 
+/**
+ * تباعد أسفل شاشة الشات — مقيس من هندسة النافذة بدل الاعتماد على إزاحة الكيبورد وحدها.
+ * سبب الفراغ: بعض الأجهزة (سامسونج) تُصغّر النافذة للكيبورد وتُبلّغ عن إزاحته في آنٍ واحد،
+ * فيتضاعف التعويض. هنا نفحص أولاً هل صُغّرت النافذة فعلاً: إن صُغّرت فالنظام عوّض بالفعل
+ * فلا نضيف شيئاً، وإلا نضيف إزاحة الكيبورد (أو شريط التنقّل عند إغلاقه). تعويض واحد فقط دائماً.
+ */
+@Composable
+private fun chatBottomPadding(): androidx.compose.ui.unit.Dp {
+    val view = androidx.compose.ui.platform.LocalView.current
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    val imePx = WindowInsets.ime.getBottom(density)
+    val navPx = WindowInsets.navigationBars.getBottom(density)
+    var windowShrunk by remember { mutableStateOf(false) }
+    DisposableEffect(view) {
+        fun screenHeight(): Int = if (android.os.Build.VERSION.SDK_INT >= 30)
+            (view.context.getSystemService(android.view.WindowManager::class.java))?.maximumWindowMetrics?.bounds?.height()
+                ?: view.resources.displayMetrics.heightPixels
+        else view.resources.displayMetrics.heightPixels
+        val listener = android.view.ViewTreeObserver.OnGlobalLayoutListener {
+            if (view.height > 0) {
+                val loc = IntArray(2); view.getLocationOnScreen(loc)
+                windowShrunk = (loc[1] + view.height) < screenHeight() - 1
+            }
+        }
+        view.viewTreeObserver.addOnGlobalLayoutListener(listener)
+        listener.onGlobalLayout()
+        onDispose { runCatching { view.viewTreeObserver.removeOnGlobalLayoutListener(listener) } }
+    }
+    val px = if (windowShrunk) 0 else maxOf(imePx, navPx)
+    return with(density) { px.toDp() }
+}
+
+
 /** دردشة الزبون (مع المندوب أو المتجر) — مربوطة بالطلب، تحديث كل ٣ ثوانٍ + صور. */
 @Composable
 fun ChatScreen(kind: String, orderId: Int, type: String, title: String, onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit) {
     val ctx = LocalContext.current
-    // في شاشة الشات فقط: على أندرويد 11+ نعطّل تصغير النافذة للكيبورد (بعض الأجهزة تُصغّر رغم edge-to-edge
-    // فيتضاعف التعويض مع imePadding ويظهر فراغ). التعويض هنا عبر windowInsetsPadding(ime) وحده، ويُعاد الوضع عند الخروج.
-    val chatRootView = androidx.compose.ui.platform.LocalView.current
-    DisposableEffect(Unit) {
-        var c: android.content.Context = chatRootView.context
-        while (c is android.content.ContextWrapper && c !is android.app.Activity) c = c.baseContext
-        val win = (c as? android.app.Activity)?.window
-        val prev = win?.attributes?.softInputMode
-        if (android.os.Build.VERSION.SDK_INT >= 30) win?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
-        onDispose { if (android.os.Build.VERSION.SDK_INT >= 30 && win != null && prev != null) win.setSoftInputMode(prev) }
-    }
     val scope = rememberCoroutineScope()
     val msgs = remember { mutableStateListOf<ChatMsg>() }
     var locked by remember { mutableStateOf(false) }
@@ -105,7 +127,7 @@ fun ChatScreen(kind: String, orderId: Int, type: String, title: String, onBack: 
         }
     }
 
-    Column(Modifier.fillMaxSize().background(C.bg).windowInsetsPadding(WindowInsets.ime.union(WindowInsets.navigationBars))) {
+    Column(Modifier.fillMaxSize().background(C.bg).padding(bottom = chatBottomPadding())) {
         ScreenHeader(title, onBack, onMenu)
         hint?.let { Box(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 6.dp), contentAlignment = Alignment.Center) { T(it, 11, FontWeight.Bold, C.muted) } }
         LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)) {
