@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.matnokh.customer.R
 
 @Composable
@@ -33,6 +34,11 @@ fun SplashScreen(onStart: () -> Unit) {
             .background(Brush.radialGradient(listOf(Color(0x59A8BFAE), Color(0x00A8BFAE)))))
         Box(Modifier.align(Alignment.BottomStart).offset(x = (-100).dp, y = 110.dp).size(360.dp).clip(CircleShape)
             .background(Brush.radialGradient(listOf(Color(0x52D9C8A9), Color(0x00D9C8A9)))))
+        // اختيار اللغة قبل الدخول — يظهر أعلى الشاشة ويقلب التطبيق كاملاً فوراً
+        Row(Modifier.align(Alignment.TopCenter).safeDrawingPadding().padding(top = 12.dp).clip(CircleShape).background(Color.White).border(1.dp, C.line, CircleShape).padding(4.dp).zIndex(2f), verticalAlignment = Alignment.CenterVertically) {
+            LangChip("العربية", Lang.isAr) { Lang.set("ar") }
+            LangChip("English", !Lang.isAr) { Lang.set("en") }
+        }
         BoxWithConstraints(Modifier.fillMaxSize()) {
             val minH = maxHeight
             Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).safeDrawingPadding().heightIn(min = minH)
@@ -66,5 +72,12 @@ fun SplashScreen(onStart: () -> Unit) {
 private fun Feat(iconId: Int, label: String) {
     Row(Modifier.clip(CircleShape).background(Color.White).border(1.dp, C.line, CircleShape).padding(horizontal = 15.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         Ic(iconId, 15.dp, C.green); Spacer(Modifier.width(6.dp)); T(label, 12, FontWeight.Bold, Color(0xFF5D6B62), maxLines = 1)
+    }
+}
+
+@Composable
+private fun LangChip(label: String, on: Boolean, onClick: () -> Unit) {
+    Box(Modifier.clip(CircleShape).then(if (on) Modifier.background(Grad.green) else Modifier).clickable(onClick = onClick).padding(horizontal = 18.dp, vertical = 8.dp)) {
+        T(label, 13, FontWeight.ExtraBold, if (on) Color.White else C.muted, maxLines = 1)
     }
 }
