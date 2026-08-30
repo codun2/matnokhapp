@@ -5,6 +5,7 @@ package com.matnokh.driver.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,6 +26,12 @@ fun SplashScreen(onStart: () -> Unit, onRegister: () -> Unit = {}) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
+        // اختيار اللغة قبل الدخول
+        Row(Modifier.clip(CircleShape).background(Color.White).border(1.dp, C.line, CircleShape).padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
+            LangChip("العربية", Lang.isAr) { Lang.set("ar") }
+            LangChip("English", !Lang.isAr) { Lang.set("en") }
+        }
+        Spacer(Modifier.height(24.dp))
         Box(Modifier.size(110.dp).clip(RoundedCornerShape(32.dp)).background(Grad.green), contentAlignment = Alignment.Center) {
             Ic(R.drawable.ic_van, 56.dp, Color.White)
         }
@@ -60,5 +67,12 @@ private fun Feat(iconId: Int, label: String) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Ic(iconId, 14.dp, C.green); Spacer(Modifier.width(6.dp)); T(label, 11, FontWeight.Bold, Color(0xFF5D6B62))
+    }
+}
+
+@Composable
+private fun LangChip(label: String, on: Boolean, onClick: () -> Unit) {
+    Box(Modifier.clip(CircleShape).then(if (on) Modifier.background(Grad.green) else Modifier).clickable(onClick = onClick).padding(horizontal = 18.dp, vertical = 8.dp)) {
+        T(label, 13, FontWeight.ExtraBold, if (on) Color.White else C.muted, maxLines = 1)
     }
 }

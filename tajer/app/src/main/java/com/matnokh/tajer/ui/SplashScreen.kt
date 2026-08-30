@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.matnokh.tajer.R
 
 @Composable
@@ -45,6 +46,11 @@ fun SplashScreen(onEnter: () -> Unit) {
         )
 
         // يتمركز عمودياً حين يتّسع، ويسمح بالتمرير حين لا يتّسع — بلا قصّ
+        // اختيار اللغة قبل الدخول
+        Row(Modifier.align(Alignment.TopCenter).safeDrawingPadding().padding(top = 12.dp).clip(CircleShape).background(Color.White).border(1.dp, C.line, CircleShape).padding(4.dp).zIndex(2f), verticalAlignment = Alignment.CenterVertically) {
+            LangChip("العربية", Lang.isAr) { Lang.set("ar") }
+            LangChip("English", !Lang.isAr) { Lang.set("en") }
+        }
         BoxWithConstraints(Modifier.fillMaxSize()) {
             val minH = maxHeight
             Column(
@@ -112,5 +118,12 @@ private fun Feat(iconId: Int, label: String) {
         Ic(iconId, 15.dp, C.green)
         Spacer(Modifier.width(6.dp))
         T(label, 12, FontWeight.Bold, Color(0xFF5D6B62), maxLines = 1)
+    }
+}
+
+@Composable
+private fun LangChip(label: String, on: Boolean, onClick: () -> Unit) {
+    Box(Modifier.clip(CircleShape).then(if (on) Modifier.background(Grad.green) else Modifier).clickable(onClick = onClick).padding(horizontal = 18.dp, vertical = 8.dp)) {
+        T(label, 13, FontWeight.ExtraBold, if (on) Color.White else C.muted, maxLines = 1)
     }
 }
