@@ -64,7 +64,7 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, onTrack: () -> Unit, to
                         Row(Modifier.padding(start = 22.dp, end = 22.dp, bottom = 12.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp)).clickable { if (activeOnly || o.status in listOf("pending", "accepted", "ready", "picked_up", "on_the_way")) bidsOrder = o else onOpenDetails(o.id, false) }.padding(15.dp), verticalAlignment = Alignment.CenterVertically) {
                             Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(C.pillLive), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_box, 22.dp, C.greenD) }
                             Spacer(Modifier.width(13.dp))
-                            Column(Modifier.weight(1f)) { T(tr("طلب من ${o.store}", "Order from ${o.store}"), 13, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(2.dp)); T(tr("${o.dt ?: ""} · $RY${money(o.total)} · رقم ${(o.order_no ?: o.id.toString()).substringAfterLast("-")}", "${o.dt ?: ""} · $RY${money(o.total)} · No. ${(o.order_no ?: o.id.toString()).substringAfterLast("-")}"), 11, FontWeight.Normal, C.muted, maxLines = 1) }
+                            Column(Modifier.weight(1f)) { T(tr("طلب من ${trd(o.store, o.store_en)}", "Order from ${trd(o.store, o.store_en)}"), 13, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(2.dp)); T(tr("${o.dt ?: ""} · $RY${money(o.total)} · رقم ${(o.order_no ?: o.id.toString()).substringAfterLast("-")}", "${o.dt ?: ""} · $RY${money(o.total)} · No. ${(o.order_no ?: o.id.toString()).substringAfterLast("-")}"), 11, FontWeight.Normal, C.muted, maxLines = 1) }
                             StatusPill(lbl, kind)
                         }
                     } else if (item is TOrder) {
@@ -73,7 +73,7 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, onTrack: () -> Unit, to
                         Row(Modifier.padding(start = 22.dp, end = 22.dp, bottom = 12.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp)).clickable { if (activeOnly) onTransport(t.id, t.status) else onOpenDetails(t.id, true) }.padding(15.dp), verticalAlignment = Alignment.CenterVertically) {
                             Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(C.pillOk), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_truck, 22.dp, C.blueText) }
                             Spacer(Modifier.width(13.dp))
-                            Column(Modifier.weight(1f)) { T(t.service_name ?: tr("خدمة نقل", "Transport service"), 13, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(2.dp)); T(tr("${t.from ?: ""} ← ${t.to ?: "-"} · $RY${money(t.final_fare ?: t.proposed_price)} · رقم ${t.order_no.substringAfterLast("-")}", "${t.from ?: ""} ← ${t.to ?: "-"} · $RY${money(t.final_fare ?: t.proposed_price)} · No. ${t.order_no.substringAfterLast("-")}"), 11, FontWeight.Normal, C.muted, maxLines = 1) }
+                            Column(Modifier.weight(1f)) { T(t.service_name?.let { trd(it, t.service_name_en) } ?: tr("خدمة نقل", "Transport service"), 13, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(2.dp)); T(tr("${t.from ?: ""} ← ${t.to ?: "-"} · $RY${money(t.final_fare ?: t.proposed_price)} · رقم ${t.order_no.substringAfterLast("-")}", "${t.from ?: ""} ← ${t.to ?: "-"} · $RY${money(t.final_fare ?: t.proposed_price)} · No. ${t.order_no.substringAfterLast("-")}"), 11, FontWeight.Normal, C.muted, maxLines = 1) }
                             StatusPill(tl, tk)
                         }
                     }
@@ -209,7 +209,7 @@ fun OrderBidsScreen(order: OrderRowDto, onBack: () -> Unit, onMenu: () -> Unit, 
                     LaunchedEffect(r.driver?.lat, r.driver?.lng) { val d = r.driver; if (d?.lat != null && d.lng != null) cam.position = CameraPosition.fromLatLngZoom(LatLng(d.lat, d.lng), 15f) }
                     Box(Modifier.fillMaxWidth().height(300.dp)) {
                         GoogleMap(modifier = Modifier.fillMaxSize(), cameraPositionState = cam, uiSettings = MapUiSettings(zoomControlsEnabled = false, mapToolbarEnabled = false, compassEnabled = false)) {
-                            r.pickup?.let { if (it.lat != null && it.lng != null) Marker(state = MarkerState(LatLng(it.lat, it.lng)), title = r.store ?: tr("المتجر", "Store"), icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)) }
+                            r.pickup?.let { if (it.lat != null && it.lng != null) Marker(state = MarkerState(LatLng(it.lat, it.lng)), title = r.store?.let { trd(it, r.store_en) } ?: tr("المتجر", "Store"), icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)) }
                             r.drop?.let { if (it.lat != null && it.lng != null) Marker(state = MarkerState(LatLng(it.lat, it.lng)), title = tr("التسليم", "Delivery"), icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)) }
                             r.driver?.let { d -> if (d.lat != null && d.lng != null) {
                                 val dr = r.drop
@@ -222,7 +222,7 @@ fun OrderBidsScreen(order: OrderRowDto, onBack: () -> Unit, onMenu: () -> Unit, 
                     Column(Modifier.offset(y = (-26).dp).fillMaxWidth().clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)).background(C.bg).padding(horizontal = 22.dp, vertical = 10.dp)) {
                         Box(Modifier.align(Alignment.CenterHorizontally).padding(top = 4.dp, bottom = 16.dp).width(44.dp).height(5.dp).clip(CircleShape).background(Color(0xFFDDD6C9)))
                         T(if (step >= 4) tr("تم توصيل طلبك بنجاح ✓", "Your order was delivered successfully ✓") else tr("مندوبك في الطريق لإتمام طلبك", "Your courier is on the way to complete your order"), 17, FontWeight.Bold, C.head)
-                        T(tr("طلب #", "Order #") + (r.order_no ?: "") + " · " + (r.store ?: ""), 12, FontWeight.Normal, C.muted)
+                        T(tr("طلب #", "Order #") + (r.order_no ?: "") + " · " + trd(r.store ?: "", r.store_en), 12, FontWeight.Normal, C.muted)
                         run {
                             val dv = r.driver; val dp = r.drop
                             if (step < 4 && dv?.lat != null && dv.lng != null && dp?.lat != null && dp.lng != null) {
@@ -371,7 +371,7 @@ private fun StoreDetail(o: OrderDetail, onAction: (String, Int) -> Unit) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             StoreLogo(o.store_logo, 46.dp, 15.dp, null)
             Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) { T(tr("طلب من ${o.store}", "Order from ${o.store}"), 14, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(2.dp)); T(tr("رقم ${(o.order_no ?: o.id.toString()).substringAfterLast("-")} \u00b7 ${o.dt ?: ""}", "No. ${(o.order_no ?: o.id.toString()).substringAfterLast("-")} \u00b7 ${o.dt ?: ""}"), 10, FontWeight.Medium, C.muted) }
+            Column(Modifier.weight(1f)) { T(tr("طلب من ${trd(o.store, o.store_en)}", "Order from ${trd(o.store, o.store_en)}"), 14, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(2.dp)); T(tr("رقم ${(o.order_no ?: o.id.toString()).substringAfterLast("-")} \u00b7 ${o.dt ?: ""}", "No. ${(o.order_no ?: o.id.toString()).substringAfterLast("-")} \u00b7 ${o.dt ?: ""}"), 10, FontWeight.Medium, C.muted) }
             StatusPill(lbl, kind)
         }
     }
@@ -380,7 +380,7 @@ private fun StoreDetail(o: OrderDetail, onAction: (String, Int) -> Unit) {
         Row(Modifier.clickable { onAction("chatM", o.id) }, verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(40.dp).clip(RoundedCornerShape(13.dp)).background(Grad.green), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_msg, 16.dp, Color.White) }
             Spacer(Modifier.width(11.dp))
-            Column(Modifier.weight(1f)) { T(tr("محادثة المتجر", "Store chat"), 13, FontWeight.Bold, C.head); T(tr("راسل ${o.store} حول طلبك", "Message ${o.store} about your order"), 10, FontWeight.Normal, C.muted) }
+            Column(Modifier.weight(1f)) { T(tr("محادثة المتجر", "Store chat"), 13, FontWeight.Bold, C.head); T(tr("راسل ${trd(o.store, o.store_en)} حول طلبك", "Message ${trd(o.store, o.store_en)} about your order"), 10, FontWeight.Normal, C.muted) }
         }
     }
     Spacer(Modifier.height(12.dp))
@@ -431,7 +431,7 @@ private fun TransportDetail(t: TOrder, onAction: (String, Int) -> Unit) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(46.dp).clip(RoundedCornerShape(15.dp)).background(C.pillOk), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_truck, 22.dp, C.blueText) }
             Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) { T(t.service_name ?: tr("خدمة نقل", "Transport service"), 14, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(2.dp)); T(tr("رقم ${t.order_no.substringAfterLast("-")}", "No. ${t.order_no.substringAfterLast("-")}"), 10, FontWeight.Medium, C.muted) }
+            Column(Modifier.weight(1f)) { T(t.service_name?.let { trd(it, t.service_name_en) } ?: tr("خدمة نقل", "Transport service"), 14, FontWeight.Bold, C.head, maxLines = 1); Spacer(Modifier.height(2.dp)); T(tr("رقم ${t.order_no.substringAfterLast("-")}", "No. ${t.order_no.substringAfterLast("-")}"), 10, FontWeight.Medium, C.muted) }
             StatusPill(lbl, kind)
         }
     }
