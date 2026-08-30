@@ -16,7 +16,7 @@ import com.matnokh.tajer.R
 
 private data class NavItem(val key: String, val iconId: Int, val label: String)
 
-private val NAV = listOf(
+private val NAV get() = listOf(
     NavItem("dash", R.drawable.ic_chart, tr("الرئيسية", "Home")),
     NavItem("products", R.drawable.ic_box, tr("المنتجات", "Products")),
     NavItem("orders", R.drawable.ic_list, tr("الطلبات", "Orders")),

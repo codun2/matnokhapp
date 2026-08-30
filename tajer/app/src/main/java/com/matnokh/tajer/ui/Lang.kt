@@ -20,3 +20,5 @@ object Lang {
 }
 
 fun tr(ar: String, en: String): String = if (Lang.isAr) ar else en
+
+fun trd(ar: String?, en: String?): String = if (Lang.isAr) (ar ?: "") else (en?.takeIf { it.isNotBlank() } ?: ar ?: "")

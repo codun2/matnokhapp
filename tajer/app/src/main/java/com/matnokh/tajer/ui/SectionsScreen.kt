@@ -75,7 +75,7 @@ fun SectionsScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Un
             else items(list) { s ->
                 ListRow(
                     leading = { SectionIcon(s.icon) },
-                    title = s.name,
+                    title = trd(s.name, s.name_en),
                     subtitle = tr("${s.products_count} منتجاً في هذا القسم", "${s.products_count} products in this section"),
                     trailing = {
                         Box(Modifier.size(34.dp).clip(RoundedCornerShape(12.dp)).background(C.redBg)

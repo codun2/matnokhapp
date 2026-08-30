@@ -69,7 +69,7 @@ fun ProductsScreen(onBack: () -> Unit, onMenu: () -> Unit, onNewProduct: () -> U
             else LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(bottom = 100.dp)) {
                 items(list) { p ->
                     ProductCard(p, branches,
-                        onToggle = { scope.launch { call({ Net.api.toggleProduct(p.id) }, toast)?.let { toast(it.message ?: ""); load() } } },
+                        onToggle = { scope.launch { call({ Net.api.toggleProduct(p.id) }, toast)?.let { toast(tr("تم تحديث حالة المنتج", "Product status updated")); load() } } },
                         onEdit = { onEdit(p.id) },
                         onChip = { bi -> stockDialog = p to bi })
                 }
@@ -98,9 +98,9 @@ private fun ProductCard(p: ProductDto, branches: List<BranchMini>, onToggle: () 
             else EmojiBox("🍽️", 54.dp, 16.dp, 25)
             Spacer(Modifier.width(13.dp))
             Column(Modifier.weight(1f)) {
-                T(p.name, 13, FontWeight.Bold, C.head, maxLines = 2)
+                T(trd(p.name, p.name_en), 13, FontWeight.Bold, C.head, maxLines = 2)
                 Spacer(Modifier.height(2.dp))
-                val extra = buildString { append(p.section ?: tr("بلا قسم", "No section")); if (p.addons.isNotEmpty()) append(tr(" · ${p.addons.size} إضافات", " · ${p.addons.size} add-ons")); if (p.images.size > 1) append(tr(" · ${p.images.size} صور", " · ${p.images.size} images")) }
+                val extra = buildString { append(trd(p.section, p.section_en).ifBlank { tr("بلا قسم", "No section") }); if (p.addons.isNotEmpty()) append(tr(" · ${p.addons.size} إضافات", " · ${p.addons.size} add-ons")); if (p.images.size > 1) append(tr(" · ${p.images.size} صور", " · ${p.images.size} images")) }
                 T(extra, 10, FontWeight.Normal, C.muted, maxLines = 1)
             }
             Spacer(Modifier.width(8.dp))
@@ -139,7 +139,7 @@ private fun StockDialog(p: ProductDto, bi: Int, onClose: () -> Unit, onSave: (In
         Column(Modifier.padding(24.dp).widthIn(max = 300.dp).fillMaxWidth().clip(RoundedCornerShape(26.dp)).background(C.bg).clickable(enabled = false) {}) {
             Column(Modifier.fillMaxWidth().background(Grad.green).padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Ic(R.drawable.ic_pin, 26.dp, Color.White)
-                Spacer(Modifier.height(6.dp)); T(p.name, 14, FontWeight.Black, Color.White, maxLines = 2)
+                Spacer(Modifier.height(6.dp)); T(trd(p.name, p.name_en), 14, FontWeight.Black, Color.White, maxLines = 2)
                 T(st.branch, 11, FontWeight.Normal, Color.White.copy(alpha = .9f))
             }
             Column(Modifier.padding(20.dp)) {

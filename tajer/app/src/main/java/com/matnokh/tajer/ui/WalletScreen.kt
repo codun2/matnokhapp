@@ -105,7 +105,7 @@ fun WalletScreen(onBack: () -> Unit, onMenu: () -> Unit, onPayments: () -> Unit,
             } else {
                 OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), PaddingValues(vertical = 4.dp)) {
                     txs.forEachIndexed { i, t ->
-                        Tx(R.drawable.ic_box, C.pillLive, C.greenD, t.title, t.dt ?: "", "+ ﷼" + money(t.amount), C.greenD, last = i == txs.lastIndex)
+                        Tx(R.drawable.ic_box, C.pillLive, C.greenD, trData(t.title), t.dt ?: "", "+ ﷼" + money(t.amount), C.greenD, last = i == txs.lastIndex)
                     }
                 }
             }
