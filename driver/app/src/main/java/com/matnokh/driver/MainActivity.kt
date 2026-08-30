@@ -33,6 +33,10 @@ class MainActivity : ComponentActivity() {
         DrvNotif.kind = intent?.getStringExtra("kind")
         DrvNotif.orderId = intent?.getStringExtra("order_id")?.toIntOrNull()
         enableEdgeToEdge()
+        // كيبورد الشات: على أندرويد 11+ تعتمد الشاشات على WindowInsets (imePadding)؛
+        // بعض أجهزة Samsung تُصغّر النافذة أيضاً بسبب adjustResize فيتضاعف التعويض ويظهر فراغ.
+        // نعطّل الـresize هنا (API 30+) ونُبقي adjustResize بالمانيفست للأجهزة الأقدم.
+        if (android.os.Build.VERSION.SDK_INT >= 30) window.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
         setContent { MatnokhTheme { androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides if (com.matnokh.driver.ui.Lang.isAr) androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr) { Root() } } }
     }
 
