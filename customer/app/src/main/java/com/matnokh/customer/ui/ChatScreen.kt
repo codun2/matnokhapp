@@ -47,6 +47,17 @@ object ChatOpen { @Volatile var key: String? = null }
 @Composable
 fun ChatScreen(kind: String, orderId: Int, type: String, title: String, onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit) {
     val ctx = LocalContext.current
+    // في شاشة الشات فقط: على أندرويد 11+ نعطّل تصغير النافذة للكيبورد (بعض الأجهزة تُصغّر رغم edge-to-edge
+    // فيتضاعف التعويض مع imePadding ويظهر فراغ). التعويض هنا عبر windowInsetsPadding(ime) وحده، ويُعاد الوضع عند الخروج.
+    val chatRootView = androidx.compose.ui.platform.LocalView.current
+    DisposableEffect(Unit) {
+        var c: android.content.Context = chatRootView.context
+        while (c is android.content.ContextWrapper && c !is android.app.Activity) c = c.baseContext
+        val win = (c as? android.app.Activity)?.window
+        val prev = win?.attributes?.softInputMode
+        if (android.os.Build.VERSION.SDK_INT >= 30) win?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
+        onDispose { if (android.os.Build.VERSION.SDK_INT >= 30 && win != null && prev != null) win.setSoftInputMode(prev) }
+    }
     val scope = rememberCoroutineScope()
     val msgs = remember { mutableStateListOf<ChatMsg>() }
     var locked by remember { mutableStateOf(false) }
