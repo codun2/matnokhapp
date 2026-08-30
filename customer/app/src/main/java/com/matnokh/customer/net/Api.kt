@@ -43,7 +43,7 @@ data class SectionDto(val id: Int, val name: String, val icon: String?, val item
 data class StoreDetailResp(val store: StoreDto, val branches: List<BranchDto>, val sections: List<SectionDto>)
 data class OfferDto(val id: Int, val name: String, val description: String?, val price: Double, val price_before: Double, val images: List<String> = emptyList(), val addons: List<AddonDto> = emptyList(), val store_id: Int, val store_name: String, val store_logo: String?, val store_category: String?, val off: Int, val section_id: Int?, val name_en: String? = null, val description_en: String? = null)
 data class OffersResp(val offers: List<OfferDto>)
-data class OrderRowDto(val id: Int, val order_no: String?, val store: String, val store_en: String? = null, val total: Double, val status: String, val dt: String?, val ts: Long = 0)
+data class OrderRowDto(val id: Int, val order_no: String?, val store: String, val total: Double, val status: String, val dt: String?, val ts: Long = 0, val store_en: String? = null)
 data class OrdersResp(val orders: List<OrderRowDto>)
 data class OrderBidDto(val id: Int, val driver: String, val rating: Double = 5.0, val amount: Double)
 data class TrackDriver(val name: String? = null, val phone: String? = null, val rating: Double = 5.0, val vehicle_type: String? = null, val lat: Double? = null, val lng: Double? = null)
