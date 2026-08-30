@@ -60,9 +60,9 @@ fun StoreRow(s: UiStore, onClick: () -> Unit) {
         StoreLogo(s.logo, 52.dp, 16.dp, trd(s.categoryName, s.categoryNameEn))
         Spacer(Modifier.width(13.dp))
         Column(Modifier.weight(1f)) {
-            T(s.name, 13, FontWeight.Bold, C.head, maxLines = 1)
+            T(trd(s.name, s.nameEn), 13, FontWeight.Bold, C.head, maxLines = 1)
             Spacer(Modifier.height(3.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) { Text("★", color = Color(0xFFD9A441), fontSize = 11.sp); Spacer(Modifier.width(4.dp)); T("${s.rating} · ${s.categoryName}", 11, FontWeight.Normal, C.muted, maxLines = 1) }
+            Row(verticalAlignment = Alignment.CenterVertically) { Text("★", color = Color(0xFFD9A441), fontSize = 11.sp); Spacer(Modifier.width(4.dp)); T("${s.rating} · ${trd(s.categoryName, s.categoryNameEn)}", 11, FontWeight.Normal, C.muted, maxLines = 1) }
         }
         com.matnokh.customer.net.Repo.here?.let { h ->
             if (s.lat != null && s.lng != null) {

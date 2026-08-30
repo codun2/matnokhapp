@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
 // نماذج واجهة مبنيّة من الـAPI
-data class UiStore(val id: Int, val name: String, val categoryName: String, val logo: String?, val rating: String, val isOpen: Boolean, val branchesCount: Int, val dist: String, val lat: Double? = null, val lng: Double? = null, val categoryNameEn: String? = null)
+data class UiStore(val id: Int, val name: String, val categoryName: String, val logo: String?, val rating: String, val isOpen: Boolean, val branchesCount: Int, val dist: String, val lat: Double? = null, val lng: Double? = null, val categoryNameEn: String? = null, val nameEn: String? = null)
 data class UiAddon(val nameAr: String, val nameEn: String?, val price: Double) { val name get() = com.matnokh.customer.ui.trd(nameAr, nameEn) }
 data class UiProduct(val id: Int, val nameAr: String, val nameEn: String?, val descAr: String, val descEn: String?, val price: Double, val oldPrice: Double, val images: List<String>, val addons: List<UiAddon>, val outBranches: List<Int> = emptyList()) { val name get() = com.matnokh.customer.ui.trd(nameAr, nameEn); val desc get() = com.matnokh.customer.ui.trd(descAr, descEn) }
 data class UiSection(val id: Int, val nameAr: String, val nameEn: String?, val items: List<UiProduct>) { val name get() = com.matnokh.customer.ui.trd(nameAr, nameEn) }
@@ -41,7 +41,7 @@ object Repo {
     val favIds = mutableStateListOf<Int>()
     var here by mutableStateOf<Pair<Double, Double>?>(null)
 
-    private fun StoreDto.toUi() = UiStore(id, store_name, category_name ?: tr("متجر", "Store"), logo, String.format("%.1f", rating.coerceAtLeast(0.0)).let { if (rating <= 0) tr("جديد", "New") else it }, is_open, branches_count, "%.1f".format((id % 4 + 5) / 10.0 + id % 3), lat, lng, category_name_en)
+    private fun StoreDto.toUi() = UiStore(id, store_name, category_name ?: tr("متجر", "Store"), logo, String.format("%.1f", rating.coerceAtLeast(0.0)).let { if (rating <= 0) tr("جديد", "New") else it }, is_open, branches_count, "%.1f".format((id % 4 + 5) / 10.0 + id % 3), lat, lng, category_name_en, store_name_en)
     fun toUiStores(list: List<StoreDto>): List<UiStore> = list.map { it.toUi() }
     private fun ProdDto.toUi(outB: List<Int> = emptyList()) = UiProduct(id, name, name_en, description ?: "", description_en, price, price_before, images, addons.map { UiAddon(it.name, it.name_en, it.price) }, outB)
 

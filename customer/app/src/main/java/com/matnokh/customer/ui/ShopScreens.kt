@@ -52,7 +52,7 @@ fun StoreScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, onPr
         }
     }
     Column(Modifier.fillMaxSize().background(C.bg)) {
-        CustBackHeader(s.name, onBack, onCart, onMenu) { StorePill(if (s.isOpen) tr("متاح", "Available") else tr("مغلق", "Closed"), if (s.isOpen) C.pillLive else C.pillOff, if (s.isOpen) C.ok else Color(0xFF9AA198)) }
+        CustBackHeader(trd(s.name, s.nameEn), onBack, onCart, onMenu) { StorePill(if (s.isOpen) tr("متاح", "Available") else tr("مغلق", "Closed"), if (s.isOpen) C.pillLive else C.pillOff, if (s.isOpen) C.ok else Color(0xFF9AA198)) }
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp)).padding(13.dp), verticalAlignment = Alignment.CenterVertically) {
                 StoreLogo(s.logo, 52.dp, 16.dp, trd(s.categoryName, s.categoryNameEn))
@@ -124,7 +124,7 @@ fun ProductScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, on
             }
             Spacer(Modifier.height(12.dp))
             OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                T(p.name, 15, FontWeight.Bold, C.head); Spacer(Modifier.height(3.dp)); T(p.desc.ifBlank { store.name }, 11, FontWeight.Normal, C.muted, lineHeight = 18)
+                T(p.name, 15, FontWeight.Bold, C.head); Spacer(Modifier.height(3.dp)); T(p.desc.ifBlank { trd(store.name, store.nameEn) }, 11, FontWeight.Normal, C.muted, lineHeight = 18)
                 Spacer(Modifier.height(11.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) { T("$RY${money(p.price)}", 22, FontWeight.Black, C.greenD); if (p.oldPrice > 0) { Spacer(Modifier.width(9.dp)); Text("$RY${money(p.oldPrice)}", fontFamily = Cairo, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFF6E776D), textDecoration = TextDecoration.LineThrough); Spacer(Modifier.width(9.dp)); Box(Modifier.clip(CircleShape).background(Color(0xFFF6ECE4)).padding(horizontal = 10.dp, vertical = 4.dp)) { T(tr("وفّر $RY${money(p.oldPrice - p.price)}", "Save $RY${money(p.oldPrice - p.price)}"), 10, FontWeight.ExtraBold, C.terraText) } } }
             }
@@ -159,7 +159,7 @@ fun ProductScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, on
                 Cart.lines.add(CartLine(p.id, p.name, p.images.firstOrNull(), qty, addQty.entries.filter { it.value > 0 }.sortedBy { it.key }.map { p.addons[it.key].name + if (it.value > 1) " ×${it.value}" else "" }, itemPrice, oldItemPrice)); toast(tr("أُضيف للسلة ✓", "Added to cart ✓")); onAdded()
             }
             Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth().clip(RoundedCornerShape(17.dp)).background(Grad.green).clickable {
-                if (!store.isOpen) { toast(tr("متجر ${store.name} لا يستقبل طلبات حالياً — يمكنك الطلب منه في أوقات الدوام", "${store.name} isn't accepting orders now — you can order during opening hours")); return@clickable }
+                if (!store.isOpen) { toast(tr("متجر ${trd(store.name, store.nameEn)} لا يستقبل طلبات حالياً — يمكنك الطلب منه في أوقات الدوام", "${trd(store.name, store.nameEn)} isn't accepting orders now — you can order during opening hours")); return@clickable }
                 if (Cart.lines.isNotEmpty() && Cart.merchantId != null && Cart.merchantId != store.id) { showConflict = true; return@clickable }
                 doAddToCart()
             }.padding(vertical = 16.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) { T(if (store.isOpen) tr("أضف للسلة — $RY${money(itemPrice)}", "Add to cart — $RY${money(itemPrice)}") else tr("المتجر مغلق حالياً — للتصفّح فقط", "Store currently closed — browsing only"), 15, FontWeight.ExtraBold, Color.White); Spacer(Modifier.width(8.dp)); Ic(R.drawable.ic_check, 17.dp, Color.White) }
@@ -168,7 +168,7 @@ fun ProductScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, on
                 confirmButton = { androidx.compose.material3.TextButton(onClick = { Cart.clear(); showConflict = false; doAddToCart() }) { T(tr("إفراغ السلة وإضافة", "Empty cart & add"), 13, FontWeight.Bold, C.redText) } },
                 dismissButton = { androidx.compose.material3.TextButton(onClick = { showConflict = false }) { T(tr("إلغاء", "Cancel"), 13, FontWeight.Bold, C.muted) } },
                 title = { T(tr("سلة من متجر آخر", "Cart from another store"), 15, FontWeight.Bold, C.head) },
-                text = { T(tr("سلتك تحتوي على منتجات من «${Cart.storeName}». أكمل طلبك الحالي أولاً، أو أفرغ السلة للطلب من «${store.name}».", "Your cart has items from «${Cart.storeName}». Finish your current order first, or empty the cart to order from «${store.name}»."), 12, FontWeight.Normal, C.muted, lineHeight = 18) }
+                text = { T(tr("سلتك تحتوي على منتجات من «${Cart.storeName}». أكمل طلبك الحالي أولاً، أو أفرغ السلة للطلب من «${trd(store.name, store.nameEn)}».", "Your cart has items from «${Cart.storeName}». Finish your current order first, or empty the cart to order from «${trd(store.name, store.nameEn)}»."), 12, FontWeight.Normal, C.muted, lineHeight = 18) }
             )
             Spacer(Modifier.height(24.dp))
         }

@@ -33,7 +33,7 @@ data class PayMethodBody(val type: String, val label: String? = null)
 
 data class CatDto(val id: Int, val name: String, val icon: String?, val name_en: String? = null)
 data class CatsResp(val categories: List<CatDto>)
-data class StoreDto(val id: Int, val store_name: String, val category_id: Int?, val category_name: String?, val logo: String?, val rating: Double = 0.0, val is_open: Boolean = false, val branches_count: Int = 0, val lat: Double? = null, val lng: Double? = null, val iban: String? = null, val bank_name: String? = null, val account_name: String? = null, val category_name_en: String? = null)
+data class StoreDto(val id: Int, val store_name: String, val category_id: Int?, val category_name: String?, val logo: String?, val rating: Double = 0.0, val is_open: Boolean = false, val branches_count: Int = 0, val lat: Double? = null, val lng: Double? = null, val iban: String? = null, val bank_name: String? = null, val account_name: String? = null, val category_name_en: String? = null, val store_name_en: String? = null)
 data class StoresResp(val stores: List<StoreDto>, val has_more: Boolean = false)
 data class AddonDto(val name: String, val price: Double, val name_en: String? = null)
 data class StockDto(val branch_id: Int, val in_stock: Int)

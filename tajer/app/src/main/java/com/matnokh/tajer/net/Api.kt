@@ -20,7 +20,7 @@ const val API_BASE = "https://matnokh.bytnova.com/api/"
 
 // ── نماذج المصادقة ──
 data class MerchantBrief(
-    val id: Int, val store_name: String, val owner_name: String?, val phone: String?, val email: String?,
+    val id: Int, val store_name: String, val store_name_en: String? = null, val owner_name: String?, val phone: String?, val email: String?,
     val logo: String?, val status: String, val is_open: Boolean = false, val prep_mode: Boolean = false,
     val auto_accept: Boolean = false, val balance: Double = 0.0, val rating: Double = 0.0,
 )
@@ -52,7 +52,7 @@ data class StoreData(
 )
 data class StoreResp(val store: StoreData, val message: String? = null)
 data class StoreUpdate(
-    val store_name: String? = null, val owner_name: String? = null, val address: String? = null,
+    val store_name: String? = null, val store_name_en: String? = null, val owner_name: String? = null, val address: String? = null,
     val city_id: Int? = null, val lat: Double? = null, val lng: Double? = null, val logo: String? = null,
     val is_open: Boolean? = null, val prep_mode: Boolean? = null, val auto_accept: Boolean? = null,
     val delivery_mode: String? = null, val delivery_fixed: Double? = null, val delivery_per_km: Double? = null,

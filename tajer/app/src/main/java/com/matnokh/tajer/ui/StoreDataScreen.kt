@@ -57,6 +57,7 @@ fun StoreDataScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> U
     var name by remember { mutableStateOf("") }
     var owner by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
+    var nameEn by remember { mutableStateOf("") }
     var cityId by remember { mutableStateOf<Int?>(null) }
     var logo by remember { mutableStateOf<String?>(null) }
     var saving by remember { mutableStateOf(false) }
@@ -74,6 +75,7 @@ fun StoreDataScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> U
         call({ Net.api.store() }, toast)?.let {
             store = it.store
             name = it.store.store_name ?: ""
+            nameEn = it.store.store_name_en ?: ""
             owner = it.store.owner_name ?: ""
             address = it.store.address ?: ""
             cityId = it.store.city_id
@@ -139,6 +141,7 @@ fun StoreDataScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> U
                 OcTitle(R.drawable.ic_shop, tr("بيانات المتجر", "Store details"))
                 FieldLabel(tr("اسم المتجر", "Store name"), required = true)
                 FinField(name, { name = it }, tr("اسم المتجر", "Store name"))
+                Spacer(Modifier.height(10.dp)); FieldLabel(tr("اسم المتجر بالإنجليزية (اختياري)", "Store name in English (optional)")); androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Ltr) { FinField(nameEn, { nameEn = it }, "e.g. Al-Amal Restaurant", align = androidx.compose.ui.text.style.TextAlign.Left) }
                 FieldLabel(tr("اسم صاحب المتجر", "Store owner name"))
                 FinField(owner, { owner = it }, tr("الاسم الكامل", "Full name"))
                 FieldLabel(tr("العنوان", "Address"))
@@ -183,7 +186,7 @@ fun StoreDataScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> U
                     if (name.isBlank()) { toast(tr("اسم المتجر مطلوب", "Store name is required")); return@WideButton }
                     scope.launch {
                         saving = true
-                        call({ Net.api.updateStore(StoreUpdate(store_name = name.trim(), owner_name = owner.trim(), address = address.trim(), city_id = cityId, lat = lat, lng = lng, logo = logo, iban = iban.trim(), bank_name = bankName.trim(), account_name = accountName.trim())) }, toast)?.let {
+                        call({ Net.api.updateStore(StoreUpdate(store_name = name.trim(), store_name_en = nameEn.trim(), owner_name = owner.trim(), address = address.trim(), city_id = cityId, lat = lat, lng = lng, logo = logo, iban = iban.trim(), bank_name = bankName.trim(), account_name = accountName.trim())) }, toast)?.let {
                             store = it.store; com.matnokh.tajer.net.Session.logo = logo; StoreInfo.logo.value = logo; toast(tr("تم حفظ بيانات المتجر ✓", "Store details saved ✓")); onBack()
                         }
                         saving = false
