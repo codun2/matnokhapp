@@ -24,12 +24,12 @@ import kotlinx.coroutines.launch
 import com.matnokh.customer.R
 import com.matnokh.customer.net.UiStore
 
-// شعار متجر (صورة أو أيقونة بديلة)
-@Composable
 /** رابط مصغّرة بحجم مناسب للقوائم — الخادم يولّدها عند أول طلب ويخدمها ثابتة بعدها. */
 fun thumb(u: String?, w: Int = 256): String? =
     if (u != null && u.contains("/storage/") && !u.contains("/storage/thumbs/")) u.replace("/storage/", "/storage/thumbs/$w/") else u
 
+// شعار متجر (صورة أو أيقونة بديلة)
+@Composable
 fun StoreLogo(logo: String?, size: Dp, corner: Dp, category: String? = null) {
     if (logo.isNullOrBlank()) Box(Modifier.size(size).clip(RoundedCornerShape(corner)).background(C.card2), contentAlignment = Alignment.Center) { Text(catEmoji(category), fontSize = (size.value * 0.45f).sp) }
     else AsyncImage(model = thumb(logo, 128), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(size).clip(RoundedCornerShape(corner)))
