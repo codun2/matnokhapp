@@ -57,7 +57,7 @@ private fun ReportCard(label: String, p: Period?, color: Color, grad: Brush) {
                 T(tr("${p?.orders ?: 0} طلباً مسلّماً", "${p?.orders ?: 0} orders delivered"), 11, FontWeight.Normal, C.muted)
             }
             Spacer(Modifier.width(8.dp))
-            T("﷼" + money(p?.sales ?: 0.0), 18, FontWeight.Black, color)
+            T("$RY" + money(p?.sales ?: 0.0), 18, FontWeight.Black, color)
         }
     }
 }

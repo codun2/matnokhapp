@@ -105,9 +105,9 @@ private fun ProductCard(p: ProductDto, branches: List<BranchMini>, onToggle: () 
             }
             Spacer(Modifier.width(8.dp))
             Column(horizontalAlignment = Alignment.End) {
-                T("﷼${money(p.price)}", 14, FontWeight.Black, C.greenD)
+                T("$RY${money(p.price)}", 14, FontWeight.Black, C.greenD)
                 if (p.price_before > 0) {
-                    Text("﷼${money(p.price_before)}", fontFamily = Cairo, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = C.strike, textDecoration = TextDecoration.LineThrough)
+                    Text("$RY${money(p.price_before)}", fontFamily = Cairo, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = C.strike, textDecoration = TextDecoration.LineThrough)
                     Spacer(Modifier.height(4.dp)); StatusPill(tr("خصم ${p.discount}٪", "${p.discount}% off"), PillKind.Wait)
                 }
             }

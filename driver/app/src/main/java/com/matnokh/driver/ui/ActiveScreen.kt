@@ -90,7 +90,7 @@ fun ActiveScreen(job: Job?, fare: Int, onBack: () -> Unit, onMenu: () -> Unit, t
                 Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp)).padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(52.dp).clip(RoundedCornerShape(17.dp)).background(Grad.terra), contentAlignment = Alignment.Center) { T(job.av, 16, FontWeight.ExtraBold, Color.White) }
                     Spacer(Modifier.width(13.dp))
-                    Column(Modifier.weight(1f)) { T(job.cust, 14, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T(tr("${trData(job.to)} · أجرتك ﷼$fare", "${trData(job.to)} · your fare ﷼$fare"), 11, FontWeight.Normal, C.muted, maxLines = 1) }
+                    Column(Modifier.weight(1f)) { T(job.cust, 14, FontWeight.Bold, C.head); Spacer(Modifier.height(2.dp)); T(tr("${trData(job.to)} · أجرتك $RY$fare", "${trData(job.to)} · your fare $RY$fare"), 11, FontWeight.Normal, C.muted, maxLines = 1) }
                     Box(Modifier.size(44.dp).clip(RoundedCornerShape(15.dp)).background(C.card2).clickable { onChat() }, contentAlignment = Alignment.Center) { Ic(R.drawable.ic_msg, 17.dp, Color(0xFF5D6B62)) }
                     Spacer(Modifier.width(9.dp))
                     Box(Modifier.size(44.dp).clip(RoundedCornerShape(15.dp)).background(Grad.green), contentAlignment = Alignment.Center) { Box(Modifier.clickable { toast(tr("اتصال بالزبون", "Call the customer")) }, contentAlignment = Alignment.Center) { Ic(R.drawable.ic_phone, 17.dp, Color.White) } }
@@ -118,7 +118,7 @@ fun ActiveScreen(job: Job?, fare: Int, onBack: () -> Unit, onMenu: () -> Unit, t
                     2 -> WideButton(tr("بدأت الرحلة — في الطريق", "Trip started — on the way"), R.drawable.ic_nav) { onStatus("on_the_way") }
                     3 -> WideButton(tr("تم التسليم للزبون", "Delivered to the customer"), R.drawable.ic_flag) { onStatus("delivered") }
                     else -> Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp)).padding(18.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        T(tr("أنجزت الرحلة 🎉  +﷼$fare", "Trip completed 🎉  +﷼$fare"), 15, FontWeight.Black, C.greenD)
+                        T(tr("أنجزت الرحلة 🎉  +$RY$fare", "Trip completed 🎉  +$RY$fare"), 15, FontWeight.Black, C.greenD)
                         Spacer(Modifier.height(8.dp)); T(tr("انتقل الطلب إلى «طلباتي — السابقة» وعدت متاحاً", "The order moved to «My orders — Past» and you're available again"), 11, FontWeight.Normal, C.muted)
                         Spacer(Modifier.height(14.dp)); WideButton(tr("العودة للاستقبال", "Back to receiving"), R.drawable.ic_nav, onClick = onFinish)
                     }

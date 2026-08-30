@@ -27,7 +27,7 @@ fun MyOrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, onOpenActive: () -> U
             Row(Modifier.padding(horizontal = 22.dp).padding(top = 14.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Kpi("${338 + Drv.pastDone.size}", tr("رحلة مكتملة", "Completed trip"), C.greenD, Modifier.weight(1f))
                 Kpi("${Drv.nowOrders.size}", tr("قيد التنفيذ", "In progress"), C.blueText, Modifier.weight(1f))
-                Kpi("﷼${Drv.pastDone.sumOf { it.fare }}", tr("أرباح الطلبات", "Order earnings"), C.terraText, Modifier.weight(1f))
+                Kpi("$RY${Drv.pastDone.sumOf { it.fare }}", tr("أرباح الطلبات", "Order earnings"), C.terraText, Modifier.weight(1f))
             }
             // تبويبات
             Row(Modifier.padding(horizontal = 22.dp).padding(top = 14.dp).fillMaxWidth().clip(RoundedCornerShape(50.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(50.dp)).padding(5.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -73,7 +73,7 @@ private fun OrderRow(iconId: Int, gradient: Int, title: String, sub: String, fro
         Spacer(Modifier.height(11.dp)); RouteBox(from, to); Spacer(Modifier.height(10.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) { if (rating != null) T(tr("تقييم الزبون: ★ $rating", "Customer rating: ★ $rating"), 11, FontWeight.Bold, C.terraText) else T(tr("أجرتك", "Your fare"), 11, FontWeight.Bold, C.muted) }
-            T("﷼$fare", 15, FontWeight.Black, C.greenD)
+            T("$RY$fare", 15, FontWeight.Black, C.greenD)
         }
     }
 }

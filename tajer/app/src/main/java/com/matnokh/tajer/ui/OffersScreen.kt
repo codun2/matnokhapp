@@ -63,7 +63,7 @@ private fun OfferRow(p: ProductDto) {
             Column(Modifier.weight(1f)) {
                 T(p.name, 13, FontWeight.Bold, C.text, maxLines = 1)
                 Spacer(Modifier.height(2.dp))
-                T("﷼" + money(p.price) + tr(" · قبل ﷼", " · before ﷼") + money(p.price_before) + (p.section?.let { " · $it" } ?: ""), 11, FontWeight.Normal, C.muted, maxLines = 1)
+                T("$RY" + money(p.price) + tr(" · قبل $RY", " · before $RY") + money(p.price_before) + (p.section?.let { " · $it" } ?: ""), 11, FontWeight.Normal, C.muted, maxLines = 1)
             }
             Spacer(Modifier.width(8.dp))
             Box(Modifier.clip(RoundedCornerShape(50)).background(Grad.terra).padding(horizontal = 10.dp, vertical = 4.dp)) {

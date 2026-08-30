@@ -125,10 +125,10 @@ fun NewProductScreen(productId: Int?, onBack: () -> Unit, onMenu: () -> Unit, on
             item {
                 OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
                     OcTitle(R.drawable.ic_cash, tr("السعر والعرض", "Price & offer"))
-                    FieldLabel(tr("السعر (﷼)", "Price (﷼)"), required = true); FinField(price, { price = decInput(it) }, "0", keyboard = KeyboardType.Decimal)
+                    FieldLabel(tr("السعر ($RY)", "Price ($RY)"), required = true); FinField(price, { price = decInput(it) }, "0", keyboard = KeyboardType.Decimal)
                     SwRow(tr("هل على المنتج عرض؟", "Does the product have an offer?"), tr("يظهر للزبون بشارة خصم وسعر مشطوب", "Shows the customer a discount badge and a struck-through price"), offer) { offer = !offer }
                     if (offer) {
-                        FieldLabel(tr("السعر قبل الخصم (﷼)", "Price before discount (﷼)")); FinField(oldPrice, { oldPrice = decInput(it) }, "0", keyboard = KeyboardType.Decimal)
+                        FieldLabel(tr("السعر قبل الخصم ($RY)", "Price before discount ($RY)")); FinField(oldPrice, { oldPrice = decInput(it) }, "0", keyboard = KeyboardType.Decimal)
                         Spacer(Modifier.height(11.dp)); CalcBox(price.toDoubleOrNull() ?: 0.0, oldPrice.toDoubleOrNull() ?: 0.0)
                     }
                 }
@@ -141,7 +141,7 @@ fun NewProductScreen(productId: Int?, onBack: () -> Unit, onMenu: () -> Unit, on
                         addons.forEachIndexed { i, a ->
                             Row(Modifier.fillMaxWidth().padding(bottom = 9.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Box(Modifier.weight(1f)) { FinField(a.name, { addons[i] = a.copy(name = it) }, tr("اسم الإضافة", "Add-on name")) }
-                                Box(Modifier.width(74.dp)) { FinField(if (a.price == 0.0) "" else money(a.price), { addons[i] = a.copy(price = decInput(it).toDoubleOrNull() ?: 0.0) }, "﷼", keyboard = KeyboardType.Decimal, align = androidx.compose.ui.text.style.TextAlign.Center) }
+                                Box(Modifier.width(74.dp)) { FinField(if (a.price == 0.0) "" else money(a.price), { addons[i] = a.copy(price = decInput(it).toDoubleOrNull() ?: 0.0) }, "$RY", keyboard = KeyboardType.Decimal, align = androidx.compose.ui.text.style.TextAlign.Center) }
                                 Box(Modifier.size(34.dp).clip(RoundedCornerShape(11.dp)).background(C.redBg).clickable { addons.removeAt(i) }, contentAlignment = Alignment.Center) { T("×", 15, FontWeight.Black, C.redText) }
                             }
                         }
@@ -245,7 +245,7 @@ private fun CalcBox(price: Double, old: Double) {
     Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Color(0xFFF9F1E9)).border(1.dp, Color(0xFFECDCC3), RoundedCornerShape(14.dp)).padding(horizontal = 14.dp, vertical = 11.dp), verticalAlignment = Alignment.CenterVertically) {
         Ic(if (invalid) R.drawable.ic_info else R.drawable.ic_zap, 15.dp, C.terra); Spacer(Modifier.width(8.dp))
         if (invalid) T(tr("السعر قبل الخصم يجب أن يكون أعلى من سعر البيع", "The pre-discount price must be higher than the sale price"), 11, FontWeight.ExtraBold, Color(0xFFA06A3C), lineHeight = 18)
-        else { val off = ((1 - price.toFloat() / old) * 100).roundToInt(); T(tr("يظهر للزبون: خصم $off٪ · وفّر ﷼${money(old - price)}", "Shown to the customer: $off% off · save ﷼${money(old - price)}"), 11, FontWeight.ExtraBold, Color(0xFFA06A3C), lineHeight = 18) }
+        else { val off = ((1 - price.toFloat() / old) * 100).roundToInt(); T(tr("يظهر للزبون: خصم $off٪ · وفّر $RY${money(old - price)}", "Shown to the customer: $off% off · save $RY${money(old - price)}"), 11, FontWeight.ExtraBold, Color(0xFFA06A3C), lineHeight = 18) }
     }
 }
 

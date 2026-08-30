@@ -46,7 +46,7 @@ private fun OfferCard(job: Job) {
         Spacer(Modifier.height(11.dp)); RouteBox(job.from, job.to); Spacer(Modifier.height(11.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Ic(R.drawable.ic_cash, 15.dp, C.greenD); Spacer(Modifier.width(6.dp))
-            T(tr("عرضك المقدَّم: ﷼${job.price}", "Your submitted offer: ﷼${job.price}"), 12, FontWeight.ExtraBold, C.greenD)
+            T(tr("عرضك المقدَّم: $RY${job.price}", "Your submitted offer: $RY${job.price}"), 12, FontWeight.ExtraBold, C.greenD)
         }
     }
 }

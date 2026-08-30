@@ -69,12 +69,12 @@ fun IncomingOrderCard(
                             Box(Modifier.size(26.dp).clip(RoundedCornerShape(8.dp)).background(C.pillLive), contentAlignment = Alignment.Center) { T("${it2.qty}×", 10, FontWeight.Black, C.greenD) }
                             Spacer(Modifier.width(9.dp))
                             T(it2.name, 12, FontWeight.Bold, C.head, Modifier.weight(1f), maxLines = 1)
-                            T("﷼${it2.line_total.toInt()}", 12, FontWeight.Black, C.greenD)
+                            T("$RY${it2.line_total.toInt()}", 12, FontWeight.Black, C.greenD)
                         }
                     }
                     if (det.items.size > 3) T(tr("+ ${det.items.size - 3} أصناف أخرى", "+ ${det.items.size - 3} more items"), 10, FontWeight.Medium, C.muted)
                     Spacer(Modifier.height(8.dp))
-                    Row(Modifier.fillMaxWidth()) { T(tr("الإجمالي (${det.items.size} أصناف)", "Total (${det.items.size} items)"), 13, FontWeight.Bold, C.head, Modifier.weight(1f)); T("﷼${o.total.toInt()}", 15, FontWeight.Black, C.greenD) }
+                    Row(Modifier.fillMaxWidth()) { T(tr("الإجمالي (${det.items.size} أصناف)", "Total (${det.items.size} items)"), 13, FontWeight.Bold, C.head, Modifier.weight(1f)); T("$RY${o.total.toInt()}", 15, FontWeight.Black, C.greenD) }
 
                     Spacer(Modifier.height(14.dp))
                     // الأزرار

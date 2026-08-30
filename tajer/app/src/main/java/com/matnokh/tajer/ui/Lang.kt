@@ -22,3 +22,6 @@ object Lang {
 fun tr(ar: String, en: String): String = if (Lang.isAr) ar else en
 
 fun trd(ar: String?, en: String?): String = if (Lang.isAr) (ar ?: "") else (en?.takeIf { it.isNotBlank() } ?: ar ?: "")
+
+/** رمز العملة حسب اللغة: ﷼ بالعربية و SAR بالإنجليزية. */
+val RY: String get() = if (Lang.isAr) "﷼" else "SAR "

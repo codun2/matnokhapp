@@ -154,7 +154,7 @@ private fun OrderCard(o: OrderRow, onOpen: () -> Unit, onAccept: () -> Unit, onR
             Column(Modifier.weight(1f)) {
                 T(tr("طلب ${o.customer}", "${o.customer}'s order"), 13, FontWeight.Bold, C.text, maxLines = 1)
                 Spacer(Modifier.height(2.dp))
-                T(tr("#${(o.order_no ?: o.id.toString()).substringAfterLast("-")} · ${o.items_count} أصناف · ﷼${o.total.toInt()} · ${payLabel(o.payment_method)}", "#${(o.order_no ?: o.id.toString()).substringAfterLast("-")} · ${o.items_count} items · ﷼${o.total.toInt()} · ${payLabel(o.payment_method)}"), 11, FontWeight.Normal, C.muted, maxLines = 1)
+                T(tr("#${(o.order_no ?: o.id.toString()).substringAfterLast("-")} · ${o.items_count} أصناف · $RY${o.total.toInt()} · ${payLabel(o.payment_method)}", "#${(o.order_no ?: o.id.toString()).substringAfterLast("-")} · ${o.items_count} items · $RY${o.total.toInt()} · ${payLabel(o.payment_method)}"), 11, FontWeight.Normal, C.muted, maxLines = 1)
                 T(listOfNotNull(o.branch, o.dt, o.driver).joinToString(" · "), 11, FontWeight.Normal, C.muted, maxLines = 1)
             }
             Spacer(Modifier.width(8.dp))
@@ -220,9 +220,9 @@ private fun OrderDetailDialog(d: OrderDetailResp, onClose: () -> Unit, onChat: (
                         Spacer(Modifier.width(10.dp))
                         Column(Modifier.weight(1f)) {
                             T(it.name, 12, FontWeight.Bold, C.head)
-                            if (it.addons.isNotEmpty()) T(it.addons.joinToString(tr("، ", ", ")) { a -> "${a.name} +﷼${money(a.price)}" }, 10, FontWeight.Normal, C.muted, maxLines = 2)
+                            if (it.addons.isNotEmpty()) T(it.addons.joinToString(tr("، ", ", ")) { a -> "${a.name} +$RY${money(a.price)}" }, 10, FontWeight.Normal, C.muted, maxLines = 2)
                         }
-                        T("﷼${it.line_total.toInt()}", 12, FontWeight.Black, C.greenD)
+                        T("$RY${it.line_total.toInt()}", 12, FontWeight.Black, C.greenD)
                     }
                     Line()
                 }
@@ -233,7 +233,7 @@ private fun OrderDetailDialog(d: OrderDetailResp, onClose: () -> Unit, onChat: (
                 Spacer(Modifier.height(4.dp))
                 Row(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                     T(tr("الإجمالي", "Total"), 14, FontWeight.Black, C.head, Modifier.weight(1f))
-                    T("﷼${d.order.total.toInt()}", 15, FontWeight.Black, C.greenD)
+                    T("$RY${d.order.total.toInt()}", 15, FontWeight.Black, C.greenD)
                 }
             }
             Box(Modifier.fillMaxWidth().clickable(onClick = onClose).padding(14.dp), contentAlignment = Alignment.Center) { T(tr("إغلاق", "Close"), 13, FontWeight.Bold, C.muted) }
@@ -284,7 +284,7 @@ private fun OrderInfoBar(d: OrderDetailResp, onChat: ((OrderDetailResp) -> Unit)
 private fun SumRow(label: String, amount: Double) {
     Row(Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
         T(label, 11, FontWeight.Medium, C.muted, Modifier.weight(1f))
-        T("﷼${amount.toInt()}", 11, FontWeight.Bold, C.head)
+        T("$RY${amount.toInt()}", 11, FontWeight.Bold, C.head)
     }
 }
 

@@ -158,7 +158,7 @@ fun RegisterScreen(onDone: () -> Unit, onBack: () -> Unit, toast: (String) -> Un
                         T(if (sel) "✓" else "○", 16, FontWeight.Bold, if (sel) C.green else C.muted)
                         Spacer(Modifier.width(11.dp))
                         Column(Modifier.weight(1f)) { T(p.name, 13, FontWeight.Bold, C.head, maxLines = 1); T((p.service ?: "") + " · " + (if (p.duration_days % 30 == 0 && p.duration_days > 0) tr("${p.duration_days / 30} شهر", "${p.duration_days / 30} months") else tr("${p.duration_days} يوم", "${p.duration_days} days")), 10, FontWeight.Medium, C.muted) }
-                        T(if (p.price <= 0.0) tr("مجاناً", "Free") else "﷼${p.price.toInt()}", 14, FontWeight.ExtraBold, C.greenD)
+                        T(if (p.price <= 0.0) tr("مجاناً", "Free") else "$RY${p.price.toInt()}", 14, FontWeight.ExtraBold, C.greenD)
                     }
                 }
             }

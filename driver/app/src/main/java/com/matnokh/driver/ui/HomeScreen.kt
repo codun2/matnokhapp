@@ -103,7 +103,7 @@ fun HomeScreen(onMenu: () -> Unit, onNotifications: () -> Unit, onBid: (Job) -> 
             }
             Row(Modifier.padding(horizontal = 22.dp).padding(top = 14.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Kpi("${Drv.tripsToday.value}", tr("رحلات اليوم", "Today's trips"), C.greenD, Modifier.weight(1f))
-                Kpi("﷼${Drv.earningsToday.value}", tr("أرباح اليوم", "Today's earnings"), C.blueText, Modifier.weight(1f))
+                Kpi("$RY${Drv.earningsToday.value}", tr("أرباح اليوم", "Today's earnings"), C.blueText, Modifier.weight(1f))
                 Kpi("${Drv.rating.value} ★", tr("تقييمي", "My rating"), C.terraText, Modifier.weight(1f))
             }
             SecTitle(tr("الطلبات الواردة", "Incoming orders")) { if (avail) Row(verticalAlignment = Alignment.CenterVertically) { Box(Modifier.size(9.dp).clip(CircleShape).background(C.green)); Spacer(Modifier.width(5.dp)); T(tr("بثّ مباشر", "Live broadcast"), 11, FontWeight.ExtraBold, C.greenD) } }
@@ -166,7 +166,7 @@ private fun JobCard(job: Job, onBid: () -> Unit, onAccept: () -> Unit, onReject:
         }
         Spacer(Modifier.height(11.dp)); RouteBox(trData(job.from), trData(job.to)); Spacer(Modifier.height(11.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) { T(tr("${if (job.bid) "سعر مقترح" else "الأجرة"}: ﷼${job.price}", "${if (job.bid) "Suggested price" else "Fare"}: ﷼${job.price}"), 11, FontWeight.Bold, C.head, maxLines = 1); T(job.opts, 10, FontWeight.Normal, C.muted, maxLines = 1) }
+            Column(Modifier.weight(1f)) { T(tr("${if (job.bid) "سعر مقترح" else "الأجرة"}: $RY${job.price}", "${if (job.bid) "Suggested price" else "Fare"}: $RY${job.price}"), 11, FontWeight.Bold, C.head, maxLines = 1); T(job.opts, 10, FontWeight.Normal, C.muted, maxLines = 1) }
             if (job.isStore || job.companyFixed) {
                 Box(Modifier.clip(RoundedCornerShape(13.dp)).background(Color(0xFFFAF8F4)).border(1.dp, C.line, RoundedCornerShape(13.dp)).clickable(onClick = onReject).padding(horizontal = 15.dp, vertical = 10.dp), contentAlignment = Alignment.Center) { T(tr("رفض", "Reject"), 12, FontWeight.ExtraBold, C.muted) }
                 Spacer(Modifier.width(8.dp))
@@ -186,7 +186,7 @@ private fun HeadsUpCard(job: Job, onGo: () -> Unit, onIgnore: () -> Unit) {
             GradBadge(job.iconId, jobGradients[job.gradient], 40.dp, 14.dp)
             Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) { T(tr("طلب جديد من ${job.cust}", "New order from ${job.cust}"), 13, FontWeight.Bold, C.head, maxLines = 1); T(tr("${job.svc} · ${job.km} كم عنك", "${job.svc} · ${job.km} km from you"), 10, FontWeight.Normal, C.muted, maxLines = 1) }
-            Column(Modifier.clip(RoundedCornerShape(13.dp)).background(C.pillLive).padding(horizontal = 11.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) { T("﷼${job.price}", 14, FontWeight.Black, C.greenD); T(tr("السعر المقترح", "Suggested price"), 8, FontWeight.Normal, C.muted) }
+            Column(Modifier.clip(RoundedCornerShape(13.dp)).background(C.pillLive).padding(horizontal = 11.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) { T("$RY${job.price}", 14, FontWeight.Black, C.greenD); T(tr("السعر المقترح", "Suggested price"), 8, FontWeight.Normal, C.muted) }
         }
         Spacer(Modifier.height(9.dp)); RouteBox(trData(job.from), trData(job.to))
         Spacer(Modifier.height(10.dp))

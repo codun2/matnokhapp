@@ -55,7 +55,7 @@ fun WalletScreen(onBack: () -> Unit, onMenu: () -> Unit, onPayments: () -> Unit,
                 Column {
                     T(tr("الرصيد المتاح للسحب", "Balance available for withdrawal"), 12, FontWeight.Normal, Color.White.copy(alpha = .85f))
                     Spacer(Modifier.height(4.dp))
-                    T("﷼" + money(s?.available ?: w?.balance ?: 0.0), 32, FontWeight.Black, Color.White)
+                    T("$RY" + money(s?.available ?: w?.balance ?: 0.0), 32, FontWeight.Black, Color.White)
                     Spacer(Modifier.height(12.dp))
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         HeroStat(tr("المتراكم", "Accrued"), s?.accrued ?: 0.0, Modifier.weight(1f))
@@ -105,7 +105,7 @@ fun WalletScreen(onBack: () -> Unit, onMenu: () -> Unit, onPayments: () -> Unit,
             } else {
                 OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), PaddingValues(vertical = 4.dp)) {
                     txs.forEachIndexed { i, t ->
-                        Tx(R.drawable.ic_box, C.pillLive, C.greenD, trData(t.title), t.dt ?: "", "+ ﷼" + money(t.amount), C.greenD, last = i == txs.lastIndex)
+                        Tx(R.drawable.ic_box, C.pillLive, C.greenD, trData(t.title), t.dt ?: "", "+ $RY" + money(t.amount), C.greenD, last = i == txs.lastIndex)
                     }
                 }
             }
@@ -127,7 +127,7 @@ private fun HeroStat(label: String, value: Double, modifier: Modifier = Modifier
     Column(modifier.clip(RoundedCornerShape(13.dp)).background(Color.White.copy(alpha = .16f)).padding(vertical = 9.dp, horizontal = 8.dp)) {
         T(label, 9, FontWeight.Normal, Color.White.copy(alpha = .8f))
         Spacer(Modifier.height(2.dp))
-        T("﷼" + money(value), 12, FontWeight.Bold, Color.White, maxLines = 1)
+        T("$RY" + money(value), 12, FontWeight.Bold, Color.White, maxLines = 1)
     }
 }
 
@@ -149,7 +149,7 @@ private fun WithdrawRowUi(x: WithdrawRow, last: Boolean) {
             }
             Spacer(Modifier.width(8.dp))
             Column(horizontalAlignment = Alignment.End) {
-                T("﷼" + money(x.amount), 13, FontWeight.Black, C.head, maxLines = 1)
+                T("$RY" + money(x.amount), 13, FontWeight.Black, C.head, maxLines = 1)
                 Spacer(Modifier.height(3.dp))
                 StatusPill(wdStatusAr(x.status), wdKind(x.status))
             }
@@ -169,11 +169,11 @@ private fun WithdrawDialog(available: Double, min: Double, accounts: List<Payout
             T(tr("طلب سحب", "Withdrawal request"), 16, FontWeight.ExtraBold, C.head)
             Spacer(Modifier.height(12.dp))
             Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(C.pillLive).padding(12.dp)) {
-                T(tr("الرصيد المتاح: ﷼", "Available balance: ﷼") + money(available) + (if (min > 0) tr("   ·   أقل مبلغ ﷼", "   ·   min amount ﷼") + money(min) else ""), 11, FontWeight.Bold, C.greenD)
+                T(tr("الرصيد المتاح: $RY", "Available balance: $RY") + money(available) + (if (min > 0) tr("   ·   أقل مبلغ $RY", "   ·   min amount $RY") + money(min) else ""), 11, FontWeight.Bold, C.greenD)
             }
             Spacer(Modifier.height(12.dp))
             FieldLabel(tr("المبلغ", "Amount"), required = true)
-            FinField(amount, { v -> amount = v.filter { it.isDigit() || it == '.' } }, placeholder = "﷼", keyboard = KeyboardType.Number, align = TextAlign.Left)
+            FinField(amount, { v -> amount = v.filter { it.isDigit() || it == '.' } }, placeholder = "$RY", keyboard = KeyboardType.Number, align = TextAlign.Left)
             Spacer(Modifier.height(12.dp))
             FieldLabel(tr("طريقة السحب", "Withdrawal method"))
             accounts.forEach { a ->

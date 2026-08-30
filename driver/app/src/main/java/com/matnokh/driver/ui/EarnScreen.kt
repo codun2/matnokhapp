@@ -29,9 +29,9 @@ fun EarnScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit) 
             // بطاقة الأرباح — حقيقية
             Column(Modifier.padding(horizontal = 22.dp).padding(top = 4.dp).fillMaxWidth().clip(RoundedCornerShape(26.dp)).background(Grad.green).padding(22.dp)) {
                 T(tr("أرباح آخر 7 أيام", "Last 7 days' earnings"), 12, FontWeight.Normal, Color.White.copy(alpha = .85f))
-                Spacer(Modifier.height(4.dp)); T("﷼${d.week.toInt()}", 34, FontWeight.Black, Color.White)
+                Spacer(Modifier.height(4.dp)); T("$RY${d.week.toInt()}", 34, FontWeight.Black, Color.White)
                 Spacer(Modifier.height(10.dp))
-                Box(Modifier.clip(RoundedCornerShape(50.dp)).background(Color.White.copy(alpha = .22f)).padding(horizontal = 14.dp, vertical = 5.dp)) { T(tr("${d.trips_week} رحلة · الرصيد ﷼${d.balance.toInt()}", "${d.trips_week} trips · balance ﷼${d.balance.toInt()}"), 11, FontWeight.Bold, Color.White) }
+                Box(Modifier.clip(RoundedCornerShape(50.dp)).background(Color.White.copy(alpha = .22f)).padding(horizontal = 14.dp, vertical = 5.dp)) { T(tr("${d.trips_week} رحلة · الرصيد $RY${d.balance.toInt()}", "${d.trips_week} trips · balance $RY${d.balance.toInt()}"), 11, FontWeight.Bold, Color.White) }
             }
             Spacer(Modifier.height(14.dp))
             // مخطط 7 أيام — حقيقي
@@ -62,7 +62,7 @@ fun EarnScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit) 
                 val ops = d.operations
                 if (data == null) Box(Modifier.fillMaxWidth().padding(20.dp), contentAlignment = Alignment.Center) { T(tr("جارٍ التحميل…", "Loading…"), 11, FontWeight.Medium, C.muted) }
                 else if (ops.isEmpty()) Box(Modifier.fillMaxWidth().padding(20.dp), contentAlignment = Alignment.Center) { T(tr("لا توجد عمليات بعد", "No transactions yet"), 12, FontWeight.Medium, C.muted) }
-                else ops.forEach { op -> Tx(svcIcon(op.key), C.pillLive, C.greenD, trData(op.title), op.dt, "+ ﷼${op.amount.toInt()}", C.greenD) }
+                else ops.forEach { op -> Tx(svcIcon(op.key), C.pillLive, C.greenD, trData(op.title), op.dt, "+ $RY${op.amount.toInt()}", C.greenD) }
             }
             Spacer(Modifier.height(110.dp))
         }

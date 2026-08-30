@@ -20,7 +20,7 @@ fun WaitScreen(custName: String, sentAmt: Int, onBack: () -> Unit, onMenu: () ->
         Column(Modifier.weight(1f).padding(40.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             Box(Modifier.size(90.dp).clip(RoundedCornerShape(28.dp)).background(C.pillLive), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_clock, 42.dp, C.greenD) }
             Spacer(Modifier.height(20.dp))
-            T(tr("تم إرسال عرضك: ﷼$sentAmt", "Your offer was sent: ﷼$sentAmt"), 17, FontWeight.Black, C.head)
+            T(tr("تم إرسال عرضك: $RY$sentAmt", "Your offer was sent: $RY$sentAmt"), 17, FontWeight.Black, C.head)
             Spacer(Modifier.height(10.dp))
             androidx.compose.material3.Text(
                 tr("وصل عرضك إلى «$custName» كإشعار فوري. قد يستقبل عروضاً من سائقين آخرين — إذا اختارك سيُسند الطلب لك تلقائياً.", "Your offer reached «$custName» as an instant notification. They may receive offers from other drivers — if they choose you, the order is assigned to you automatically."),

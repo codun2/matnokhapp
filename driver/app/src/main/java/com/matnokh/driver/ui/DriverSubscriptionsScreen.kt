@@ -98,12 +98,12 @@ fun DriverSubscriptionsScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (St
                                 Spacer(Modifier.height(3.dp))
                                 T(subStatusLabel(s.status) + (s.days_left?.let { tr(" · متبقٍ $it يوم", " · $it days left") } ?: ""), 11, FontWeight.Medium, C.muted)
                             }
-                            T(if (s.price <= 0.0) tr("مجاناً", "Free") else "﷼${s.price.toInt()}", 14, FontWeight.ExtraBold, C.greenD)
+                            T(if (s.price <= 0.0) tr("مجاناً", "Free") else "$RY${s.price.toInt()}", 14, FontWeight.ExtraBold, C.greenD)
                         }
                         if (s.status == "pending" && s.price > 0.0) {
                             Spacer(Modifier.height(12.dp))
                             Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(13.dp)).background(C.green).clickable(enabled = busyId == null) { chooserFor = s }.padding(vertical = 12.dp), contentAlignment = Alignment.Center) {
-                                T(if (busyId == s.id) tr("جارٍ المعالجة…", "Processing…") else tr("ادفع الآن · ﷼${s.price.toInt()}", "Pay now · ﷼${s.price.toInt()}"), 13, FontWeight.ExtraBold, Color.White)
+                                T(if (busyId == s.id) tr("جارٍ المعالجة…", "Processing…") else tr("ادفع الآن · $RY${s.price.toInt()}", "Pay now · $RY${s.price.toInt()}"), 13, FontWeight.ExtraBold, Color.White)
                             }
                             Spacer(Modifier.height(5.dp))
                             T(tr("بعد الدفع عُد وحدّث الشاشة.", "After paying, come back and refresh the screen."), 10, FontWeight.Normal, C.muted)
@@ -121,7 +121,7 @@ fun DriverSubscriptionsScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (St
                 Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(C.card).padding(20.dp)) {
                     T(tr("اختر طريقة الدفع", "Choose a payment method"), 17, FontWeight.Black, C.head)
                     Spacer(Modifier.height(4.dp))
-                    T(tr("﷼${s.price.toInt()} · ${s.service ?: "خدمة"}", "﷼${s.price.toInt()} · ${s.service ?: "Service"}"), 12, FontWeight.Medium, C.muted)
+                    T(tr("$RY${s.price.toInt()} · ${s.service ?: "خدمة"}", "$RY${s.price.toInt()} · ${s.service ?: "Service"}"), 12, FontWeight.Medium, C.muted)
                     val eOn = payInfo?.tap_enabled == true
                     val bOn = payInfo?.bank_enabled != false
                     val cOn = payInfo?.cash_enabled != false

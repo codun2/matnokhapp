@@ -72,7 +72,7 @@ fun DashScreen(onMenu: () -> Unit, onOpenOrders: () -> Unit, onNotifications: ()
                 Column {
                     T(tr("مبيعات هذا الشهر", "This month's sales"), 12, FontWeight.Normal, Color.White.copy(alpha = .85f))
                     Spacer(Modifier.height(4.dp))
-                    T("﷼" + money(d?.sales_month ?: 0.0), 32, FontWeight.Black, Color.White)
+                    T("$RY" + money(d?.sales_month ?: 0.0), 32, FontWeight.Black, Color.White)
                     Spacer(Modifier.height(10.dp))
                     val g = d?.growth_pct
                     val trend = when {
@@ -148,7 +148,7 @@ private fun RecentOrdRow(o: DashOrder) {
     val shortNo = (o.order_no?.substringAfterLast("-")?.trimStart('0')?.ifEmpty { "0" }) ?: o.id.toString()
     val what = o.items ?: (if (o.items_count == 1) tr("صنف واحد", "One item") else tr("${o.items_count} أصناف", "${o.items_count} items"))
     val sub = buildString {
-        append(tr("$what · ﷼${money(o.total)} · طلب #$shortNo", "$what · ﷼${money(o.total)} · order #$shortNo"))
+        append(tr("$what · $RY${money(o.total)} · طلب #$shortNo", "$what · $RY${money(o.total)} · order #$shortNo"))
         o.driver?.let { append(tr(" · مندوب: $it", " · courier: $it")) }
     }
     OrdRow(

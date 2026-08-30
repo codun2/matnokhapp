@@ -35,7 +35,7 @@ fun ProfileScreen(onBack: () -> Unit, onMenu: () -> Unit, onLogout: () -> Unit, 
             Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Kpi("${Drv.tripsToday.value}", tr("رحلات اليوم", "Today's trips"), C.greenD, Modifier.weight(1f))
                 Kpi("${Drv.rating.value} ★", tr("التقييم", "Rating"), C.blueText, Modifier.weight(1f))
-                Kpi("﷼${Drv.balance.value}", tr("الرصيد", "Balance"), C.terraText, Modifier.weight(1f))
+                Kpi("$RY${Drv.balance.value}", tr("الرصيد", "Balance"), C.terraText, Modifier.weight(1f))
             }
             Spacer(Modifier.height(14.dp))
             if (Drv.companyName.value.isNotBlank()) {

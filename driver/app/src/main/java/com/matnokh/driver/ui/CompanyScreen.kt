@@ -57,7 +57,7 @@ fun CompanyScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Uni
                     Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(22.dp)).padding(16.dp)) {
                         T(tr("رصيدك الحالي لدى الشركة", "Your current balance with the company"), 11, FontWeight.Medium, C.muted)
                         Spacer(Modifier.height(4.dp))
-                        T("﷼${(d?.balance ?: 0.0).toInt()}", 22, FontWeight.ExtraBold, C.greenD)
+                        T("$RY${(d?.balance ?: 0.0).toInt()}", 22, FontWeight.ExtraBold, C.greenD)
                         Spacer(Modifier.height(2.dp))
                         T(tr("يُصفّى عند استلامك الدفعة من الشركة.", "Settled when you receive the payout from the company."), 10, FontWeight.Normal, C.muted)
                     }
@@ -71,7 +71,7 @@ fun CompanyScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Uni
                         settlements.forEach { s ->
                             Column(Modifier.fillMaxWidth().padding(bottom = 10.dp).clip(RoundedCornerShape(18.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(18.dp)).padding(14.dp)) {
                                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                                    T("﷼${s.amount.toInt()}", 16, FontWeight.ExtraBold, C.greenD, Modifier.weight(1f))
+                                    T("$RY${s.amount.toInt()}", 16, FontWeight.ExtraBold, C.greenD, Modifier.weight(1f))
                                     T(s.settled_at ?: "", 11, FontWeight.Medium, C.muted)
                                 }
                                 Spacer(Modifier.height(4.dp))

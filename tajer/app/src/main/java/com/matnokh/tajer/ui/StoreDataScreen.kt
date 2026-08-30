@@ -263,12 +263,12 @@ private fun StoreDeliveryCard(mode: String, fixed: String, perKm: String, onMode
         }
         Spacer(Modifier.height(12.dp))
         if (mode == "per_km") {
-            FieldLabel(tr("سعر الكيلومتر الواحد (﷼)", "Price per kilometer (﷼)"))
+            FieldLabel(tr("سعر الكيلومتر الواحد ($RY)", "Price per kilometer ($RY)"))
             FinField(perKm, onPerKm, tr("مثال: 2", "e.g. 2"), keyboard = androidx.compose.ui.text.input.KeyboardType.Decimal)
             Spacer(Modifier.height(5.dp))
             T(tr("الأجرة = سعر الكيلو × المسافة من متجرك إلى الزبون.", "Fee = per-km price × distance from your store to the customer."), 10, FontWeight.Medium, C.muted, lineHeight = 16)
         } else {
-            FieldLabel(tr("أجرة التوصيل الثابتة (﷼)", "Fixed delivery fee (﷼)"))
+            FieldLabel(tr("أجرة التوصيل الثابتة ($RY)", "Fixed delivery fee ($RY)"))
             FinField(fixed, onFixed, tr("مثال: 15", "e.g. 15"), keyboard = androidx.compose.ui.text.input.KeyboardType.Decimal)
             Spacer(Modifier.height(5.dp))
             T(tr("أجرة ثابتة لكل طلب داخل نطاق خدمتك.", "A fixed fee per order within your service area."), 10, FontWeight.Medium, C.muted, lineHeight = 16)

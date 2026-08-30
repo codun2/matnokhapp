@@ -41,14 +41,14 @@ fun BidScreen(job: Job, onBack: () -> Unit, onMenu: () -> Unit, onSend: (Int) ->
             }
             Spacer(Modifier.height(12.dp))
             OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth()) {
-                OcTitle(R.drawable.ic_cash, tr("عرضك للأجرة الكاملة (﷼)", "Your full-fare offer (﷼)"))
+                OcTitle(R.drawable.ic_cash, tr("عرضك للأجرة الكاملة ($RY)", "Your full-fare offer ($RY)"))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
                     BStep("−") { bid = maxOf(20, bid - 5) }
-                    Box(Modifier.weight(1f).height(56.dp).clip(RoundedCornerShape(17.dp)).background(Color.White).border(1.5.dp, Color(0xFFCFE0D4), RoundedCornerShape(17.dp)), contentAlignment = Alignment.Center) { T("﷼$bid", 24, FontWeight.Black, C.greenD) }
+                    Box(Modifier.weight(1f).height(56.dp).clip(RoundedCornerShape(17.dp)).background(Color.White).border(1.5.dp, Color(0xFFCFE0D4), RoundedCornerShape(17.dp)), contentAlignment = Alignment.Center) { T("$RY$bid", 24, FontWeight.Black, C.greenD) }
                     BStep("+") { bid += 5 }
                 }
                 Spacer(Modifier.height(10.dp))
-                T(tr("السعر المقترح من المنصّة: ﷼${job.price} (سعر الكيلو × المسافة + الإضافات). عرضك يصل الزبون فوراً — وقد يزايد سائقون آخرون.", "Platform-suggested price: ﷼${job.price} (per-km price × distance + extras). Your offer reaches the customer instantly — other drivers may bid too."), 10, FontWeight.Medium, C.muted, lineHeight = 17)
+                T(tr("السعر المقترح من المنصّة: $RY${job.price} (سعر الكيلو × المسافة + الإضافات). عرضك يصل الزبون فوراً — وقد يزايد سائقون آخرون.", "Platform-suggested price: $RY${job.price} (per-km price × distance + extras). Your offer reaches the customer instantly — other drivers may bid too."), 10, FontWeight.Medium, C.muted, lineHeight = 17)
             }
             Spacer(Modifier.height(16.dp))
             WideButton(tr("إرسال العرض للزبون", "Send offer to customer"), R.drawable.ic_check, modifier = Modifier.padding(horizontal = 22.dp)) { onSend(bid) }

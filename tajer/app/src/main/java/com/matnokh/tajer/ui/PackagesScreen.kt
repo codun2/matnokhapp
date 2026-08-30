@@ -67,7 +67,7 @@ fun PackagesScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Un
                             busy = false
                         }
                     }.padding(vertical = 15.dp), contentAlignment = Alignment.Center) {
-                        T(if (busy) tr("جارٍ فتح صفحة الدفع…", "Opening the payment page…") else tr("ادفع الاشتراك · ﷼${money(sub?.price ?: 0.0)}", "Pay subscription · ﷼${money(sub?.price ?: 0.0)}"), 15, FontWeight.ExtraBold, androidx.compose.ui.graphics.Color.White)
+                        T(if (busy) tr("جارٍ فتح صفحة الدفع…", "Opening the payment page…") else tr("ادفع الاشتراك · $RY${money(sub?.price ?: 0.0)}", "Pay subscription · $RY${money(sub?.price ?: 0.0)}"), 15, FontWeight.ExtraBold, androidx.compose.ui.graphics.Color.White)
                     }
                     Spacer(Modifier.height(6.dp))
                     T(tr("بعد إتمام الدفع، عُد واضغط «تحديث حالة الاشتراك».", "After completing payment, come back and tap «Refresh subscription status»."), 11, FontWeight.Normal, C.muted)
@@ -121,7 +121,7 @@ private fun PlanCard(p: PlanDto, enabled: Boolean, onSubscribe: (PlanDto) -> Uni
                 Spacer(Modifier.height(3.dp))
                 T(durationLabel(p.duration_days), 11, FontWeight.Medium, C.muted)
             }
-            T(if (p.price <= 0.0) tr("مجاناً", "Free") else "﷼${money(p.price)}", 18, FontWeight.ExtraBold, C.greenD)
+            T(if (p.price <= 0.0) tr("مجاناً", "Free") else "$RY${money(p.price)}", 18, FontWeight.ExtraBold, C.greenD)
         }
         if (p.features.isNotEmpty()) {
             Spacer(Modifier.height(10.dp))
