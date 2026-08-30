@@ -47,7 +47,7 @@ fun StoreScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, onPr
     val preloadCtx = androidx.compose.ui.platform.LocalContext.current
     LaunchedEffect(d) {
         val loader = coil.Coil.imageLoader(preloadCtx)
-        d.sections.flatMap { it.items }.mapNotNull { it.images.firstOrNull() }.distinct().take(30).forEach { u ->
+        d.sections.flatMap { it.items }.mapNotNull { it.images.firstOrNull() }.distinct().take(8).forEach { u ->
             loader.enqueue(coil.request.ImageRequest.Builder(preloadCtx).data(u).build())
         }
     }

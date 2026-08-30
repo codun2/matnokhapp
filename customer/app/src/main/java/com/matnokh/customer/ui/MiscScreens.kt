@@ -42,22 +42,30 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, onTrack: () -> Unit, to
     LaunchedEffect(RefreshBus.tick) { if (Session.isLoggedIn()) { val o = call({ Net.api.orders() }, toast)?.orders ?: emptyList(); val t = runCatching { Net.api.transportOrders().orders }.getOrNull() ?: emptyList(); torders = t; orders = o } else { orders = emptyList(); torders = emptyList() } }
     Column(Modifier.fillMaxSize().background(C.bg)) {
         ScreenHeader(if (activeOnly) tr("العروض الجارية", "Active offers") else tr("طلباتي", "My orders"), onBack, onMenu)
-        Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
-            val list = orders?.let { if (activeOnly) it.filter { o -> o.status in listOf("ready", "accepted", "picked_up", "on_the_way") } else it }
-            if (list == null) { Box(Modifier.fillMaxWidth().padding(30.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = C.green) } }
+        val list = orders?.let { if (activeOnly) it.filter { o -> o.status in listOf("ready", "accepted", "picked_up", "on_the_way") } else it }
+        val tlist = if (activeOnly) torders.filter { t -> t.status in listOf("broadcasting", "assigned", "loaded", "on_the_way") } else torders
+        // قائمة كسولة: تركيب البطاقات المرئية فقط (كانت تُركَّب كلها دفعة واحدة = تعليق مع كثرة الطلبات)
+        val merged = remember(orders, torders, activeOnly) {
+            val l = orders?.let { if (activeOnly) it.filter { o -> o.status in listOf("ready", "accepted", "picked_up", "on_the_way") } else it } ?: emptyList()
+            val tl = if (activeOnly) torders.filter { t -> t.status in listOf("broadcasting", "assigned", "loaded", "on_the_way") } else torders
+            (l.map { it as Any } + tl.map { it as Any }).sortedByDescending { when (it) { is OrderRowDto -> it.ts; is TOrder -> it.ts; else -> 0L } }
+        }
+        androidx.compose.foundation.lazy.LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(bottom = 20.dp)) {
+            if (list == null) { item { Box(Modifier.fillMaxWidth().padding(30.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = C.green) } } }
             else {
-                val tlist = if (activeOnly) torders.filter { t -> t.status in listOf("broadcasting", "assigned", "loaded", "on_the_way") } else torders
-                val done = list.count { it.status in listOf("delivered", "done") } + tlist.count { it.status == "delivered" }
-                val active = list.count { it.status in listOf("pending", "accepted", "ready", "picked_up", "on_the_way") } + tlist.count { it.status in listOf("broadcasting", "assigned", "loaded", "on_the_way") }
-                val spend = list.sumOf { it.total } + tlist.sumOf { it.final_fare ?: it.proposed_price }
-                if (!activeOnly) {
-                Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Kpi("$done", tr("طلب مكتمل", "Completed order"), C.greenD, Modifier.weight(1f)); Kpi("$active", tr("طلب نشط", "Active order"), C.blueText, Modifier.weight(1f)); Kpi("$RY${money(spend)}", tr("إجمالي الإنفاق", "Total spending"), C.terraText, Modifier.weight(1f))
+                if (!activeOnly) item {
+                    Column {
+                        val done = list.count { it.status in listOf("delivered", "done") } + tlist.count { it.status == "delivered" }
+                        val active = list.count { it.status in listOf("pending", "accepted", "ready", "picked_up", "on_the_way") } + tlist.count { it.status in listOf("broadcasting", "assigned", "loaded", "on_the_way") }
+                        val spend = list.sumOf { it.total } + tlist.sumOf { it.final_fare ?: it.proposed_price }
+                        Row(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Kpi("$done", tr("طلب مكتمل", "Completed order"), C.greenD, Modifier.weight(1f)); Kpi("$active", tr("طلب نشط", "Active order"), C.blueText, Modifier.weight(1f)); Kpi("$RY${money(spend)}", tr("إجمالي الإنفاق", "Total spending"), C.terraText, Modifier.weight(1f))
+                        }
+                        SecTitle(tr("الأحدث", "Newest"))
+                    }
                 }
-                SecTitle(tr("الأحدث", "Newest"))
-                }
-                if (list.isEmpty() && tlist.isEmpty()) CenterHint(if (!Session.isLoggedIn()) tr("سجّل الدخول لعرض طلباتك", "Log in to view your orders") else if (activeOnly) tr("لا توجد عروض جارية حالياً", "No active offers currently") else tr("لا توجد طلبات بعد", "No orders yet"))
-                (list.map { it as Any } + tlist.map { it as Any }).sortedByDescending { when (it) { is OrderRowDto -> it.ts; is TOrder -> it.ts; else -> 0L } }.forEach { item ->
+                if (list.isEmpty() && tlist.isEmpty()) item { CenterHint(if (!Session.isLoggedIn()) tr("سجّل الدخول لعرض طلباتك", "Log in to view your orders") else if (activeOnly) tr("لا توجد عروض جارية حالياً", "No active offers currently") else tr("لا توجد طلبات بعد", "No orders yet")) }
+                items(merged, key = { x -> when (x) { is OrderRowDto -> "o${x.id}"; is TOrder -> "t${x.id}"; else -> x.hashCode() } }) { item ->
                     if (item is OrderRowDto) {
                         val o = item
                         val (lbl, kind) = orderStatus(o.status)
@@ -79,7 +87,6 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, onTrack: () -> Unit, to
                     }
                 }
             }
-            Spacer(Modifier.height(20.dp))
         }
     }
 }
