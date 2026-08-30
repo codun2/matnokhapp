@@ -41,7 +41,7 @@ data class SubscribeBody(val subscription_plan_id: Int)
 
 // ── نماذج المتجر ──
 data class StoreData(
-    val id: Int, val store_name: String?, val owner_name: String?, val phone: String?, val email: String?,
+    val id: Int, val store_name: String?, val store_name_en: String? = null, val owner_name: String?, val phone: String?, val email: String?,
     val address: String?, val city_id: Int?, val city: String?, val store_category_id: Int?,
     val lat: Double?, val lng: Double?, val logo: String?, val status: String?,
     val rating: Double = 0.0, val balance: Double = 0.0,
