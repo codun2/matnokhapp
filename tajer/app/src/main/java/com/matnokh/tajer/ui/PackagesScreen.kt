@@ -97,8 +97,8 @@ fun PackagesScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Un
 @Composable
 private fun SubBanner(sub: SubDto?) {
     val (title, body, tint) = when (sub?.status) {
-        "active" -> Triple(tr("اشتراكك فعّال ✓", "Your subscription is active ✓"), tr("باقة ${sub?.plan_name ?: ""} — متبقٍ ${sub?.days_left ?: 0} يوم", "Package ${sub?.plan_name ?: ""} — ${sub?.days_left ?: 0} days left") + (sub?.ends_at?.let { tr(" (ينتهي $it)", " (ends $it)") } ?: ""), C.greenD)
-        "pending" -> Triple(tr("طلبك قيد المراجعة ⏳", "Your request is under review ⏳"), tr("باقة ${sub?.plan_name ?: ""} — بانتظار موافقة الإدارة، سنبلّغك فور التفعيل", "Package ${sub?.plan_name ?: ""} — awaiting admin approval; we'll notify you once activated"), Color(0xFFB45309))
+        "active" -> Triple(tr("اشتراكك فعّال ✓", "Your subscription is active ✓"), tr("باقة ${sub?.plan_name ?: ""} — متبقٍ ${sub?.days_left ?: 0} يوم", "Package ${trd(sub?.plan_name, sub?.plan_name_en)} — ${sub?.days_left ?: 0} days left") + (sub?.ends_at?.let { tr(" (ينتهي $it)", " (ends $it)") } ?: ""), C.greenD)
+        "pending" -> Triple(tr("طلبك قيد المراجعة ⏳", "Your request is under review ⏳"), tr("باقة ${sub?.plan_name ?: ""} — بانتظار موافقة الإدارة، سنبلّغك فور التفعيل", "Package ${trd(sub?.plan_name, sub?.plan_name_en)} — awaiting admin approval; we'll notify you once activated"), Color(0xFFB45309))
         "rejected" -> Triple(tr("لم يُعتمد طلبك السابق", "Your previous request wasn't approved"), tr("اختر باقة من الأسفل لإعادة الطلب", "Choose a package below to reorder"), C.terra)
         "expired" -> Triple(tr("انتهى اشتراكك", "Your subscription has expired"), tr("اختر باقة لتجديد اشتراكك", "Choose a package to renew your subscription"), C.terra)
         else -> Triple(tr("اختر باقتك للبدء", "Choose your package to start"), tr("كل الباقات تمنحك طلبات ومنتجات بلا حدود — الفرق في المدة والنوع فقط", "All packages give you unlimited orders and products — they differ only in duration and type"), C.head)
@@ -117,7 +117,7 @@ private fun PlanCard(p: PlanDto, enabled: Boolean, onSubscribe: (PlanDto) -> Uni
     Column(Modifier.padding(bottom = 14.dp).fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(20.dp)).padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                T(p.name, 15, FontWeight.ExtraBold, C.head)
+                T(trd(p.name, p.name_en), 15, FontWeight.ExtraBold, C.head)
                 Spacer(Modifier.height(3.dp))
                 T(durationLabel(p.duration_days), 11, FontWeight.Medium, C.muted)
             }
