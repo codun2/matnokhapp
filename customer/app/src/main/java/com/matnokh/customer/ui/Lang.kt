@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /** حالة اللغة العامة (عربي/إنجليزي) مع الحفظ. */
 object Lang {
@@ -15,8 +18,15 @@ object Lang {
         val p = ctx.getSharedPreferences("matnokh_customer", Context.MODE_PRIVATE)
         prefs = p
         code = p.getString("lang", "ar") ?: "ar"
+        syncToServer()
     }
-    fun set(c: String) { code = c; prefs?.edit()?.putString("lang", c)?.apply() }
+    fun set(c: String) { code = c; prefs?.edit()?.putString("lang", c)?.apply(); syncToServer() }
+    /** مزامنة اللغة للخادم — إشعارات Push تصل بلغة المستخدم المختارة. يتجاهل الفشل بصمت (قبل الدخول مثلاً). */
+    fun syncToServer() {
+        CoroutineScope(Dispatchers.IO).launch {
+            runCatching { com.matnokh.customer.net.Net.api.setLanguage(com.matnokh.customer.net.LangBody(code)) }
+        }
+    }
     fun toggle() = set(if (isAr) "en" else "ar")
 }
 

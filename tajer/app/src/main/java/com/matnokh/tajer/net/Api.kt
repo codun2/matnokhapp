@@ -30,7 +30,7 @@ data class RegisterBody(val store_name: String, val owner_name: String, val phon
 data class LoginResp(val token: String?, val merchant: MerchantBrief?, val message: String?, val status: String?)
 data class MsgResp(val message: String?, val status: String?, val dev_code: String?)
 data class MeResp(val merchant: MerchantBrief?)
-data class NotifItem(val id: Int, val title: String, val body: String, val type: String? = null, val dt: String? = null)
+data class NotifItem(val id: Int, val title: String, val body: String, val type: String? = null, val dt: String? = null, val title_en: String? = null, val body_en: String? = null)
 data class NotificationsResp(val notifications: List<NotifItem>)
 data class PlanDto(val id: Int, val name: String, val name_en: String? = null, val type: String = "regular", val price: Double = 0.0, val duration_days: Int = 30, val features: List<String> = emptyList(), val description: String? = null)
 data class PlansResp(val plans: List<PlanDto> = emptyList())
@@ -142,6 +142,7 @@ interface MerchantApi {
     @GET("merchant/me") suspend fun me(): MeResp
     @POST("merchant/device-token") suspend fun registerDeviceToken(@Body body: Map<String, String>): MsgResp
     @GET("merchant/notifications") suspend fun notifications(): NotificationsResp
+    @retrofit2.http.POST("merchant/language") suspend fun setLanguage(@retrofit2.http.Body b: LangBody): LangResp
     @GET("merchant/plans") suspend fun plans(): PlansResp
     @GET("merchant/subscription") suspend fun subscription(): SubResp
     @POST("merchant/subscribe") suspend fun subscribe(@Body body: SubscribeBody): MsgResp
@@ -227,3 +228,6 @@ fun errorMessage(e: retrofit2.HttpException): String? = try {
         }
     }
 } catch (_: Exception) { null }
+
+data class LangBody(val lang: String)
+data class LangResp(val lang: String? = null)

@@ -50,7 +50,7 @@ data class TrackDriver(val name: String? = null, val phone: String? = null, val 
 data class LatLngDto(val lat: Double? = null, val lng: Double? = null)
 data class OrderBidsResp(val bids: List<OrderBidDto> = emptyList(), val status: String? = null, val driver_id: Int? = null, val step: Int = 0, val order_no: String? = null, val store: String? = null, val store_en: String? = null, val driver: TrackDriver? = null, val pickup: LatLngDto? = null, val drop: LatLngDto? = null)
 data class PickBidBody(val bid_id: Int)
-data class NotifItem(val id: Int, val title: String, val body: String, val type: String? = null, val ref_id: Int? = null, val ref_kind: String? = null, val dt: String? = null)
+data class NotifItem(val id: Int, val title: String, val body: String, val type: String? = null, val ref_id: Int? = null, val ref_kind: String? = null, val dt: String? = null, val title_en: String? = null, val body_en: String? = null)
 data class NotifResp(val notifications: List<NotifItem>)
 data class OrderItemBody(val product_id: Int?, val name: String, val price: Double, val qty: Int, val addons: List<String>)
 data class QuoteBody(val merchant_id: Int, val drop_lat: Double? = null, val drop_lng: Double? = null)
@@ -111,6 +111,7 @@ interface CustomerApi {
     @POST("customer/orders/{id}/pick-bid") suspend fun pickBid(@Path("id") id: Int, @Body b: PickBidBody): MsgResp
     @POST("customer/device-token") suspend fun registerDeviceToken(@Body b: Map<String, String>): MsgResp
     @GET("customer/notifications") suspend fun notifications(): NotifResp
+    @retrofit2.http.POST("customer/language") suspend fun setLanguage(@retrofit2.http.Body b: LangBody): LangResp
 }
 
 object Net {
@@ -138,3 +139,6 @@ fun errorMessage(e: retrofit2.HttpException): String? = try {
             else -> null }
     }
 } catch (_: Exception) { null }
+
+data class LangBody(val lang: String)
+data class LangResp(val lang: String? = null)

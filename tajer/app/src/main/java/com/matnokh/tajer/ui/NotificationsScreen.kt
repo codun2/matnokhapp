@@ -43,10 +43,10 @@ fun NotificationsScreen(onBack: () -> Unit, onMenu: () -> Unit, onOpen: (String?
                         Spacer(Modifier.width(13.dp))
                         Column(Modifier.weight(1f)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                T(n.title, 13, FontWeight.Bold, C.head, Modifier.weight(1f), maxLines = 1)
+                                T(trd(n.title, n.title_en), 13, FontWeight.Bold, C.head, Modifier.weight(1f), maxLines = 1)
                                 n.dt?.let { T(it, 9, FontWeight.Medium, C.muted) }
                             }
-                            Spacer(Modifier.height(3.dp)); T(n.body, 11, FontWeight.Normal, C.muted, lineHeight = 18)
+                            Spacer(Modifier.height(3.dp)); T(trd(n.body, n.body_en), 11, FontWeight.Normal, C.muted, lineHeight = 18)
                         }
                     }
                 }

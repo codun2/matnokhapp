@@ -66,7 +66,7 @@ data class JobDto(
 data class OrdersResp(val orders: List<JobDto>)
 data class DashResp(val trips_today: Int = 0, val earnings_today: Double = 0.0, val rating: Double = 5.0, val balance: Double = 0.0)
 data class AvailBody(val is_available: Boolean)
-data class NotifItem(val title: String = "", val body: String = "", val type: String? = null, val dt: String? = null)
+data class NotifItem(val title: String = "", val body: String = "", val type: String? = null, val dt: String? = null, val title_en: String? = null, val body_en: String? = null)
 data class NotifResp(val notifications: List<NotifItem> = emptyList())
 data class EarnDay(val label: String = "", val amount: Double = 0.0)
 data class EarnOp(val title: String = "", val dt: String = "", val amount: Double = 0.0, val key: String? = null)
@@ -111,6 +111,7 @@ interface DriverApi {
     @GET("driver/store-orders") suspend fun storeOrders(): StoreOrdersResp
     @GET("driver/store-active") suspend fun storeActive(): StoreOrdersResp
     @GET("driver/notifications") suspend fun notifications(): NotifResp
+    @retrofit2.http.POST("driver/language") suspend fun setLanguage(@retrofit2.http.Body b: LangBody): LangResp
     @GET("driver/my-offers") suspend fun myOffers(): OrdersResp
     @GET("driver/earnings") suspend fun earnings(): EarnResp
     @POST("driver/store-orders/{id}/bid") suspend fun storeBid(@Path("id") id: Int, @Body b: BidBody): MsgResp
@@ -153,3 +154,6 @@ fun errorMessage(e: HttpException): String? = try {
         }
     }
 } catch (_: Exception) { null }
+
+data class LangBody(val lang: String)
+data class LangResp(val lang: String? = null)
