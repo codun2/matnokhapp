@@ -74,7 +74,6 @@ private fun DocCard(
     onUploaded: (String) -> Unit, onBusyEnd: () -> Unit,
 ) {
     var text by remember { mutableStateOf(d.value ?: "") }
-    var open by remember { mutableStateOf(false) }  // الوثائق مطوية افتراضياً — تُفتح بالسهم
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri == null) { onBusyEnd(); return@rememberLauncherForActivityResult }
         scope.launch {
@@ -89,7 +88,7 @@ private fun DocCard(
     }
 
     OCard(Modifier.padding(start = 22.dp, end = 22.dp, bottom = 12.dp).fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth().clickable { open = !open }, verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(40.dp).clip(RoundedCornerShape(13.dp)).background(C.card2), contentAlignment = Alignment.Center) {
                 Ic(if (d.field == "text") R.drawable.ic_cash else R.drawable.ic_doc, 20.dp, C.greenD)
             }
@@ -102,9 +101,7 @@ private fun DocCard(
                 if (d.description != null) { Spacer(Modifier.height(2.dp)); T(d.description, 10, FontWeight.Normal, C.muted, lineHeight = 16) }
             }
             DocStatus(d.status)
-            Spacer(Modifier.width(8.dp)); T(if (open) "▴" else "▾", 13, FontWeight.Bold, C.muted)
         }
-        if (open) {
         Spacer(Modifier.height(10.dp))
         if (d.field == "text") {
             FinField(text, { text = it }, tr("أدخل القيمة (مثال: SA00 0000 …)", "Enter the value (e.g. SA00 0000 …)"))
@@ -114,7 +111,6 @@ private fun DocCard(
             WideButton(if (busy) tr("جارٍ الرفع…", "Uploading…") else if (d.value != null) tr("تغيير الملف", "Change file") else tr("رفع الملف", "Upload file"), R.drawable.ic_img, ghost = d.value != null) {
                 if (!busy) { onPickFile(); picker.launch("*/*") }
             }
-        }
         }
     }
 }

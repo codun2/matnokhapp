@@ -12,7 +12,7 @@ android {
         applicationId = "com.matnokh.tajer"
         minSdk = 26
         targetSdk = 34
-        versionCode = 35
+        versionCode = 34
         versionName = "3.1"
     }
 
