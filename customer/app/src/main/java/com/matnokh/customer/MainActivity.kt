@@ -66,7 +66,6 @@ fun Root() {
     val openMenu = { drawerOpen = true }
     LaunchedEffect(toastMsg) { if (toastMsg != null) { delay(2400); toastMsg = null } }
     LaunchedEffect(Unit) { call({ Repo.loadHome() }, toast) }
-    LaunchedEffect(screen) { if (screen == "stores") runCatching { Repo.reloadStores() } }
     val ctx = LocalContext.current
     val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { }
     LaunchedEffect(Unit) {
@@ -93,7 +92,7 @@ fun Root() {
             "register" -> RegisterScreen(onDone = { screen = "home"; Fcm.registerToken(ctx) }, onBack = { screen = "login" }, toast = toast)
             else -> Column(Modifier.fillMaxSize()) {
                 Box(Modifier.weight(1f)) {
-                    Refreshable({ RefreshBus.tick++; runCatching { when (screen) { "home", "offersall", "track" -> Repo.loadHome(); "stores" -> Repo.reloadStores(); else -> {} } } }) {
+                    Refreshable({ RefreshBus.tick++; runCatching { when (screen) { "home", "offersall", "track" -> Repo.loadHome(); else -> {} } } }) {
                     when (screen) {
                         "home" -> HomeScreen(openMenu, onCart, { screen = "stores" }, { screen = "offersall" }, { screen = "nearby" }, { openStore(it) }, { Sel.svc = it; screen = "order" }, { screen = "activeoffers" }, { screen = "notifications" }, onAllServices = { screen = "services" })
                         "stores" -> StoresScreen({ screen = "home" }, onCart, openMenu) { openStore(it) }

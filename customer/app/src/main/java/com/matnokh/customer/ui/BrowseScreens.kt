@@ -42,7 +42,7 @@ fun StoresScreen(onBack: () -> Unit, onCart: () -> Unit, onMenu: () -> Unit, onS
         if (loading) return
         loading = true
         val next = if (reset) 1 else page + 1
-        val r = runCatching { com.matnokh.customer.net.Net.api.stores(cat, next, 20, query.trim().ifBlank { null }) }.getOrNull()
+        val r = runCatching { com.matnokh.customer.net.Net.api.stores(cat, next, 10, query.trim().ifBlank { null }) }.getOrNull()
         if (r != null) {
             val ui = Repo.toUiStores(r.stores)
             stores = if (reset) ui else stores + ui

@@ -47,7 +47,7 @@ object Repo {
 
     suspend fun loadHome() {
         categories = Net.api.categories().categories
-        stores = Net.api.stores().stores.map { it.toUi() }
+        stores = Net.api.stores(page = 1, per = 8).stores.map { it.toUi() }
         offers = Net.api.offers().offers.map { o ->
             UiOffer(UiProduct(o.id, o.name, o.name_en, o.description ?: "", o.description_en, o.price, o.price_before, o.images, o.addons.map { UiAddon(it.name, it.name_en, it.price) }), o.store_id, o.store_name, o.store_logo, o.store_category ?: "", o.off)
         }
