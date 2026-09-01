@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.matnokh.driver"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.matnokh.driver"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 34
         versionName = "3.4"
     }

@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.matnokh.tajer"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.matnokh.tajer"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 36
         versionName = "3.1"
     }
