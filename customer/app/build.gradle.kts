@@ -7,7 +7,7 @@ android {
     namespace = "com.matnokh.customer"
     compileSdk = 34
     defaultConfig {
-        applicationId = "com.matnokh.customer"
+        applicationId = "com.matnook.customer"
         minSdk = 26; targetSdk = 34; versionCode = 36; versionName = "2.7"
     }
     signingConfigs {
