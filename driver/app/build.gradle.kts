@@ -17,6 +17,12 @@ android {
     }
 
     signingConfigs {
+        create("release") {
+            storeFile = file("/opt/gradle-home/matnokh-release.keystore")
+            storePassword = "matnokh-release-2026"
+            keyAlias = "matnokh"
+            keyPassword = "matnokh-release-2026"
+        }
         getByName("debug") {
             storeFile = file("/opt/gradle-home/debug.keystore")
             storePassword = "android"
@@ -27,6 +33,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {

@@ -17,8 +17,14 @@ android {
             keyAlias = "androiddebugkey"
             keyPassword = "android"
         }
+        create("release") {
+            storeFile = file("/opt/gradle-home/matnokh-release.keystore")
+            storePassword = "matnokh-release-2026"
+            keyAlias = "matnokh"
+            keyPassword = "matnokh-release-2026"
+        }
     }
-    buildTypes { release { isMinifyEnabled = false } }
+    buildTypes { release { isMinifyEnabled = false; signingConfig = signingConfigs.getByName("release") } }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true }
