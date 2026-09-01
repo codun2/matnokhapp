@@ -53,10 +53,7 @@ fun Root() {
     var screen by remember { mutableStateOf(if (Session.isLoggedIn()) "home" else "splash") }
     LaunchedEffect(DrvNotif.open) { DrvNotif.open?.let { o -> if (Session.isLoggedIn()) screen = o; DrvNotif.open = null } }
     val fcmCtx = androidx.compose.ui.platform.LocalContext.current
-    val bgLocLauncher = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { }
-    val permLauncher = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()) { res ->
-        if (res[android.Manifest.permission.ACCESS_FINE_LOCATION] == true && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q && androidx.core.content.ContextCompat.checkSelfPermission(fcmCtx, android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED) { bgLocLauncher.launch(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) }
-    }
+    val permLauncher = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()) { }
     LaunchedEffect(Unit) {
         val perms = mutableListOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) perms.add(android.Manifest.permission.POST_NOTIFICATIONS)
