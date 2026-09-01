@@ -254,7 +254,8 @@ fun CartScreen(onBack: () -> Unit, onMenu: () -> Unit, onOrdered: (String, Int?)
             }
             Column(Modifier.padding(horizontal = 22.dp, vertical = 12.dp).fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(Color(0xFFF2F8F3)).border(1.dp, Color(0xFFCFE0D4), RoundedCornerShape(18.dp)).padding(horizontal = 15.dp, vertical = 12.dp)) { T(tr("بعد تأكيد الطلب يُرسَل للمتجر، وبعد تجهيزه يُسنَد لأقرب مندوب لتوصيله إليك.", "After you confirm, the order goes to the store; once prepared it's assigned to the nearest courier to deliver it to you."), 11, FontWeight.Medium, Color(0xFF4B5A51), lineHeight = 20) }
             DestRow(onDest)
-            Column(Modifier.padding(horizontal = 22.dp, vertical = 4.dp).fillMaxWidth()) {
+            // قسم اختيار الدفع يظهر فقط إذا أدخل المتجر حسابه البنكي؛ وإلا يُتمّ الطلب بالبطاقة مباشرة (payMethod=card الافتراضي)
+            if (!bankIban.isNullOrBlank()) Column(Modifier.padding(horizontal = 22.dp, vertical = 4.dp).fillMaxWidth()) {
                 T(tr("وسيلة الدفع", "Payment method"), 13, FontWeight.Bold, C.head)
                 Spacer(Modifier.height(8.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
