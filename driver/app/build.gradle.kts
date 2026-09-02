@@ -9,7 +9,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.matnokh.driver"
+        applicationId = "com.matnook.driver"
         minSdk = 26
         targetSdk = 36
         versionCode = 34
