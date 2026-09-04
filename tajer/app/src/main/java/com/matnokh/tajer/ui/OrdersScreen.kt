@@ -171,7 +171,7 @@ private fun OrderCard(o: OrderRow, onOpen: () -> Unit, onAccept: () -> Unit, onR
                 ActBtn(tr("رفض", "Reject"), R.drawable.ic_x, ActKind.Rj, Modifier.weight(1f), onReject)
             }
             "prep" -> ActionRow { ActBtn(tr("جاهز — أبلغ المناديب", "Ready — notify couriers"), R.drawable.ic_check, ActKind.Ok, Modifier.weight(1f), onReady) }
-            "ready" -> ActionRow { ActBtn(tr("بُثّ للمناديب — بانتظار من يستلمه", "Broadcast to couriers — awaiting acceptance"), R.drawable.ic_clock, ActKind.Ghost, Modifier.weight(1f)) {} }
+            "ready" -> ActionRow { ActBtn(tr("بُثّ للمناديب", "Broadcast to couriers"), R.drawable.ic_clock, ActKind.Ghost, Modifier.weight(1f)) {}; ActBtn(tr("إلغاء وإرجاع المبلغ", "Cancel & refund"), R.drawable.ic_x, ActKind.Rj, Modifier.weight(1f)) { onCancel() } }
         }
     }
 }

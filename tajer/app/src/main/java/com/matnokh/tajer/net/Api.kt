@@ -117,7 +117,7 @@ data class DashWeekDay(val label: String, val total: Double)
 data class DashOrder(val id: Int, val order_no: String?, val customer: String, val items_count: Int, val total: Double, val status: String, val driver: String? = null, val dt: String? = null, val items: String? = null)
 data class DashResp(val sales_month: Double, val orders_month: Int, val growth_pct: Int? = null, val branches: Int, val products: Int, val rating: Double, val week: List<DashWeekDay> = emptyList(), val recent: List<DashOrder> = emptyList())
 
-data class WalletTx(val id: Int, val title: String, val dt: String? = null, val amount: Double)
+data class WalletTx(val id: Int, val title: String, val dt: String? = null, val amount: Double, val title_en: String? = null, val order_no: String? = null)
 data class WalletResp(val balance: Double, val transactions: List<WalletTx> = emptyList())
 
 // ---- payout / withdrawals ----

@@ -105,7 +105,7 @@ fun WalletScreen(onBack: () -> Unit, onMenu: () -> Unit, onPayments: () -> Unit,
             } else {
                 OCard(Modifier.padding(horizontal = 22.dp).fillMaxWidth(), PaddingValues(vertical = 4.dp)) {
                     txs.forEachIndexed { i, t ->
-                        Tx(R.drawable.ic_box, C.pillLive, C.greenD, trData(t.title), t.dt ?: "", "+ $RY" + money(t.amount), C.greenD, last = i == txs.lastIndex)
+                        Tx(R.drawable.ic_box, C.pillLive, C.greenD, trd(t.title, t.title_en), listOfNotNull(t.order_no?.let { tr("طلب #", "Order #") + it }, t.dt?.takeIf { it.isNotBlank() }).joinToString("  ·  "), "+ $RY" + money(t.amount), C.greenD, last = i == txs.lastIndex)
                     }
                 }
             }
@@ -205,12 +205,14 @@ private fun Tx(iconId: Int, iconBg: Color, iconColor: Color, title: String, sub:
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                T(title, 12, FontWeight.Bold, C.head, maxLines = 1)
-                Spacer(Modifier.height(1.dp))
-                T(sub, 10, FontWeight.Medium, C.muted, lineHeight = 16)
+                T(title, 13, FontWeight.ExtraBold, C.head, maxLines = 1)
+                Spacer(Modifier.height(2.dp))
+                T(sub, 11, FontWeight.Medium, C.muted, maxLines = 1)
             }
-            Spacer(Modifier.width(8.dp))
-            T(amount, 13, FontWeight.Black, amountColor, maxLines = 1)
+            Spacer(Modifier.width(10.dp))
+            Box(Modifier.clip(RoundedCornerShape(10.dp)).background(iconBg).padding(horizontal = 10.dp, vertical = 6.dp)) {
+                T(amount, 13, FontWeight.Black, amountColor, maxLines = 1)
+            }
         }
         if (!last) androidx.compose.foundation.Canvas(Modifier.fillMaxWidth().height(1.dp).padding(horizontal = 16.dp)) {
             drawLine(Color(0xFFF0ECE3), androidx.compose.ui.geometry.Offset(0f, 0f), androidx.compose.ui.geometry.Offset(size.width, 0f), 1f)
