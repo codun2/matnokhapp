@@ -102,6 +102,7 @@ fun OrdersScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit
                     onAccept = { act { call({ Net.api.acceptOrder(o.id) }, toast)?.let { toast(it.message ?: "") } } },
                     onReject = { act { call({ Net.api.rejectOrder(o.id) }, toast)?.let { toast(it.message ?: "") } } },
                     onReady = { act { call({ Net.api.readyOrder(o.id) }, toast)?.let { toast(it.message ?: "") } } },
+                    onCancel = { act { call({ Net.api.cancelOrder(o.id) }, toast)?.let { toast(it.message ?: "") } } },
                     onConfirmPay = { act { call({ Net.api.confirmPayment(o.id) }, toast)?.let { toast(it.message ?: "") } } },
                     onRejectPay = { act { call({ Net.api.rejectPayment(o.id) }, toast)?.let { toast(it.message ?: "") } } },
                     onViewProof = { o.payment_proof?.let { proofImg = it } ?: toast(tr("لا يوجد إيصال مرفوع", "No receipt uploaded")) })
@@ -138,7 +139,7 @@ private fun ModeBar(iconId: Int, prep: Boolean, bold: String, rest: String) {
 }
 
 @Composable
-private fun OrderCard(o: OrderRow, onOpen: () -> Unit, onAccept: () -> Unit, onReject: () -> Unit, onReady: () -> Unit, onConfirmPay: () -> Unit = {}, onRejectPay: () -> Unit = {}, onViewProof: () -> Unit = {}) {
+private fun OrderCard(o: OrderRow, onOpen: () -> Unit, onAccept: () -> Unit, onReject: () -> Unit, onReady: () -> Unit, onConfirmPay: () -> Unit = {}, onRejectPay: () -> Unit = {}, onViewProof: () -> Unit = {}, onCancel: () -> Unit = {}) {
     val (lbl, kind) = orderStatus(o.status)
     val st = o.status
     val iconId = when (st) { "withdriver" -> R.drawable.ic_van; "done" -> R.drawable.ic_check; else -> R.drawable.ic_list }
