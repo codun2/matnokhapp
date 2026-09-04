@@ -38,7 +38,7 @@ fun NotificationsScreen(onBack: () -> Unit, onMenu: () -> Unit, onOpen: (String?
             else -> LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(top = 4.dp, bottom = 24.dp)) {
                 items(list) { n ->
                     Row(Modifier.padding(start = 22.dp, end = 22.dp, bottom = 12.dp).fillMaxWidth()
-                        .clip(RoundedCornerShape(20.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(20.dp)).clickable { onOpen(n.type) }.padding(15.dp)) {
+                        .clip(RoundedCornerShape(20.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(20.dp)).padding(15.dp)) {
                         Box(Modifier.size(42.dp).clip(RoundedCornerShape(14.dp)).background(C.pillLive), contentAlignment = Alignment.Center) { Ic(R.drawable.ic_bell, 20.dp, C.greenD) }
                         Spacer(Modifier.width(13.dp))
                         Column(Modifier.weight(1f)) {
