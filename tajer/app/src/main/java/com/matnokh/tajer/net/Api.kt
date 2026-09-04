@@ -185,6 +185,7 @@ interface MerchantApi {
     @POST("merchant/orders/{id}/ready") suspend fun readyOrder(@Path("id") id: Int): MsgResp
     @POST("merchant/orders/{id}/confirm-payment") suspend fun confirmPayment(@Path("id") id: Int): MsgResp
     @POST("merchant/orders/{id}/reject-payment") suspend fun rejectPayment(@Path("id") id: Int): MsgResp
+    @POST("merchant/orders/{id}/cancel") suspend fun cancelOrder(@Path("id") id: Int): MsgResp
 
     @GET("merchant/payments") suspend fun payments(): PaymentsResp
     @POST("merchant/payments") suspend fun linkPayment(@Body body: LinkPayBody): MsgResp
