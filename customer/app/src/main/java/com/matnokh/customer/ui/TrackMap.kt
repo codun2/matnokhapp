@@ -81,14 +81,16 @@ fun AnimatedCarMarker(target: LatLng, title: String, ctx: Context, toward: LatLn
             else -> rot
         }
         if (start.latitude == target.latitude && start.longitude == target.longitude) return@LaunchedEffect
-        val frames = 25
+        // حركة مستمرة تمتد على كامل الفجوة بين تحديثات الموقع (بدل قفزة سريعة ثم تجمّد)
+        val frames = 60
         repeat(frames) { i ->
-            val tt = (i + 1) / frames.toFloat()
+            val raw = (i + 1) / frames.toFloat()
+            val tt = raw * raw * (3f - 2f * raw)  // easing ناعم (ease-in-out)
             state.position = LatLng(
                 start.latitude + (target.latitude - start.latitude) * tt,
                 start.longitude + (target.longitude - start.longitude) * tt,
             )
-            delay(48)
+            delay(50)
         }
         state.position = target
     }

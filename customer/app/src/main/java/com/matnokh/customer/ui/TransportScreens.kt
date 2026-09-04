@@ -277,7 +277,7 @@ fun TrackScreen(onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit,
     var rated by remember { mutableStateOf(0) }
     LaunchedEffect(rated) { if (rated > 0) runCatching { com.matnokh.customer.net.Net.api.rate(com.matnokh.customer.net.RateBody(Sel.transportId ?: 0, true, rated)) } }
     var ord by remember { mutableStateOf<com.matnokh.customer.net.TOrder?>(null) }
-    LaunchedEffect(Unit) { while (true) { val o = runCatching { com.matnokh.customer.net.Net.api.transportOrders().orders.firstOrNull { it.id == Sel.transportId } }.getOrNull(); ord = o; if (o != null) step = when (o.status) { "assigned" -> 1; "loaded" -> 2; "on_the_way" -> 3; "delivered" -> 4; else -> step }; delay(4000) } }
+    LaunchedEffect(Unit) { while (true) { val o = runCatching { com.matnokh.customer.net.Net.api.transportOrders().orders.firstOrNull { it.id == Sel.transportId } }.getOrNull(); ord = o; if (o != null) step = when (o.status) { "assigned" -> 1; "loaded" -> 2; "on_the_way" -> 3; "delivered" -> 4; else -> step }; delay(3000) } }
     Column(Modifier.fillMaxSize().background(C.bg)) {
         ScreenHeader(tr("تتبّع الطلب", "Track order"), onBack, onMenu)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {

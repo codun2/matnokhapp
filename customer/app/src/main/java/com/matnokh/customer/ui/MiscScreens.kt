@@ -191,7 +191,7 @@ fun OrderBidsScreen(order: OrderRowDto, onBack: () -> Unit, onMenu: () -> Unit, 
     var resp by remember { mutableStateOf<OrderBidsResp?>(null) }
     var rated by remember { mutableStateOf(0) }
     LaunchedEffect(rated) { if (rated > 0) runCatching { Net.api.rate(com.matnokh.customer.net.RateBody(order.id, false, rated)) } }
-    LaunchedEffect(Unit) { while (true) { runCatching { resp = Net.api.orderBids(order.id) }; kotlinx.coroutines.delay(4000) } }
+    LaunchedEffect(Unit) { while (true) { runCatching { resp = Net.api.orderBids(order.id) }; kotlinx.coroutines.delay(3000) } }
     val ctx = LocalContext.current
     Column(Modifier.fillMaxSize().background(C.bg)) {
         ScreenHeader(tr("تتبّع الطلب — رقم ", "Track order — No. ") + (order.order_no ?: order.id.toString()).substringAfterLast("-"), onBack, onMenu)

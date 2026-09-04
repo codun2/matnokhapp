@@ -56,8 +56,8 @@ class LocationService : Service() {
             stopSelf(); return
         }
         fused = LocationServices.getFusedLocationProviderClient(this)
-        val req = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 20_000L)
-            .setMinUpdateIntervalMillis(10_000L)
+        val req = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5_000L)
+            .setMinUpdateIntervalMillis(3_000L)
             .build()
         cb = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
