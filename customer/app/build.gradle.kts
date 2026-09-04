@@ -8,7 +8,7 @@ android {
     compileSdk = 36
     defaultConfig {
         applicationId = "com.matnook.customer"
-        minSdk = 26; targetSdk = 36; versionCode = 37; versionName = "2.7"
+        minSdk = 26; targetSdk = 36; versionCode = 38; versionName = "2.7"
     }
     signingConfigs {
         getByName("debug") {
