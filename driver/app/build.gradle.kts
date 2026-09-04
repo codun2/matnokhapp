@@ -12,7 +12,7 @@ android {
         applicationId = "com.matnook.driver"
         minSdk = 26
         targetSdk = 36
-        versionCode = 34
+        versionCode = 35
         versionName = "3.4"
     }
 

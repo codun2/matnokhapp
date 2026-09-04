@@ -52,7 +52,7 @@ fun FinField(
     singleLine: Boolean = true,
     minHeight: Dp = 46.dp,
     modifier: Modifier = Modifier,
-    align: TextAlign = TextAlign.Right,
+    align: TextAlign = if (Lang.isAr) TextAlign.Right else TextAlign.Left,
 ) {
     BasicTextField(
         value = value,
