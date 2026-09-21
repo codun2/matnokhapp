@@ -92,6 +92,11 @@ fun Root() {
             "splash" -> SplashScreen(onStart = { if (Session.isLoggedIn()) { com.matnokh.driver.net.Fcm.registerToken(fcmCtx); goHomeLoaded() } else screen = "login" }, onRegister = { screen = "register" })
             "login" -> LoginScreen(onLoggedIn = { goHomeLoaded(); com.matnokh.driver.net.Fcm.registerToken(fcmCtx) }, onRegister = { screen = "register" }, toast = toast)
             "register" -> RegisterScreen(onDone = { screen = "login" }, onBack = { screen = "login" }, toast = toast)
+            "chat" -> {
+                val nk = DrvNotif.kind; val nid = DrvNotif.orderId
+                if (nid != null) ChatScreen(nk ?: "store", nid, tr("محادثة الزبون", "Customer chat"), { DrvNotif.kind = null; DrvNotif.orderId = null; screen = "home" }, openMenu, toast)
+                else Drv.nowOrders.firstOrNull()?.let { j -> ChatScreen(if (j.isStore) "store" else "transport", j.oid, tr("محادثة ${j.cust}", "${j.cust} chat"), { screen = "active" }, openMenu, toast) } ?: run { screen = "home" }
+            }
             else -> Column(Modifier.fillMaxSize()) {
                 Box(Modifier.weight(1f)) {
                     Refreshable({ when (screen) { "home" -> { repoMe(toast); repoActive(toast); repoDash(toast); if (Drv.available.value) { Drv.received.clear(); repoNearby(toast); repoStoreOrders(toast) } }; "myorders" -> { repoActive(toast); repoPast(toast) }; "earn" -> { repoDash(toast); repoPast(toast) }; "notifications" -> repoMe(toast); else -> {} } }) {
@@ -108,11 +113,6 @@ fun Root() {
                             onStatus = { st -> scope.launch { Drv.nowOrders.firstOrNull()?.let { o -> if (o.isStore) { val mapped = if (st == "loaded") "picked_up" else st; if (repoStoreStatus(o.oid, mapped, toast)) { if (st == "delivered") Drv.activeStep.value = 4 else { val idx = Drv.nowOrders.indexOfFirst { it.oid == o.oid }; if (idx >= 0) Drv.nowOrders[idx] = Drv.nowOrders[idx].copy(status = mapped); Drv.activeStep.value = statusToStep(mapped) } } } else { if (repoStatus(o.oid, st, toast)) { if (st == "delivered") Drv.activeStep.value = 4 else { repoActive(toast) } } } } } },
                             onFinish = { scope.launch { repoNow(toast); repoPast(toast); repoDash(toast) }; screen = "home" }, onExpand = { screen = "routemap" },
                             onChat = { if (Drv.nowOrders.isNotEmpty()) { DrvNotif.kind = null; DrvNotif.orderId = null; screen = "chat" } })
-                        "chat" -> {
-                            val nk = DrvNotif.kind; val nid = DrvNotif.orderId
-                            if (nid != null) ChatScreen(nk ?: "store", nid, tr("محادثة الزبون", "Customer chat"), { DrvNotif.kind = null; DrvNotif.orderId = null; screen = "home" }, openMenu, toast)
-                            else Drv.nowOrders.firstOrNull()?.let { j -> ChatScreen(if (j.isStore) "store" else "transport", j.oid, tr("محادثة ${j.cust}", "${j.cust} chat"), { screen = "active" }, openMenu, toast) } ?: run { screen = "home" }
-                        }
                         "earn" -> EarnScreen({ screen = "home" }, openMenu, toast)
                         "profile" -> ProfileScreen({ screen = "home" }, openMenu, onLogout = { logout() }, toast, onNav = { screen = it })
                         "company" -> CompanyScreen({ screen = "profile" }, openMenu, toast)
