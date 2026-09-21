@@ -95,7 +95,7 @@ fun ChatScreen(kind: String, orderId: Int, title: String, onBack: () -> Unit, on
         }
         if (showReport) ReportDialog(onDismiss = { showReport = false }, onSubmit = { block ->
             showReport = false
-            scope.launch { chatApi({ Net.api.chatReport(kind, orderId, com.matnokh.driver.net.ChatReportBody(block = block)) }, { toast(it) })?.let { toast(it.message ?: tr("تم استلام بلاغك", "Your report was received")) } }
+            scope.launch { call({ Net.api.chatReport(kind, orderId, com.matnokh.driver.net.ChatReportBody(block = block)) }, toast)?.let { r -> toast(r.message ?: tr("تم استلام بلاغك", "Your report was received")) } }
         })
         LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)) {
             item { Spacer(Modifier.height(4.dp)) }
