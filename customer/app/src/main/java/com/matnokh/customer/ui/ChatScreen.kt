@@ -55,9 +55,6 @@ object ChatOpen { @Volatile var key: String? = null }
  * فيتضاعف التعويض. هنا نفحص أولاً هل صُغّرت النافذة فعلاً: إن صُغّرت فالنظام عوّض بالفعل
  * فلا نضيف شيئاً، وإلا نضيف إزاحة الكيبورد (أو شريط التنقّل عند إغلاقه). تعويض واحد فقط دائماً.
  */
-@Composable
-
-
 /** دردشة الزبون (مع المندوب أو المتجر) — مربوطة بالطلب، تحديث كل ٣ ثوانٍ + صور. */
 @Composable
 fun ChatScreen(kind: String, orderId: Int, type: String, title: String, onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit) {
