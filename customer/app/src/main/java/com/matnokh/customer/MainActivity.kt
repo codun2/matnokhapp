@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -91,7 +92,7 @@ fun Root() {
             "login" -> LoginScreen(onLoggedIn = { screen = "home"; Fcm.registerToken(ctx) }, onRegister = { screen = "register" }, toast = toast)
             "register" -> RegisterScreen(onDone = { screen = "home"; Fcm.registerToken(ctx) }, onBack = { screen = "login" }, toast = toast)
             else -> Column(Modifier.fillMaxSize()) {
-                Box(Modifier.weight(1f)) {
+                Box(Modifier.weight(1f).imePadding()) {
                     Refreshable({ RefreshBus.tick++; runCatching { when (screen) { "home", "offersall", "track" -> Repo.loadHome(); else -> {} } } }) {
                     when (screen) {
                         "home" -> HomeScreen(openMenu, onCart, { screen = "stores" }, { screen = "offersall" }, { screen = "nearby" }, { openStore(it) }, { Sel.svc = it; screen = "order" }, { screen = "activeoffers" }, { screen = "notifications" }, onAllServices = { screen = "services" })

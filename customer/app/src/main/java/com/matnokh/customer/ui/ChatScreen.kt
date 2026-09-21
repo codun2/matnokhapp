@@ -51,16 +51,10 @@ object ChatOpen { @Volatile var key: String? = null }
  */
 @Composable
 private fun chatBottomPadding(): androidx.compose.ui.unit.Dp {
-    // شاشة الشات تعيش داخل Box(weight=1f) فوق BottomNav (الذي يطبّق navigationBarsPadding).
-    // إذن شريط النظام محسوب مرة واحدة هناك — نضيف هنا مسافة الكيبورد (IME) فقط، وإلا
-    // يتضاعف inset شريط التنقّل فيظهر فراغ بين مربّع الكتابة وشريط التبويب.
-    val density = androidx.compose.ui.platform.LocalDensity.current
-    val imePx = WindowInsets.ime.getBottom(density)
-    val navPx = WindowInsets.navigationBars.getBottom(density)
-    // عند ظهور الكيبورد نرفع المُدخل فوقه؛ لكن BottomNav أصلاً يزيح فوق شريط النظام،
-    // فنطرح ارتفاع شريط النظام من مسافة الكيبورد حتى لا يُحسب مرتين.
-    val px = (imePx - navPx).coerceAtLeast(0)
-    return with(density) { px.toDp() }
+    // لا حاجة لأي padding سفلي هنا: الجذر يطبّق imePadding مرة واحدة (يرفع فوق الكيبورد)،
+    // وBottomNav يطبّق navigationBarsPadding (يزيح فوق شريط النظام). فالمُدخل يلتصق مباشرة
+    // بشريط التبويب، ويرتفع بسلاسة مع الكيبورد بلا تضاعف أو فراغ.
+    return 0.dp
 }
 
 
