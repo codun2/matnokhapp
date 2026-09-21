@@ -51,27 +51,15 @@ object ChatOpen { @Volatile var key: String? = null }
  */
 @Composable
 private fun chatBottomPadding(): androidx.compose.ui.unit.Dp {
-    val view = androidx.compose.ui.platform.LocalView.current
+    // شاشة الشات تعيش داخل Box(weight=1f) فوق BottomNav (الذي يطبّق navigationBarsPadding).
+    // إذن شريط النظام محسوب مرة واحدة هناك — نضيف هنا مسافة الكيبورد (IME) فقط، وإلا
+    // يتضاعف inset شريط التنقّل فيظهر فراغ بين مربّع الكتابة وشريط التبويب.
     val density = androidx.compose.ui.platform.LocalDensity.current
     val imePx = WindowInsets.ime.getBottom(density)
     val navPx = WindowInsets.navigationBars.getBottom(density)
-    var windowShrunk by remember { mutableStateOf(false) }
-    DisposableEffect(view) {
-        fun screenHeight(): Int = if (android.os.Build.VERSION.SDK_INT >= 30)
-            (view.context.getSystemService(android.view.WindowManager::class.java))?.maximumWindowMetrics?.bounds?.height()
-                ?: view.resources.displayMetrics.heightPixels
-        else view.resources.displayMetrics.heightPixels
-        val listener = android.view.ViewTreeObserver.OnGlobalLayoutListener {
-            if (view.height > 0) {
-                val loc = IntArray(2); view.getLocationOnScreen(loc)
-                windowShrunk = (loc[1] + view.height) < screenHeight() - 1
-            }
-        }
-        view.viewTreeObserver.addOnGlobalLayoutListener(listener)
-        listener.onGlobalLayout()
-        onDispose { runCatching { view.viewTreeObserver.removeOnGlobalLayoutListener(listener) } }
-    }
-    val px = if (windowShrunk) 0 else maxOf(imePx, navPx)
+    // عند ظهور الكيبورد نرفع المُدخل فوقه؛ لكن BottomNav أصلاً يزيح فوق شريط النظام،
+    // فنطرح ارتفاع شريط النظام من مسافة الكيبورد حتى لا يُحسب مرتين.
+    val px = (imePx - navPx).coerceAtLeast(0)
     return with(density) { px.toDp() }
 }
 
