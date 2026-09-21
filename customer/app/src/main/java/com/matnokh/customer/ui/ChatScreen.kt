@@ -1,3 +1,7 @@
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 package com.matnokh.customer.ui
 
 import android.net.Uri
@@ -50,18 +54,23 @@ object ChatOpen { @Volatile var key: String? = null }
  * فلا نضيف شيئاً، وإلا نضيف إزاحة الكيبورد (أو شريط التنقّل عند إغلاقه). تعويض واحد فقط دائماً.
  */
 @Composable
-private fun chatBottomPadding(): androidx.compose.ui.unit.Dp {
-    // لا حاجة لأي padding سفلي هنا: الجذر يطبّق imePadding مرة واحدة (يرفع فوق الكيبورد)،
-    // وBottomNav يطبّق navigationBarsPadding (يزيح فوق شريط النظام). فالمُدخل يلتصق مباشرة
-    // بشريط التبويب، ويرتفع بسلاسة مع الكيبورد بلا تضاعف أو فراغ.
-    return 0.dp
-}
 
 
 /** دردشة الزبون (مع المندوب أو المتجر) — مربوطة بالطلب، تحديث كل ٣ ثوانٍ + صور. */
 @Composable
 fun ChatScreen(kind: String, orderId: Int, type: String, title: String, onBack: () -> Unit, onMenu: () -> Unit, toast: (String) -> Unit) {
     val ctx = LocalContext.current
+    // شاشة الشات: نمنع تصغير النافذة تلقائياً (بعض أجهزة سامسونج تُصغّرها رغم edge-to-edge)
+    // حتى يكون padding الـinset (nav ∪ ime) هو المصدر الوحيد لرفع المُدخل — بلا تضاعف.
+    val chatView = androidx.compose.ui.platform.LocalView.current
+    androidx.compose.runtime.DisposableEffect(Unit) {
+        var c: android.content.Context = chatView.context
+        while (c is android.content.ContextWrapper && c !is android.app.Activity) c = c.baseContext
+        val win = (c as? android.app.Activity)?.window
+        val prev = win?.attributes?.softInputMode
+        win?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
+        onDispose { if (win != null && prev != null) win.setSoftInputMode(prev) }
+    }
     val scope = rememberCoroutineScope()
     val msgs = remember { mutableStateListOf<ChatMsg>() }
     var locked by remember { mutableStateOf(false) }
@@ -110,7 +119,7 @@ fun ChatScreen(kind: String, orderId: Int, type: String, title: String, onBack: 
         }
     }
 
-    Column(Modifier.fillMaxSize().background(C.bg).padding(bottom = chatBottomPadding())) {
+    Column(Modifier.fillMaxSize().background(C.bg).windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime))) {
         ScreenHeader(title, onBack, onMenu) {
             Box(Modifier.size(40.dp).clip(RoundedCornerShape(13.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(13.dp)).clickable { showReport = true }, contentAlignment = Alignment.Center) { T("\uD83D\uDEA9", 16, FontWeight.Bold, C.head) }
         }
