@@ -87,6 +87,7 @@ fun ChatScreen(kind: String, orderId: Int, type: String, title: String, onBack: 
     var sending by remember { mutableStateOf(false) }
     var uploading by remember { mutableStateOf(false) }
     var hint by remember { mutableStateOf<String?>(null) }
+    var showReport by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
 
     suspend fun poll(notify: Boolean = false) {
@@ -128,7 +129,13 @@ fun ChatScreen(kind: String, orderId: Int, type: String, title: String, onBack: 
     }
 
     Column(Modifier.fillMaxSize().background(C.bg).padding(bottom = chatBottomPadding())) {
-        ScreenHeader(title, onBack, onMenu)
+        ScreenHeader(title, onBack, onMenu) {
+            Box(Modifier.size(40.dp).clip(RoundedCornerShape(13.dp)).background(C.card).border(1.dp, C.line, RoundedCornerShape(13.dp)).clickable { showReport = true }, contentAlignment = Alignment.Center) { T("\uD83D\uDEA9", 16, FontWeight.Bold, C.head) }
+        }
+        if (showReport) ReportDialog(onDismiss = { showReport = false }, onSubmit = { block ->
+            showReport = false
+            scope.launch { chatApi({ Net.api.chatReport(kind, orderId, type, com.matnokh.customer.net.ChatReportBody(block = block)) }, toast)?.let { toast(it.message ?: tr("تم استلام بلاغك", "Your report was received")) } }
+        })
         hint?.let { Box(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 6.dp), contentAlignment = Alignment.Center) { T(it, 11, FontWeight.Bold, C.muted) } }
         LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)) {
             item { Spacer(Modifier.height(4.dp)) }
@@ -171,6 +178,23 @@ fun ChatScreen(kind: String, orderId: Int, type: String, title: String, onBack: 
                     Ic(R.drawable.ic_back, 18.dp, Color.White)
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ReportDialog(onDismiss: () -> Unit, onSubmit: (Boolean) -> Unit) {
+    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+        Column(Modifier.clip(RoundedCornerShape(22.dp)).background(C.card).padding(22.dp)) {
+            T(tr("الإبلاغ عن إساءة", "Report abuse"), 16, FontWeight.ExtraBold, C.head)
+            Spacer(Modifier.height(8.dp))
+            T(tr("إذا كان هذا المستخدم يسيء التصرّف، أبلغنا وسنراجع المحادثة. يمكنك أيضاً حظره في هذا الطلب.", "If this user is misbehaving, report them and we'll review the chat. You can also block them for this order."), 12, FontWeight.Medium, C.muted, lineHeight = 18)
+            Spacer(Modifier.height(16.dp))
+            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Color(0xFFF7ECEC)).clickable { onSubmit(true) }.padding(vertical = 13.dp), horizontalArrangement = Arrangement.Center) { T(tr("إبلاغ وحظر", "Report & block"), 13, FontWeight.ExtraBold, C.terraText) }
+            Spacer(Modifier.height(8.dp))
+            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(C.bg).border(1.dp, C.line, RoundedCornerShape(14.dp)).clickable { onSubmit(false) }.padding(vertical = 13.dp), horizontalArrangement = Arrangement.Center) { T(tr("إبلاغ فقط", "Report only"), 13, FontWeight.ExtraBold, C.head) }
+            Spacer(Modifier.height(8.dp))
+            Row(Modifier.fillMaxWidth().clickable(onClick = onDismiss).padding(vertical = 10.dp), horizontalArrangement = Arrangement.Center) { T(tr("إلغاء", "Cancel"), 12, FontWeight.Bold, C.muted) }
         }
     }
 }

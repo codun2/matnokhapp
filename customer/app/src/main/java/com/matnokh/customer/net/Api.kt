@@ -20,6 +20,7 @@ data class IdsResp(val ids: List<Int> = emptyList())
 data class UploadResp(val url: String?)
 data class ChatMsg(val id: Int, val sender: String? = null, val body: String? = null, val image: String? = null, val at: String? = null, val mine: Boolean = false)
 data class ChatResp(val thread_id: Int = 0, val locked: Boolean = false, val messages: List<ChatMsg> = emptyList())
+data class ChatReportBody(val reason: String? = null, val block: Boolean = false)
 data class ChatSendBody(val body: String? = null, val image: String? = null)
 data class ChatSendResp(val id: Int = 0)
 data class ProfileBody(val name: String? = null, val email: String? = null, val avatar: String? = null, val search_radius_km: Double? = null)
@@ -82,6 +83,7 @@ interface CustomerApi {
     @Multipart @POST("customer/uploads") suspend fun upload(@Part file: MultipartBody.Part): UploadResp
     @GET("customer/chat/{kind}/{id}/{type}") suspend fun chatShow(@Path("kind") kind: String, @Path("id") id: Int, @Path("type") type: String, @Query("after") after: Int = 0): ChatResp
     @POST("customer/chat/{kind}/{id}/{type}") suspend fun chatSend(@Path("kind") kind: String, @Path("id") id: Int, @Path("type") type: String, @Body b: ChatSendBody): ChatSendResp
+    @POST("customer/chat/{kind}/{id}/{type}/report") suspend fun chatReport(@Path("kind") kind: String, @Path("id") id: Int, @Path("type") type: String, @Body b: ChatReportBody): com.matnokh.customer.net.MsgResp
     @PATCH("customer/profile") suspend fun updateProfile(@Body b: ProfileBody): AuthResp
     @GET("customer/addresses") suspend fun addresses(): AddressesResp
     @POST("customer/addresses") suspend fun addAddress(@Body b: AddressBody): MsgResp
