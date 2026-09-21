@@ -1,8 +1,10 @@
+package com.matnokh.customer.ui
+
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.windowInsetsPadding
-package com.matnokh.customer.ui
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
