@@ -12,8 +12,8 @@ android {
         applicationId = "com.matnook.driver"
         minSdk = 26
         targetSdk = 36
-        versionCode = 39
-        versionName = "3.5"
+        versionCode = 40
+        versionName = "3.6"
     }
 
     signingConfigs {
